@@ -57,7 +57,7 @@ export class UserController {
         password: USER_DEFAULT_PASSWORD,
         ...(createUserDto.role
           ? { role: createUserDto.role }
-          : { role: Role.USER }),
+          : { role: Role.AGENT }),
       },
       auditContext: {
         actorUserId: request.user.id,

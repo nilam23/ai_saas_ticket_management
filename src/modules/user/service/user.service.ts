@@ -71,7 +71,7 @@ export class UserService {
         action:
           createUserInput.role === Role.ADMIN
             ? AuditLogAction.ADMIN_CREATE
-            : AuditLogAction.USER_CREATE,
+            : AuditLogAction.AGENT_CREATE,
         entityType: AuditLogEntityType.USER,
         entityId: newUser.id,
         afterState: {
