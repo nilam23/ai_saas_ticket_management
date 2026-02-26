@@ -1,0 +1,16 @@
+node_modules
+dist
+coverage
+.env
+.env.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.tsbuildinfo
+.DS_Store
+*.log
+*.sqlite
+prisma/dev.db
+prisma/dev.db-journal
+
