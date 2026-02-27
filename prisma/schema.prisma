@@ -41,6 +41,20 @@ model Tenant {
   @@map("tenants")
 }
 
+model TenantDoc {
+  id          String   @id @default(uuid())
+  tenantId    String
+  uploadedBy  String
+  fileName    String
+  fileKey     String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([uploadedBy])
+  @@map("tenant_docs")
+}
+
 model AuditLog {
   id          String   @id @default(uuid())
   tenantId    String

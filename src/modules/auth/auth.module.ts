@@ -24,7 +24,7 @@ import { AuditModule } from '../audit/audit.module';
       inject: [ConfigService],
     }),
     forwardRef(() => UserModule),
-    TenantsModule,
+    forwardRef(() => TenantsModule),
     AuditModule,
   ],
   controllers: [AuthController],

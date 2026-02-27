@@ -6,4 +6,8 @@ export type EnvVariablesType = {
   [EnvConfigEnum.JWT_SECRET]: string;
   [EnvConfigEnum.DATABASE_URL]: string;
   [EnvConfigEnum.USER_DEFAULT_PASSWORD]: string;
+  [EnvConfigEnum.AWS_ACCESS_KEY]: string;
+  [EnvConfigEnum.AWS_SECRET_KEY]: string;
+  [EnvConfigEnum.AWS_REGION]: string;
+  [EnvConfigEnum.AWS_S3_BUCKET]: string;
 };

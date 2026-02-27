@@ -3,9 +3,11 @@ export enum AuditLogAction {
   ADMIN_CREATE = 'ADMIN_CREATE',
   AGENT_CREATE = 'AGENT_CREATE',
   LOGIN_ATTEMPT = 'LOGIN_ATTEMPT',
+  UPLOAD_DOC = 'UPLOAD_DOC',
 }
 
 export enum AuditLogEntityType {
   TENANT = 'TENANT',
   USER = 'USER',
+  TENANT_DOC = 'TENANT_DOC',
 }

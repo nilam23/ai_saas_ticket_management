@@ -14,3 +14,13 @@ export const JWT_SECRET = configService.get<string>(EnvConfigEnum.JWT_SECRET);
 export const USER_DEFAULT_PASSWORD = configService.get<string>(
   EnvConfigEnum.USER_DEFAULT_PASSWORD,
 );
+export const AWS_ACCESS_KEY = configService.get<string>(
+  EnvConfigEnum.AWS_ACCESS_KEY,
+);
+export const AWS_SECRET_KEY = configService.get<string>(
+  EnvConfigEnum.AWS_SECRET_KEY,
+);
+export const AWS_REGION = configService.get<string>(EnvConfigEnum.AWS_REGION);
+export const AWS_S3_BUCKET = configService.get<string>(
+  EnvConfigEnum.AWS_S3_BUCKET,
+);
