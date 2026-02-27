@@ -16,11 +16,13 @@ export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    this.logger.log('Checking if user has required roles');
     const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
+    this.logger.log(
+      `Checking if user has required roles: ${requiredRoles.join(', ')}`,
+    );
 
     if (!requiredRoles || requiredRoles.length === 0) {
       this.logger.log('No required roles found, allowing access');
@@ -43,7 +45,7 @@ export class RolesGuard implements CanActivate {
     }
 
     this.logger.log(
-      `User ${user.email} has required role ${requiredRoles.join(', ')}, allowing access`,
+      `User ${user.email} has required role ${requiredRoles.join(', ')}. Allowing access`,
     );
     return true;
   }

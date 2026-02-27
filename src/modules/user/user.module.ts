@@ -1,5 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { UserController } from './user.controller';
+import { AdminController } from './admin.controller';
 import { UserService } from './service/user.service';
 import { GetUserDataHandler } from './handlers/get-user-data.handler';
 import { UserRepository } from './repository/user.repository';
@@ -11,7 +12,7 @@ import { AuditModule } from '../audit/audit.module';
 
 @Module({
   imports: [DatabaseModule, forwardRef(() => AuthModule), AuditModule],
-  controllers: [UserController],
+  controllers: [UserController, AdminController],
   providers: [
     UserService,
     UserRepository,
