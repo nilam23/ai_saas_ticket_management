@@ -25,6 +25,10 @@ model User {
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
+  createdTickets  Ticket[]  @relation("TicketCreator")
+  assignedTickets Ticket[]  @relation("TicketAssignee")
+  messages        Message[]
+
   @@unique([tenantId, email])
   @@index([tenantId])
   @@map("users")
@@ -42,13 +46,13 @@ model Tenant {
 }
 
 model TenantDoc {
-  id          String   @id @default(uuid())
-  tenantId    String
-  uploadedBy  String
-  fileName    String
-  fileKey     String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id         String   @id @default(uuid())
+  tenantId   String
+  uploadedBy String
+  fileName   String
+  fileKey    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@index([tenantId])
   @@index([uploadedBy])
@@ -58,7 +62,7 @@ model TenantDoc {
 model AuditLog {
   id          String   @id @default(uuid())
   tenantId    String
-  actorUserId     String
+  actorUserId String
   action      String
   entityType  String
   entityId    String
@@ -70,6 +74,65 @@ model AuditLog {
 
   @@index([tenantId])
   @@index([actorUserId])
-
   @@map("audit_logs")
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model Ticket {
+  id           String         @id @default(uuid())
+  tenantId     String
+  createdById  String
+  assignedToId String?
+  subject      String
+  status       TicketStatus   @default(OPEN)
+  priority     TicketPriority @default(MEDIUM)
+  version      Int            @default(1)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  closedAt     DateTime?
+
+  createdBy  User  @relation("TicketCreator", fields: [createdById], references: [id])
+  assignedTo User? @relation("TicketAssignee", fields: [assignedToId], references: [id])
+
+  messages Message[]
+
+  @@index([tenantId])
+  @@index([status])
+  @@index([assignedToId])
+  @@index([createdById])
+  @@map("tickets")
+}
+
+enum SenderType {
+  CUSTOMER
+  AGENT
+  AI
+}
+
+model Message {
+  id         String     @id @default(uuid())
+  ticketId   String
+  senderId   String?
+  senderType SenderType
+  content    String
+  createdAt  DateTime   @default(now())
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  sender User?  @relation(fields: [senderId], references: [id])
+
+  @@index([ticketId])
+  @@index([senderType])
+  @@map("messages")
 }

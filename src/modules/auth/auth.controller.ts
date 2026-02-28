@@ -16,7 +16,7 @@ import { Tenant } from 'src/shared/decorators/tenant.decorator';
 import { Public } from 'src/shared/decorators/public-route.decorator';
 import type { Request } from 'express';
 import { RegisterCustomerHandler } from './handlers/register-customer.handler';
-import { RegisterCustomerDto } from './dto/customer-register.dto';
+import { RegisterCustomerDto } from './dto/register-customer.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -75,7 +75,7 @@ export class AuthController {
       `Request to register customer: ${registerCustomerDto.email} for the tenant: ${tenantId}`,
     );
     return this.registerCustomerHandler.handle({
-      registerCustomerrInput: { ...registerCustomerDto, tenantId },
+      registerCustomerInput: { ...registerCustomerDto, tenantId },
       auditContext: {
         ipAddress: request.ip,
         userAgent: request.headers['user-agent'],

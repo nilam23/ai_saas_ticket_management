@@ -6,7 +6,6 @@ import {
 import { AuthService } from '../service/auth.service';
 import { normalizeError } from 'src/shared/utils/error.utils';
 import { UserAlreadyExistsException } from 'src/modules/user/exceptions';
-import { TenantAlreadyExistsException } from 'src/modules/tenants/exceptions';
 import { RegisterCustomerApiHandlerEvent } from '../types/api-handler-event.type';
 
 @Injectable()
@@ -23,28 +22,26 @@ export class RegisterCustomerHandler extends BaseHttpHandler<
   public async handle(
     event: RegisterCustomerApiHandlerEvent,
   ): Promise<HttpResponse<void>> {
-    const { registerCustomerrInput, auditContext } = event;
+    const { registerCustomerInput, auditContext } = event;
     try {
       this.logger.log(
-        `Handling request to register customer with email: ${registerCustomerrInput.email} for the tenant: ${registerCustomerrInput.tenantId}`,
+        `Handling request to register customer with email: ${registerCustomerInput.email} for the tenant: ${registerCustomerInput.tenantId}`,
       );
       await this.authService.registerCustomer(
-        registerCustomerrInput,
+        registerCustomerInput,
         auditContext,
       );
       this.logger.log(
-        `Customer registered successfully with email: ${registerCustomerrInput.email} for the tenant: ${registerCustomerrInput.tenantId}`,
+        `Customer registered successfully with email: ${registerCustomerInput.email} for the tenant: ${registerCustomerInput.tenantId}`,
       );
       return this.created();
     } catch (error) {
       const { message } = normalizeError(error);
       this.logger.error(
-        `Error registering customer with email: ${registerCustomerrInput.email} for the tenant: ${registerCustomerrInput.tenantId}. Error: ${message}`,
+        `Error registering customer with email: ${registerCustomerInput.email} for the tenant: ${registerCustomerInput.tenantId}. Error: ${message}`,
       );
 
       if (error instanceof UserAlreadyExistsException) {
-        this.conflict(message);
-      } else if (error instanceof TenantAlreadyExistsException) {
         this.conflict(message);
       }
 

@@ -16,6 +16,6 @@ export type UserSignInApiHandlerEvent = {
 };
 
 export type RegisterCustomerApiHandlerEvent = {
-  registerCustomerrInput: RegisterCustomerInput;
+  registerCustomerInput: RegisterCustomerInput;
   auditContext: AuditContext;
 };

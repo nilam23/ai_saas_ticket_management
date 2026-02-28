@@ -8,6 +8,7 @@ import { DatabaseModule } from './infra/prisma/prisma.module';
 import { TenantGuard } from './shared/guards/tenant.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { AuditModule } from './modules/audit/audit.module';
+import { TicketModule } from './modules/tickets/ticket.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { AuditModule } from './modules/audit/audit.module';
     HealthModule,
     UserModule,
     AuditModule,
+    TicketModule,
   ],
   providers: [
     {

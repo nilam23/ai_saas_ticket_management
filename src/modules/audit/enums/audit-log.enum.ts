@@ -5,10 +5,12 @@ export enum AuditLogAction {
   CUSTOMER_CREATE = 'CUSTOMER_CREATE',
   LOGIN_ATTEMPT = 'LOGIN_ATTEMPT',
   UPLOAD_DOC = 'UPLOAD_DOC',
+  CREATE_TICKET = 'CREATE_TICKET',
 }
 
 export enum AuditLogEntityType {
   TENANT = 'TENANT',
   USER = 'USER',
   TENANT_DOC = 'TENANT_DOC',
+  TICKET = 'TICKET',
 }
