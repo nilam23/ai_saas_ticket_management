@@ -23,7 +23,7 @@ export class GetUserDataHandler extends BaseHttpHandler<
   ): Promise<HttpResponse<GetUserDataOutput>> {
     try {
       this.logger.log(
-        `Handling fetch user data request for user: ${getUserDataInput.email}`,
+        `Handling request to fetch user data for: ${getUserDataInput.email}`,
       );
       const user = await this.userService.getUserData(getUserDataInput);
       this.logger.log(
@@ -41,7 +41,7 @@ export class GetUserDataHandler extends BaseHttpHandler<
     } catch (error) {
       const { message } = normalizeError(error);
       this.logger.error(
-        `Error getting user data for user: ${getUserDataInput.email}: ${message}`,
+        `Error fetching data for the user: ${getUserDataInput.email}. Error: ${message}`,
       );
 
       if (error instanceof UserNotFoundException) {

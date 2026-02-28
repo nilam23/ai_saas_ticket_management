@@ -32,7 +32,7 @@ export class UploadDocHandler extends BaseHttpHandler<
     } catch (error) {
       const { message } = normalizeError(error);
       this.logger.error(
-        `Error uploading doc: ${file.originalname} for the tenant: ${auditContext.tenantId}`,
+        `Error uploading doc: ${file.originalname} for the tenant: ${auditContext.tenantId}. Error: ${message}`,
       );
 
       if (error instanceof S3UploadException) {

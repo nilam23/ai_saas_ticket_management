@@ -13,7 +13,7 @@ export class AuditService {
     createAuditLogInput: CreateAuditLogInput,
   ): Promise<void> {
     this.logger.log(
-      `Creating audit log. Action: ${createAuditLogInput.action}, Entity Type: ${createAuditLogInput.entityType}, Entity ID: ${createAuditLogInput.entityId}`,
+      `Creating audit log. Actor ID: ${createAuditLogInput.actorUserId}, Action: ${createAuditLogInput.action}, Entity Type: ${createAuditLogInput.entityType}, Entity ID: ${createAuditLogInput.entityId}`,
     );
     const auditLog =
       await this.auditRepository.createAuditLog(createAuditLogInput);

@@ -36,7 +36,7 @@ export class RegisterHandler extends BaseHttpHandler<
     } catch (error) {
       const { message } = normalizeError(error);
       this.logger.error(
-        `Error registering user with email: ${registerInput.email} for the tenant: ${registerInput.tenantName}: ${message}`,
+        `Error registering user with email: ${registerInput.email} for the tenant: ${registerInput.tenantName}. Error: ${message}`,
       );
 
       if (error instanceof UserAlreadyExistsException) {

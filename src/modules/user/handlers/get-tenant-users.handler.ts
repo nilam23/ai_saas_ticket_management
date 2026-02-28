@@ -22,18 +22,18 @@ export class GetTenantUsersHandler extends BaseHttpHandler<
   ): Promise<HttpResponse<GetTenantUsersOutput>> {
     try {
       this.logger.log(
-        `Request to get tenant users for tenant: ${getTenantUsersInput.tenantId}`,
+        `Handling request to fetch users for tenant: ${getTenantUsersInput.tenantId}`,
       );
       const users =
         await this.userService.getUsersByTenantId(getTenantUsersInput);
       this.logger.log(
-        `Tenant users fetched successfully for tenant: ${getTenantUsersInput.tenantId}`,
+        `Users fetched successfully for the tenant: ${getTenantUsersInput.tenantId}`,
       );
       return this.ok(users);
     } catch (error) {
       const { message } = normalizeError(error);
       this.logger.error(
-        `Error getting tenant users for tenant: ${getTenantUsersInput.tenantId}: ${message}`,
+        `Error fetching users for the tenant: ${getTenantUsersInput.tenantId}. Error: ${message}`,
       );
       this.handleUnknownError(message);
     }

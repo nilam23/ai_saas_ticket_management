@@ -25,7 +25,7 @@ export class CreateUserHandler extends BaseHttpHandler<
 
     try {
       this.logger.log(
-        `Handling request to create user with email: ${createUserInput.email} for the tenant: ${createUserInput.tenantId}`,
+        `Handling request to create user with email: ${createUserInput.email} for the tenant: ${createUserInput.tenantId} by ${auditContext.actorUserId!}`,
       );
       await this.userService.createUser(createUserInput, auditContext);
       this.logger.log(
@@ -35,7 +35,7 @@ export class CreateUserHandler extends BaseHttpHandler<
     } catch (error) {
       const { message } = normalizeError(error);
       this.logger.error(
-        `Error creating user with email: ${createUserInput.email} for the tenant: ${createUserInput.tenantId}: ${message}`,
+        `Error creating user with email: ${createUserInput.email} for the tenant: ${createUserInput.tenantId} by ${auditContext.actorUserId!}. Error: ${message}`,
       );
 
       if (error instanceof UserAlreadyExistsException) {

@@ -93,7 +93,7 @@ export class UserService {
     getTenantUsersInput: GetTenantUsersInput,
   ): Promise<GetTenantUsersOutput> {
     this.logger.log(
-      `Getting users by tenantId: ${getTenantUsersInput.tenantId}`,
+      `Getting users for the tenant: ${getTenantUsersInput.tenantId}`,
     );
     return this.userRepository.getUsersByTenantId(getTenantUsersInput.tenantId);
   }

@@ -10,13 +10,14 @@ import { GetUserDataOutput } from './types/user.type';
 @Controller('users')
 export class UserController {
   private readonly logger = new Logger(UserController.name);
+
   constructor(private readonly getUserDataHandler: GetUserDataHandler) {}
 
   @Get('me')
   getUserData(
     @Req() request: Request,
   ): Promise<HttpResponse<GetUserDataOutput>> {
-    this.logger.log(`Request to get user data for user: ${request.user.email}`);
+    this.logger.log(`Request to get data for the user: ${request.user.email}`);
     return this.getUserDataHandler.handle({
       email: request.user.email,
       tenantId: request.user.tenantId,

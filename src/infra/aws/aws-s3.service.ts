@@ -53,7 +53,7 @@ export class AwsS3Service {
     } catch (error) {
       const { message } = normalizeError(error);
       this.logger.log(
-        `Upload to S3 failed. Key: ${key}, Bucket: ${this.bucket}, Acl: ${acl}`,
+        `Upload to S3 failed. Key: ${key}, Bucket: ${this.bucket}, Acl: ${acl}, Error: ${message}`,
       );
       throw new S3UploadException(message);
     }

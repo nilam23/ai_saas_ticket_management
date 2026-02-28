@@ -47,6 +47,10 @@ export class AuthService {
       role: Role.ADMIN,
     });
 
+    this.logger.log(
+      `User created successfully with email: ${registerInput.email} for the tenant: ${registerInput.tenantName}`,
+    );
+
     await Promise.all([
       this.auditService.createAuditLog({
         tenantId: newTenant.id,
@@ -79,10 +83,6 @@ export class AuthService {
         userAgent: auditContext.userAgent,
       }),
     ]);
-
-    this.logger.log(
-      `User created successfully with email: ${registerInput.email} for the tenant: ${registerInput.tenantName}`,
-    );
   }
 
   public async loginUser(

@@ -60,7 +60,7 @@ export class AdminController {
     @Req() request: Request,
   ): Promise<HttpResponse<GetTenantUsersOutput>> {
     this.logger.log(
-      `Request to get tenant users for tenant: ${request.user.tenantId}`,
+      `Request to get users for the tenant: ${request.user.tenantId}`,
     );
     return this.getTenantUsersHandler.handle({
       tenantId: request.user.tenantId,

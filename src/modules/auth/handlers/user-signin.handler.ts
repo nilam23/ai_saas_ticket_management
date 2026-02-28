@@ -26,7 +26,7 @@ export class UserSignInHandler extends BaseHttpHandler<
     const { userSignInInput, auditContext } = event;
     try {
       this.logger.log(
-        `Logging in user with email: ${userSignInInput.email} for the tenant: ${userSignInInput.tenantId}`,
+        `Handling request to login user with email: ${userSignInInput.email} for the tenant: ${userSignInInput.tenantId}`,
       );
       const loginData = await this.authService.loginUser(
         userSignInInput,
@@ -39,7 +39,7 @@ export class UserSignInHandler extends BaseHttpHandler<
     } catch (error) {
       const { message } = normalizeError(error);
       this.logger.error(
-        `Error logging in user with email: ${userSignInInput.email} for the tenant: ${userSignInInput.tenantId}: ${message}`,
+        `Error logging in user with email: ${userSignInInput.email} for the tenant: ${userSignInInput.tenantId}. Error: ${message}`,
       );
 
       if (error instanceof UserNotFoundException) {
