@@ -5,12 +5,14 @@ import { PrismaHealthIndicator } from './indicators/prisma.indicator';
 import { Indicators } from './enums/indicator.enum';
 import { Public } from 'src/shared/decorators/public-route.decorator';
 import type { HealthLivenessResponse } from './types/api-response.type';
+import { AwsHealthIndicator } from './indicators/aws.indicator';
 
 @Controller('health')
 export class HealthController {
   constructor(
     private readonly healthService: HealthCheckService,
     private readonly prismaHealthIndicator: PrismaHealthIndicator,
+    private readonly awsHealthIndicator: AwsHealthIndicator,
   ) {}
 
   @Get('readiness')
@@ -18,6 +20,7 @@ export class HealthController {
   async readiness(): Promise<HealthCheckResult> {
     return this.healthService.check([
       () => this.prismaHealthIndicator.isHealthy(Indicators.DATABASE),
+      () => this.awsHealthIndicator.isHealthy(Indicators.AWS),
     ]);
   }
 
