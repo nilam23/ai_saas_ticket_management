@@ -11,6 +11,7 @@ import { JwtApplicationService } from './service/jwt.service';
 import { UserModule } from '../user/user.module';
 import { TenantsModule } from '../tenants/tenants.module';
 import { AuditModule } from '../audit/audit.module';
+import { RegisterCustomerHandler } from './handlers/register-customer.handler';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AuditModule } from '../audit/audit.module';
     AuthService,
     RegisterHandler,
     UserSignInHandler,
+    RegisterCustomerHandler,
     JwtApplicationService,
   ],
   exports: [JwtApplicationService],

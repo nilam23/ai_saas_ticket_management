@@ -15,6 +15,8 @@ import { UserSignInDto } from './dto/user-signin.dto';
 import { Tenant } from 'src/shared/decorators/tenant.decorator';
 import { Public } from 'src/shared/decorators/public-route.decorator';
 import type { Request } from 'express';
+import { RegisterCustomerHandler } from './handlers/register-customer.handler';
+import { RegisterCustomerDto } from './dto/customer-register.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -23,6 +25,7 @@ export class AuthController {
   constructor(
     private readonly registerHandler: RegisterHandler,
     private readonly userSignInHandler: UserSignInHandler,
+    private readonly registerCustomerHandler: RegisterCustomerHandler,
   ) {}
 
   @Post('register')
@@ -55,6 +58,24 @@ export class AuthController {
     );
     return this.userSignInHandler.handle({
       userSignInInput: { ...userSignInDto, tenantId },
+      auditContext: {
+        ipAddress: request.ip,
+        userAgent: request.headers['user-agent'],
+      },
+    });
+  }
+
+  @Post('register-customer')
+  registerCustomer(
+    @Tenant() tenantId: string,
+    @Body() registerCustomerDto: RegisterCustomerDto,
+    @Req() request: Request,
+  ) {
+    this.logger.log(
+      `Request to register customer: ${registerCustomerDto.email} for the tenant: ${tenantId}`,
+    );
+    return this.registerCustomerHandler.handle({
+      registerCustomerrInput: { ...registerCustomerDto, tenantId },
       auditContext: {
         ipAddress: request.ip,
         userAgent: request.headers['user-agent'],

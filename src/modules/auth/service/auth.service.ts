@@ -6,7 +6,11 @@ import { UserService } from 'src/modules/user/service/user.service';
 import { TenantService } from 'src/modules/tenants/service/tenant.service';
 import { Role } from '@prisma/client';
 import { JwtPayload } from 'src/modules/user/types/user.type';
-import { RegisterInput, UserSignInInput } from '../types/auth.type';
+import {
+  RegisterCustomerInput,
+  RegisterInput,
+  UserSignInInput,
+} from '../types/auth.type';
 import { AuditService } from 'src/modules/audit/service/audit.service';
 import {
   AuditLogAction,
@@ -133,5 +137,44 @@ export class AuthService {
     });
 
     return { token };
+  }
+
+  public async registerCustomer(
+    registerCustomerInput: RegisterCustomerInput,
+    auditContext: AuditContext,
+  ) {
+    this.logger.log(
+      `Registering customer with email: ${registerCustomerInput.email} for the tenant: ${registerCustomerInput.tenantId}`,
+    );
+
+    const { name, email, password, tenantId } = registerCustomerInput;
+    const newCustomer = await this.userService.createUser({
+      name,
+      email,
+      password,
+      tenantId,
+      role: Role.CUSTOMER,
+    });
+
+    this.logger.log(
+      `Customer created successfully with email: ${registerCustomerInput.email} for the tenant: ${registerCustomerInput.tenantId}`,
+    );
+
+    await this.auditService.createAuditLog({
+      tenantId: registerCustomerInput.tenantId,
+      actorUserId: newCustomer.id,
+      action: AuditLogAction.CUSTOMER_CREATE,
+      entityType: AuditLogEntityType.USER,
+      entityId: newCustomer.id,
+      afterState: {
+        id: newCustomer.id,
+        email: registerCustomerInput.email,
+        name: registerCustomerInput.name,
+        role: Role.ADMIN,
+        tenantId: registerCustomerInput.tenantId,
+      },
+      ipAddress: auditContext.ipAddress,
+      userAgent: auditContext.userAgent,
+    });
   }
 }

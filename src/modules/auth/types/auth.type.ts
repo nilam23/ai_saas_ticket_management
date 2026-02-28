@@ -13,3 +13,10 @@ export type UserSignInInput = {
   password: string;
   tenantId: string;
 };
+
+export type RegisterCustomerInput = {
+  name: string;
+  email: string;
+  password: string;
+  tenantId: string;
+};
