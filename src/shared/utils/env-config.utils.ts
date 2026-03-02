@@ -24,3 +24,12 @@ export const AWS_REGION = configService.get<string>(EnvConfigEnum.AWS_REGION);
 export const AWS_S3_BUCKET = configService.get<string>(
   EnvConfigEnum.AWS_S3_BUCKET,
 );
+export const KAFKA_CLIENT_ID = configService.get<string>(
+  EnvConfigEnum.KAFKA_CLIENT_ID,
+);
+export const KAFKA_GROUP_ID = configService.get<string>(
+  EnvConfigEnum.KAFKA_GROUP_ID,
+);
+export const KAFKA_BROKER = configService.get<string>(
+  EnvConfigEnum.KAFKA_BROKER,
+);
