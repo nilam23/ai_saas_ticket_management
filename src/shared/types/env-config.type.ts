@@ -10,4 +10,7 @@ export type EnvVariablesType = {
   [EnvConfigEnum.AWS_SECRET_KEY]: string;
   [EnvConfigEnum.AWS_REGION]: string;
   [EnvConfigEnum.AWS_S3_BUCKET]: string;
+  [EnvConfigEnum.KAFKA_CLIENT_ID]: string;
+  [EnvConfigEnum.KAFKA_GROUP_ID]: string;
+  [EnvConfigEnum.KAFKA_BROKER]: string;
 };

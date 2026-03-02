@@ -8,6 +8,9 @@ export enum EnvConfigEnum {
   AWS_SECRET_KEY = 'AWS_SECRET_KEY',
   AWS_REGION = 'AWS_REGION',
   AWS_S3_BUCKET = 'AWS_S3_BUCKET',
+  KAFKA_CLIENT_ID = 'KAFKA_CLIENT_ID',
+  KAFKA_GROUP_ID = 'KAFKA_GROUP_ID',
+  KAFKA_BROKER = 'KAFKA_BROKER',
 }
 
 export enum NodeEnvironmentEnum {
