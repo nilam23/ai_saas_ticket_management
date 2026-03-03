@@ -1,9 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { CreateTicketInput } from '../type/ticket.type';
+import {
+  CreateTicketInput,
+  FindTicketByIdInput,
+  UpdateTicketFilterQuery,
+  UpdateTicketInput,
+  UpdateTicketUpdateQuery,
+} from '../type/ticket.type';
 import { AuditContext } from 'src/modules/audit/types/audit.type';
 import { TicketRepository } from '../repository/ticket.repository';
 import { MessageRepository } from '../repository/message.repository';
-import { SenderType } from '@prisma/client';
+import { SenderType, Ticket } from '@prisma/client';
 import { AuditService } from 'src/modules/audit/service/audit.service';
 import {
   AuditLogAction,
@@ -12,6 +18,7 @@ import {
 import { TicketCreatedEvent } from '../events/ticket-created.event';
 import { KafkaProducer } from 'src/infra/kafka/service/kafka-producer.service';
 import { KafkaTopic } from 'src/infra/kafka/enums/kafka.enums';
+import { TicketNotFoundException } from '../exceptions/ticket-service.exception';
 
 @Injectable()
 export class TicketService {
@@ -68,5 +75,56 @@ export class TicketService {
       `Emitting event. Topic: ${KafkaTopic.EVENT_BUS}, Event: ${event.name}, Event ID: ${event.id}`,
     );
     this.kafkaProducer.emit(KafkaTopic.EVENT_BUS, event);
+  }
+
+  public async findTicketById(
+    findTicketByIdInput: FindTicketByIdInput,
+  ): Promise<Ticket> {
+    this.logger.log(`Fetching ticket with ID: ${findTicketByIdInput.ticketId}`);
+    const ticket =
+      await this.ticketRepository.findTicketById(findTicketByIdInput);
+
+    if (!ticket) {
+      this.logger.error(
+        `Ticket with ID: ${findTicketByIdInput.ticketId} not found`,
+      );
+      throw new TicketNotFoundException(findTicketByIdInput.ticketId);
+    }
+
+    this.logger.log(
+      `Ticket with ID: ${findTicketByIdInput.ticketId} fetched successfully`,
+    );
+    return ticket;
+  }
+
+  public async updateTicket(
+    updateTicketInput: UpdateTicketInput,
+  ): Promise<Ticket> {
+    this.logger.log(`Updating ticket with ID: ${updateTicketInput.ticketId}`);
+
+    const filterQuery: UpdateTicketFilterQuery = {
+      id: updateTicketInput.ticketId,
+      tenantId: updateTicketInput.tenantId,
+    };
+    const updateQuery: UpdateTicketUpdateQuery = {
+      ...(updateTicketInput.status && { status: updateTicketInput.status }),
+      ...(updateTicketInput.assignedToId && {
+        assignedTo: { connect: { id: updateTicketInput.assignedToId } },
+      }),
+      updatedAt: new Date(),
+    };
+
+    this.logger.log(
+      `Data to be udpated for ticket ${updateTicketInput.ticketId}: ${JSON.stringify(updateQuery)}`,
+    );
+
+    const updatedTicket = await this.ticketRepository.updateTicket(
+      filterQuery,
+      updateQuery,
+    );
+
+    this.logger.log(`Ticket with ID: ${updateTicketInput.ticketId} updated`);
+
+    return updatedTicket;
   }
 }
