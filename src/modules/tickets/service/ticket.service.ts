@@ -9,6 +9,9 @@ import {
   AuditLogAction,
   AuditLogEntityType,
 } from 'src/modules/audit/enums/audit-log.enum';
+import { TicketCreatedEvent } from '../events/ticket-created.event';
+import { KafkaProducer } from 'src/infra/kafka/service/kafka-producer.service';
+import { KafkaTopic } from 'src/infra/kafka/enums/kafka.enums';
 
 @Injectable()
 export class TicketService {
@@ -18,6 +21,7 @@ export class TicketService {
     private readonly ticketRepository: TicketRepository,
     private readonly messageRepository: MessageRepository,
     private readonly auditService: AuditService,
+    private readonly kafkaProducer: KafkaProducer,
   ) {}
 
   public async createTicket(
@@ -54,5 +58,15 @@ export class TicketService {
     this.logger.log(
       `Ticket successfully created by ${createTicketInput.createdById}. Ticket ID: ${createdTicket.id}`,
     );
+
+    const event = new TicketCreatedEvent({
+      tenantId: createdTicket.tenantId,
+      ticketId: createdTicket.id,
+      createdBy: createdTicket.createdById,
+    });
+    this.logger.log(
+      `Emitting event. Topic: ${KafkaTopic.EVENT_BUS}, Event: ${event.name}, Event ID: ${event.id}`,
+    );
+    this.kafkaProducer.emit(KafkaTopic.EVENT_BUS, event);
   }
 }

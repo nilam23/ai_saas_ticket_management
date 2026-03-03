@@ -28,7 +28,7 @@ export class CreateTicketHandler extends BaseHttpHandler<
       );
       await this.ticketService.createTicket(createTicketInput, auditContext);
       this.logger.log(
-        `Ticket successfully created by customer: ${auditContext.actorUserId} for the tenant: ${createTicketInput.tenantId}`,
+        `Ticket successfully created by customer: ${createTicketInput.createdById} for the tenant: ${createTicketInput.tenantId}`,
       );
       return this.created();
     } catch (error) {
