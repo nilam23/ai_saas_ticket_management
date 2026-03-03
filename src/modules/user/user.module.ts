@@ -9,9 +9,17 @@ import { AuthModule } from '../auth/auth.module';
 import { CreateUserHandler } from './handlers/create-user.handler';
 import { GetTenantUsersHandler } from './handlers/get-tenant-users.handler';
 import { AuditModule } from '../audit/audit.module';
+import { RoutingModule } from '../ticket-routing/routing.module';
+import { KafkaModule } from 'src/infra/kafka/kafka.module';
 
 @Module({
-  imports: [DatabaseModule, forwardRef(() => AuthModule), AuditModule],
+  imports: [
+    DatabaseModule,
+    forwardRef(() => AuthModule),
+    AuditModule,
+    KafkaModule,
+    RoutingModule,
+  ],
   controllers: [UserController, AdminController],
   providers: [
     UserService,
