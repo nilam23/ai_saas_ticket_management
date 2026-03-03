@@ -25,9 +25,10 @@ model User {
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
-  createdTickets  Ticket[]  @relation("TicketCreator")
-  assignedTickets Ticket[]  @relation("TicketAssignee")
+  createdTickets  Ticket[]       @relation("TicketCreator")
+  assignedTickets Ticket[]       @relation("TicketAssignee")
   messages        Message[]
+  workload        AgentWorkload?
 
   @@unique([tenantId, email])
   @@index([tenantId])
@@ -40,7 +41,8 @@ model Tenant {
   slug      String   @unique
   createdAt DateTime @default(now())
 
-  users User[]
+  users         User[]
+  AgentWorkload AgentWorkload[]
 
   @@map("tenants")
 }
@@ -135,4 +137,18 @@ model Message {
   @@index([ticketId])
   @@index([senderType])
   @@map("messages")
+}
+
+model AgentWorkload {
+  agentId           String   @id
+  tenantId          String
+  activeTicketCount Int      @default(0)
+  updatedAt         DateTime @updatedAt
+
+  agent  User   @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([activeTicketCount])
+  @@map("agent_workload")
 }
