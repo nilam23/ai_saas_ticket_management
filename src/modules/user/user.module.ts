@@ -18,7 +18,7 @@ import { KafkaModule } from 'src/infra/kafka/kafka.module';
     forwardRef(() => AuthModule),
     AuditModule,
     KafkaModule,
-    RoutingModule,
+    forwardRef(() => RoutingModule),
   ],
   controllers: [UserController, AdminController],
   providers: [

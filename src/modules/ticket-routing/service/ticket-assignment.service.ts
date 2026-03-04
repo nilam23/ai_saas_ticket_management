@@ -7,6 +7,13 @@ import {
 } from '../strategies/strategy.interface';
 import { TicketStatus } from '@prisma/client';
 import { AgentWorkloadService } from './agent-workload.service';
+import { AuditService } from 'src/modules/audit/service/audit.service';
+import {
+  AuditLogAction,
+  AuditLogEntityType,
+} from 'src/modules/audit/enums/audit-log.enum';
+import { UserService } from 'src/modules/user/service/user.service';
+import { getTenantSystemUserEmail } from 'src/shared/utils/common.utils';
 
 @Injectable()
 export class TicketAssignmentService {
@@ -17,6 +24,8 @@ export class TicketAssignmentService {
     private readonly agentWorkloadService: AgentWorkloadService,
     @Inject(ASSIGNMENT_STRATEGY)
     private readonly pickAgentStrategy: AssignmentStrategy,
+    private readonly auditService: AuditService,
+    private readonly userService: UserService,
   ) {}
 
   public async assignTicket(
@@ -46,6 +55,10 @@ export class TicketAssignmentService {
       return;
     }
 
+    this.logger.log(
+      `${availableAgents.length} available agents picked for the ticket ${assignTicketInput.ticketId}`,
+    );
+
     const selectedAgentId = this.pickAgentStrategy.select(availableAgents);
 
     if (!selectedAgentId) {
@@ -54,6 +67,15 @@ export class TicketAssignmentService {
       );
       return;
     }
+
+    const systemUser = await this.userService.getUserData({
+      tenantId: assignTicketInput.tenantId,
+      email: getTenantSystemUserEmail(assignTicketInput.tenantId),
+    });
+
+    this.logger.log(
+      `System user fetched for the tenant ${assignTicketInput.tenantId}`,
+    );
 
     await Promise.all([
       this.agentWorkloadService.updateAgentWorkload({
@@ -66,6 +88,14 @@ export class TicketAssignmentService {
         tenantId: assignTicketInput.tenantId,
         assignedToId: selectedAgentId,
         status: TicketStatus.IN_PROGRESS,
+      }),
+      this.auditService.createAuditLog({
+        tenantId: assignTicketInput.tenantId,
+        actorUserId: systemUser.id,
+        action: AuditLogAction.TICKET_ASSIGNED,
+        entityId: assignTicketInput.ticketId,
+        entityType: AuditLogEntityType.TICKET,
+        afterState: { assignedTo: selectedAgentId },
       }),
     ]);
 

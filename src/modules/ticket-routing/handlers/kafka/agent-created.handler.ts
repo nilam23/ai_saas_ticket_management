@@ -18,10 +18,14 @@ export class AgentCreatedEventHandler {
     @Payload() event: EventEnvelope<AgentCreatedEventPayload>,
   ) {
     this.logger.log(
-      `${KafkaEvent.AGENT_CREATED} event consumed. Event ID: ${event.id}, Paylod: ${JSON.stringify(event.payload)}`,
+      `${KafkaEvent.AGENT_CREATED} event with ID ${event.id} consumed. Paylod: ${JSON.stringify(event.payload)}`,
     );
 
     const { agentId, tenantId } = event.payload;
     await this.agentWorkloadService.createAgentWorkload({ agentId, tenantId });
+
+    this.logger.log(
+      `${KafkaEvent.AGENT_CREATED} event with ID ${event.id} processed successfully`,
+    );
   }
 }

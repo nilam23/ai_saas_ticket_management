@@ -11,6 +11,7 @@ enum Role {
   ADMIN
   AGENT
   CUSTOMER
+  SYSTEM
 }
 
 model User {

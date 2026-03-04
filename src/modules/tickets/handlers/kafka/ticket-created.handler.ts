@@ -20,10 +20,14 @@ export class TicketCreatedEventHandler {
     @Payload() event: EventEnvelope<TicketCreatedEventPayload>,
   ) {
     this.logger.log(
-      `${KafkaEvent.TICKET_CREATED} event consumed. Event ID: ${event.id}, Paylod: ${JSON.stringify(event.payload)}`,
+      `${KafkaEvent.TICKET_CREATED} event with ID ${event.id} consumed. Paylod: ${JSON.stringify(event.payload)}`,
     );
 
     const { tenantId, ticketId } = event.payload;
     await this.ticketAssignmentService.assignTicket({ tenantId, ticketId });
+
+    this.logger.log(
+      `${KafkaEvent.TICKET_CREATED} event with ID ${event.id} processed successfully`,
+    );
   }
 }

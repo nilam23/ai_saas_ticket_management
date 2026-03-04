@@ -36,9 +36,6 @@ export class AgentWorkloadService {
     );
     const agents =
       await this.agentWorkloadRepository.pickAgents(pickAgentInput);
-    this.logger.log(
-      `Total ${agents.length} agents picked for tenant ${pickAgentInput.tenantId}`,
-    );
     return agents;
   }
 
