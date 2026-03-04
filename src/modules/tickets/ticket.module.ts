@@ -9,15 +9,20 @@ import { TicketRepository } from './repository/ticket.repository';
 import { PrismaService } from 'src/infra/prisma/prisma.service';
 import { CreateTicketHandler } from './handlers/create-ticket.handler';
 import { MessageRepository } from './repository/message.repository';
+import { KafkaModule } from 'src/infra/kafka/kafka.module';
+import { TicketCreatedEventHandler } from './handlers/kafka/ticket-created.handler';
+import { RoutingModule } from '../ticket-routing/routing.module';
 
 @Module({
   imports: [
     DatabaseModule,
     AuditModule,
+    KafkaModule,
+    forwardRef(() => RoutingModule),
     forwardRef(() => AuthModule),
     forwardRef(() => UserModule),
   ],
-  controllers: [TicketController],
+  controllers: [TicketController, TicketCreatedEventHandler],
   providers: [
     TicketService,
     TicketRepository,

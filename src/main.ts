@@ -10,8 +10,7 @@ import {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  useMicroservice(app);
-  await app.startAllMicroservices();
+  await useMicroservice(app);
   useValidation(app);
   useGlobalApiPrefix(app);
   await useListen(app);

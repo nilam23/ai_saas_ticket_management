@@ -34,7 +34,7 @@ export const useGlobalApiPrefix = (app: INestApplication): void => {
   app.setGlobalPrefix(API_PREFIX);
 };
 
-export const useMicroservice = (app: INestApplication) => {
+export const useMicroservice = async (app: INestApplication) => {
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.KAFKA,
     options: {
@@ -53,4 +53,6 @@ export const useMicroservice = (app: INestApplication) => {
       },
     },
   });
+
+  await app.startAllMicroservices();
 };

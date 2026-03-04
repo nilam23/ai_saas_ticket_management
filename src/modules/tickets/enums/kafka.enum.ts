@@ -1,3 +1,4 @@
 export enum KafkaEvent {
   TICKET_CREATED = 'TICKET_CREATED',
+  AGENT_CREATED = 'AGENT_CREATED',
 }

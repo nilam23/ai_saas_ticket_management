@@ -17,6 +17,8 @@ import {
   AuditLogEntityType,
 } from 'src/modules/audit/enums/audit-log.enum';
 import { AuditContext } from 'src/modules/audit/types/audit.type';
+import { USER_DEFAULT_PASSWORD } from 'src/shared/utils/env-config.utils';
+import { getTenantSystemUserEmail } from 'src/shared/utils/common.utils';
 
 @Injectable()
 export class AuthService {
@@ -43,22 +45,31 @@ export class AuthService {
 
     this.logger.log(`Tenant created successfully. Tenant ID: ${newTenant.id}`);
 
-    const newUser = await this.userService.createUser({
-      name: registerInput.name,
-      email: registerInput.email,
-      password: registerInput.password,
-      tenantId: newTenant.id,
-      role: Role.ADMIN,
-    });
+    const [admin, systemUser] = await Promise.all([
+      this.userService.createUser({
+        name: registerInput.name,
+        email: registerInput.email,
+        password: registerInput.password,
+        tenantId: newTenant.id,
+        role: Role.ADMIN,
+      }),
+      this.userService.createUser({
+        name: 'System',
+        email: getTenantSystemUserEmail(newTenant.id),
+        password: USER_DEFAULT_PASSWORD,
+        tenantId: newTenant.id,
+        role: Role.SYSTEM,
+      }),
+    ]);
 
     this.logger.log(
-      `User created successfully with email: ${registerInput.email} for the tenant: ${registerInput.tenantName}`,
+      `Admin and User created. Tenant: ${registerInput.tenantName}, Admin ID: ${admin.id}, System ID: ${systemUser.id}`,
     );
 
     await Promise.all([
       this.auditService.createAuditLog({
         tenantId: newTenant.id,
-        actorUserId: newUser.id,
+        actorUserId: admin.id,
         action: AuditLogAction.TENANT_CREATE,
         entityType: AuditLogEntityType.TENANT,
         entityId: newTenant.id,
@@ -72,17 +83,21 @@ export class AuthService {
       }),
       this.auditService.createAuditLog({
         tenantId: newTenant.id,
-        actorUserId: newUser.id,
+        actorUserId: admin.id,
         action: AuditLogAction.ADMIN_CREATE,
         entityType: AuditLogEntityType.USER,
-        entityId: newUser.id,
-        afterState: {
-          id: newUser.id,
-          email: registerInput.email,
-          name: registerInput.name,
-          role: Role.ADMIN,
-          tenantId: newTenant.id,
-        },
+        entityId: admin.id,
+        afterState: { id: admin.id, email: registerInput.email },
+        ipAddress: auditContext.ipAddress,
+        userAgent: auditContext.userAgent,
+      }),
+      this.auditService.createAuditLog({
+        tenantId: newTenant.id,
+        actorUserId: systemUser.id,
+        action: AuditLogAction.SYSTEM_CREATE,
+        entityType: AuditLogEntityType.USER,
+        entityId: systemUser.id,
+        afterState: { id: systemUser.id, email: systemUser.email },
         ipAddress: auditContext.ipAddress,
         userAgent: auditContext.userAgent,
       }),

@@ -1,5 +1,5 @@
-export const createSlug = (input: string): string => {
-  return input
+export const createSlug = (input: string): string =>
+  input
     .toLowerCase()
     .trim()
     .normalize('NFKD')
@@ -7,7 +7,6 @@ export const createSlug = (input: string): string => {
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .replace(/^-+|-+$/g, '');
-};
 
 export const formatDateToYMD = (timestamp: number = Date.now()): string => {
   const date = new Date(timestamp);
@@ -18,3 +17,6 @@ export const formatDateToYMD = (timestamp: number = Date.now()): string => {
 
   return `${year}-${month}-${day}`;
 };
+
+export const getTenantSystemUserEmail = (tenantId: string): string =>
+  `system@${tenantId}.internal`;

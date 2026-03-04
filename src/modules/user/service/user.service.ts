@@ -17,6 +17,9 @@ import {
   AuditLogEntityType,
 } from 'src/modules/audit/enums/audit-log.enum';
 import { AuditContext } from 'src/modules/audit/types/audit.type';
+import { KafkaProducer } from 'src/infra/kafka/service/kafka-producer.service';
+import { KafkaTopic } from 'src/infra/kafka/enums/kafka.enums';
+import { AgentCreatedEvent } from '../events/agent-created.event';
 
 @Injectable()
 export class UserService {
@@ -25,6 +28,7 @@ export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly auditService: AuditService,
+    private readonly kafkaProducer: KafkaProducer,
   ) {}
 
   public async getUserData(getUserDataInput: GetUserDataInput): Promise<User> {
@@ -63,6 +67,20 @@ export class UserService {
       `Creating user with email: ${createUserInput.email} for the tenant: ${createUserInput.tenantId}`,
     );
     const newUser = await this.userRepository.createUser(createUserInput);
+
+    if (newUser.role === Role.AGENT) {
+      this.logger.log(
+        `An agent has been created. Agent ID: ${newUser.id}, Tenant ID: ${newUser.tenantId}`,
+      );
+      const event = new AgentCreatedEvent({
+        agentId: newUser.id,
+        tenantId: newUser.tenantId,
+      });
+      this.logger.log(
+        `Emitting event. Topic: ${KafkaTopic.EVENT_BUS}, Event: ${event.name}, Event ID: ${event.id}`,
+      );
+      this.kafkaProducer.emit(KafkaTopic.EVENT_BUS, event);
+    }
 
     if (auditContext) {
       await this.auditService.createAuditLog({
