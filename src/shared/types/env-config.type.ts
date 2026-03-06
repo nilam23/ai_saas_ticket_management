@@ -13,4 +13,6 @@ export type EnvVariablesType = {
   [EnvConfigEnum.KAFKA_CLIENT_ID]: string;
   [EnvConfigEnum.KAFKA_GROUP_ID]: string;
   [EnvConfigEnum.KAFKA_BROKER]: string;
+  [EnvConfigEnum.GEMINI_API_KEY]: string;
+  [EnvConfigEnum.GEMINI_MODEL]: string;
 };

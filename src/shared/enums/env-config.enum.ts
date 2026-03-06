@@ -11,6 +11,8 @@ export enum EnvConfigEnum {
   KAFKA_CLIENT_ID = 'KAFKA_CLIENT_ID',
   KAFKA_GROUP_ID = 'KAFKA_GROUP_ID',
   KAFKA_BROKER = 'KAFKA_BROKER',
+  GEMINI_API_KEY = 'GEMINI_API_KEY',
+  GEMINI_MODEL = 'GEMINI_MODEL',
 }
 
 export enum NodeEnvironmentEnum {

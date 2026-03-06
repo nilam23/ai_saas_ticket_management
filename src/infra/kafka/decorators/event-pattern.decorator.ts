@@ -1,6 +1,5 @@
 import { EventPattern } from '@nestjs/microservices';
-import { KafkaTopic } from '../enums/kafka.enums';
-import { KafkaEvent } from 'src/modules/tickets/enums/kafka.enum';
+import { KafkaEvent, KafkaTopic } from '../enums/kafka.enum';
 
 export function KafkaEventPattern(
   topicName: KafkaTopic,

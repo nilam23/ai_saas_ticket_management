@@ -18,7 +18,7 @@ import {
 } from 'src/modules/audit/enums/audit-log.enum';
 import { AuditContext } from 'src/modules/audit/types/audit.type';
 import { KafkaProducer } from 'src/infra/kafka/service/kafka-producer.service';
-import { KafkaTopic } from 'src/infra/kafka/enums/kafka.enums';
+import { KafkaTopic } from 'src/infra/kafka/enums/kafka.enum';
 import { AgentCreatedEvent } from '../events/agent-created.event';
 
 @Injectable()

@@ -17,7 +17,7 @@ import {
 } from 'src/modules/audit/enums/audit-log.enum';
 import { TicketCreatedEvent } from '../events/ticket-created.event';
 import { KafkaProducer } from 'src/infra/kafka/service/kafka-producer.service';
-import { KafkaTopic } from 'src/infra/kafka/enums/kafka.enums';
+import { KafkaTopic } from 'src/infra/kafka/enums/kafka.enum';
 import { TicketNotFoundException } from '../exceptions/ticket-service.exception';
 
 @Injectable()
@@ -69,6 +69,8 @@ export class TicketService {
     const event = new TicketCreatedEvent({
       tenantId: createdTicket.tenantId,
       ticketId: createdTicket.id,
+      subject: createTicketInput.subject,
+      message: createTicketInput.message,
       createdBy: createdTicket.createdById,
     });
     this.logger.log(

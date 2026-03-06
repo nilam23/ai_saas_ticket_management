@@ -1,10 +1,9 @@
 import { Controller, Logger } from '@nestjs/common';
 import { Payload } from '@nestjs/microservices';
-import { KafkaTopic } from 'src/infra/kafka/enums/kafka.enums';
+import { KafkaEvent, KafkaTopic } from 'src/infra/kafka/enums/kafka.enum';
 import type { EventEnvelope } from 'src/infra/kafka/type/kafka.type';
 import { AgentWorkloadService } from '../../service/agent-workload.service';
 import { AgentCreatedEventPayload } from 'src/modules/user/types/kafka-event.type';
-import { KafkaEvent } from 'src/modules/tickets/enums/kafka.enum';
 import { KafkaEventPattern } from 'src/infra/kafka/decorators/event-pattern.decorator';
 
 @Controller()
