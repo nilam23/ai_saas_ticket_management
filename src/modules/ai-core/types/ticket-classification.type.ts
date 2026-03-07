@@ -6,7 +6,6 @@ export type TicketClassificationInput = {
   ticketId: string;
   subject: string;
   message: string;
-  createdBy: string;
 };
 
 export type TicketClassificationRawResult = {

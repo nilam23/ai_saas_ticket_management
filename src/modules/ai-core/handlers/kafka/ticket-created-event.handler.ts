@@ -37,7 +37,6 @@ export class TicketCreatedEventHandler {
     const ticketClassifiedEvent = new TicketClassifiedEvent({
       ticketId: event.payload.ticketId,
       tenantId: event.payload.tenantId,
-      createdBy: event.payload.createdBy,
       classificationResult,
     });
 

@@ -92,7 +92,7 @@ export class TicketAssignmentService {
       this.auditService.createAuditLog({
         tenantId: assignTicketInput.tenantId,
         actorUserId: systemUser.id,
-        action: AuditLogAction.TICKET_ASSIGNED,
+        action: AuditLogAction.ASSIGN_TICKET,
         entityId: assignTicketInput.ticketId,
         entityType: AuditLogEntityType.TICKET,
         afterState: { assignedTo: selectedAgentId },

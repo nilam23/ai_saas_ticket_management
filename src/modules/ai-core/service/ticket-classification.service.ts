@@ -7,12 +7,23 @@ import {
 } from '../types/ticket-classification.type';
 import { AiProviderService } from './ai-provider.service';
 import { TicketClassificationSchema } from '../types/ticket-classification.schema';
+import { AuditService } from 'src/modules/audit/service/audit.service';
+import { UserService } from 'src/modules/user/service/user.service';
+import { getTenantSystemUserEmail } from 'src/shared/utils/common.utils';
+import {
+  AuditLogAction,
+  AuditLogEntityType,
+} from 'src/modules/audit/enums/audit-log.enum';
 
 @Injectable()
 export class TicketClassificationService {
   private readonly logger = new Logger(TicketClassificationService.name);
 
-  constructor(private readonly aiProviderService: AiProviderService) {}
+  constructor(
+    private readonly aiProviderService: AiProviderService,
+    private readonly auditService: AuditService,
+    private readonly userService: UserService,
+  ) {}
 
   public async classifyTicket(
     classificationInput: TicketClassificationInput,
@@ -38,6 +49,24 @@ export class TicketClassificationService {
     this.logger.log(
       `Classification generated for the ticket ${ticketId}. Result: ${JSON.stringify(validation.data)}`,
     );
+
+    const systemUser = await this.userService.getUserData({
+      tenantId: classificationInput.tenantId,
+      email: getTenantSystemUserEmail(classificationInput.tenantId),
+    });
+
+    this.logger.log(
+      `System user fetched for the tenant ${classificationInput.tenantId}`,
+    );
+
+    await this.auditService.createAuditLog({
+      tenantId: classificationInput.tenantId,
+      actorUserId: systemUser.id,
+      action: AuditLogAction.CLASSIFY_TICKET,
+      entityType: AuditLogEntityType.TICKET,
+      entityId: classificationInput.ticketId,
+      afterState: { ...validation.data },
+    });
 
     return validation.data;
   }

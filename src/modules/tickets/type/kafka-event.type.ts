@@ -3,5 +3,4 @@ export type TicketCreatedEventPayload = {
   ticketId: string;
   subject: string;
   message: string;
-  createdBy: string;
 };

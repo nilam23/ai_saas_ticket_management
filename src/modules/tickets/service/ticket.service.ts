@@ -71,7 +71,6 @@ export class TicketService {
       ticketId: createdTicket.id,
       subject: createTicketInput.subject,
       message: createTicketInput.message,
-      createdBy: createdTicket.createdById,
     });
     this.logger.log(
       `Emitting event. Topic: ${KafkaTopic.EVENT_BUS}, Event: ${event.name}, Event ID: ${event.id}`,
