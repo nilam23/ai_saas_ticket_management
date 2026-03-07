@@ -1,3 +1,6 @@
+import z from 'zod';
+import { TicketClassificationSchema } from './ticket-classification.schema';
+
 export type TicketClassificationInput = {
   tenantId: string;
   ticketId: string;
@@ -6,9 +9,13 @@ export type TicketClassificationInput = {
   createdBy: string;
 };
 
-export type TicketClassificationResult = {
-  category: string;
-  priority: string;
-  sentiment: string;
-  confidence: number;
+export type TicketClassificationRawResult = {
+  category?: string;
+  priority?: string;
+  sentiment?: string;
+  confidence?: number;
 };
+
+export type TicketClassificationResult = z.infer<
+  typeof TicketClassificationSchema
+>;

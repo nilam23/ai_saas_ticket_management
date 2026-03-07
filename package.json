@@ -27,7 +27,6 @@
     "@aws-sdk/client-s3": "^3.999.0",
     "@aws-sdk/client-sts": "^3.1000.0",
     "@aws-sdk/s3-request-presigner": "^3.999.0",
-    "@google/genai": "^1.44.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.3",
     "@nestjs/core": "^11.0.1",
@@ -37,12 +36,14 @@
     "@nestjs/terminus": "^11.1.0",
     "@paralleldrive/cuid2": "^3.3.0",
     "@prisma/client": "^6.7.0",
+    "axios": "^1.13.6",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
     "kafkajs": "^2.2.4",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

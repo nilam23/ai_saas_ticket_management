@@ -15,7 +15,7 @@ export class TicketClassifiedEventHandler {
   ) {}
 
   @KafkaEventPattern(KafkaTopic.EVENT_BUS, KafkaEvent.TICKET_CLASSIFIED)
-  async handleTicketCreated(
+  async handleTicketClassified(
     @Payload() event: EventEnvelope<TicketClassifiedEventPayload>,
   ) {
     this.logger.log(

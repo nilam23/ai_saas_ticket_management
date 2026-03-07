@@ -1,10 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { generateTicketClassificationPrompt } from '../utils/prompt.utils';
 import {
+  TicketClassificationRawResult,
   TicketClassificationInput,
   TicketClassificationResult,
 } from '../types/ticket-classification.type';
 import { AiProviderService } from './ai-provider.service';
+import { TicketClassificationSchema } from '../types/ticket-classification.schema';
 
 @Injectable()
 export class TicketClassificationService {
@@ -20,12 +22,23 @@ export class TicketClassificationService {
     this.logger.log(`Classifying the ticket ${ticketId}`);
 
     const prompt = generateTicketClassificationPrompt(subject, message);
-    const classificationRsult = await this.aiProviderService.generate(prompt);
+    const aiResponse = await this.aiProviderService.generate<string>(prompt, {
+      stop: ['Explanation:', 'Ticket Subject:', 'You are', '\n\n'],
+    });
+    const rawResponse = JSON.parse(aiResponse) as TicketClassificationRawResult;
+    const validation = TicketClassificationSchema.safeParse(rawResponse);
+
+    if (!validation.success) {
+      this.logger.error(
+        `Invalid AI classification. Error: ${validation.error}`,
+      );
+      throw new Error('AI classification validation failed');
+    }
 
     this.logger.log(
-      `Classification generated for the ticket ${ticketId}. Result: ${classificationRsult}`,
+      `Classification generated for the ticket ${ticketId}. Result: ${JSON.stringify(validation.data)}`,
     );
 
-    return JSON.parse(classificationRsult) as TicketClassificationResult;
+    return validation.data;
   }
 }

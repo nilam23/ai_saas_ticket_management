@@ -6,6 +6,7 @@ import { KafkaEventPattern } from 'src/infra/kafka/decorators/event-pattern.deco
 import { TicketCreatedEventPayload } from 'src/modules/tickets/type/kafka-event.type';
 import { KafkaProducer } from 'src/infra/kafka/service/kafka-producer.service';
 import { TicketClassificationService } from '../../service/ticket-classification.service';
+import { TicketClassifiedEvent } from '../../events/ticket-classified.event';
 
 @Controller()
 export class TicketCreatedEventHandler {
@@ -24,10 +25,22 @@ export class TicketCreatedEventHandler {
       `${KafkaEvent.TICKET_CREATED} event with ID ${event.id} consumed. Paylod: ${JSON.stringify(event.payload)}`,
     );
 
-    await this.ticketClassificationService.classifyTicket({ ...event.payload });
+    const classificationResult =
+      await this.ticketClassificationService.classifyTicket({
+        ...event.payload,
+      });
 
     this.logger.log(
       `${KafkaEvent.TICKET_CREATED} event with ID ${event.id} processed successfully`,
     );
+
+    const ticketClassifiedEvent = new TicketClassifiedEvent({
+      ticketId: event.payload.ticketId,
+      tenantId: event.payload.tenantId,
+      createdBy: event.payload.createdBy,
+      classificationResult,
+    });
+
+    this.kafkaProducer.emit(KafkaTopic.EVENT_BUS, ticketClassifiedEvent);
   }
 }

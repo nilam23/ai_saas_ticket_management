@@ -33,9 +33,7 @@ export const KAFKA_GROUP_ID = configService.get<string>(
 export const KAFKA_BROKER = configService.get<string>(
   EnvConfigEnum.KAFKA_BROKER,
 );
-export const GEMINI_API_KEY = configService.get<string>(
-  EnvConfigEnum.GEMINI_API_KEY,
-);
-export const GEMINI_MODEL = configService.get<string>(
-  EnvConfigEnum.GEMINI_MODEL,
+export const OLLAMA_URL = configService.get<string>(EnvConfigEnum.OLLAMA_URL);
+export const OLLAMA_MODEL = configService.get<string>(
+  EnvConfigEnum.OLLAMA_MODEL,
 );

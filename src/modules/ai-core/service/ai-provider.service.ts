@@ -1,41 +1,36 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { GoogleGenAI } from '@google/genai';
+import { invokeAPI } from 'src/shared/utils/axios.utils';
 import {
-  GEMINI_API_KEY,
-  GEMINI_MODEL,
-} from 'src/shared/utils/env-config.utils';
+  OllamaGenerateRequest,
+  OllamaGenerateResponse,
+  OllamaModelOptions,
+} from '../types/ollama.type';
+import { OLLAMA_MODEL, OLLAMA_URL } from 'src/shared/utils/env-config.utils';
 
 @Injectable()
 export class AiProviderService {
   private readonly logger = new Logger(AiProviderService.name);
-  private readonly provider = new GoogleGenAI({
-    apiKey: GEMINI_API_KEY,
-  });
-  private readonly model = GEMINI_MODEL;
 
   constructor() {}
 
-  async generate(prompt: string): Promise<string> {
-    this.logger.log(
-      `AI generation started. Model: ${this.model}, Prompt Length: ${prompt.length}`,
-    );
+  public async generate<T>(
+    prompt: string,
+    options?: OllamaModelOptions,
+  ): Promise<T> {
+    this.logger.log('AI generation started');
 
-    const response = await this.provider.models.generateContent({
-      model: this.model,
-      contents: prompt,
+    const response = await invokeAPI<
+      OllamaGenerateRequest,
+      OllamaGenerateResponse
+    >('POST', OLLAMA_URL, {
+      model: OLLAMA_MODEL,
+      prompt,
+      stream: false,
+      ...(options && { options }),
     });
 
-    if (!response?.text) {
-      this.logger.warn(`AI returned empty text. Model: ${this.model}`);
+    this.logger.log('AI generation completed');
 
-      // to be handled
-      return '';
-    }
-
-    this.logger.log(
-      `AI generation completed. Model: ${this.model}, Output Length: ${response.text.length}`,
-    );
-
-    return response.text;
+    return response.data.response as unknown as T;
   }
 }

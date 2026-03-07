@@ -19,8 +19,9 @@ export const generateTicketClassificationPrompt = (
 
     Sentiment: ${TicketClassificationSentiments.join(', ')}
 
-    Return only valid JSON response.
-    Do not wrap the response in markdown or code blocks.
+    Return ONLY valid JSON.
+    Do NOT wrap the response in markdown.
+    Do NOT include \`\`\` or the word json.
 
     {
       "category": "",
