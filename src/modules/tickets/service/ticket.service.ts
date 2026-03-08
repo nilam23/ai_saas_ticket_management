@@ -118,6 +118,9 @@ export class TicketService {
       ...(updateTicketInput.sentiment && {
         sentiment: updateTicketInput.sentiment,
       }),
+      ...(updateTicketInput.confidence && {
+        aiConfidence: updateTicketInput.confidence,
+      }),
       ...(updateTicketInput.assignedToId && {
         assignedTo: { connect: { id: updateTicketInput.assignedToId } },
       }),

@@ -20,6 +20,7 @@ export type UpdateTicketInput = {
   priority?: TicketPriority;
   category?: string;
   sentiment?: string;
+  confidence?: number;
 };
 
 export type UpdateTicketFilterQuery = {

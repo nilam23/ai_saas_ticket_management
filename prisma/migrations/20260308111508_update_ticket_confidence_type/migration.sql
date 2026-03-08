@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "tickets" ALTER COLUMN "aiConfidence" SET DATA TYPE DOUBLE PRECISION;
