@@ -22,8 +22,12 @@ export class TicketClassifiedEventHandler {
       `${KafkaEvent.TICKET_CLASSIFIED} event with ID ${event.id} consumed. Paylod: ${JSON.stringify(event.payload)}`,
     );
 
-    const { tenantId, ticketId } = event.payload;
-    await this.ticketAssignmentService.assignTicket({ tenantId, ticketId });
+    const { tenantId, ticketId, classificationResult } = event.payload;
+    await this.ticketAssignmentService.assignTicket({
+      tenantId,
+      ticketId,
+      classificationResult,
+    });
 
     this.logger.log(
       `${KafkaEvent.TICKET_CLASSIFIED} event with ID ${event.id} processed successfully`,

@@ -109,6 +109,15 @@ export class TicketService {
     };
     const updateQuery: UpdateTicketUpdateQuery = {
       ...(updateTicketInput.status && { status: updateTicketInput.status }),
+      ...(updateTicketInput.priority && {
+        priority: updateTicketInput.priority,
+      }),
+      ...(updateTicketInput.category && {
+        category: updateTicketInput.category,
+      }),
+      ...(updateTicketInput.sentiment && {
+        sentiment: updateTicketInput.sentiment,
+      }),
       ...(updateTicketInput.assignedToId && {
         assignedTo: { connect: { id: updateTicketInput.assignedToId } },
       }),

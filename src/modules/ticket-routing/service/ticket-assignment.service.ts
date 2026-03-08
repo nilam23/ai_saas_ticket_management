@@ -88,6 +88,9 @@ export class TicketAssignmentService {
         tenantId: assignTicketInput.tenantId,
         assignedToId: selectedAgentId,
         status: TicketStatus.IN_PROGRESS,
+        priority: assignTicketInput.classificationResult.priority,
+        category: assignTicketInput.classificationResult.category,
+        sentiment: assignTicketInput.classificationResult.sentiment,
       }),
       this.auditService.createAuditLog({
         tenantId: assignTicketInput.tenantId,
