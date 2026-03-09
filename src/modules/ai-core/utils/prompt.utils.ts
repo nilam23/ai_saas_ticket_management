@@ -1,8 +1,5 @@
-import {
-  TicketClassificationCategories,
-  TicketClassificationPriorities,
-  TicketClassificationSentiments,
-} from '../constants/ticket-classification.constant';
+import { TicketPriority } from "@prisma/client";
+import { AllowedTicketCategories, AllowedTicketSentiments } from "src/modules/tickets/enums/ticket.enum";
 
 export const generateTicketClassificationPrompt = (
   subject: string,
@@ -13,11 +10,11 @@ export const generateTicketClassificationPrompt = (
 
     Classify the ticket into:
 
-    Categories: ${TicketClassificationCategories.join(', ')}
+    Categories: ${Object.values(AllowedTicketCategories).join(', ')}
 
-    Priorities: ${TicketClassificationPriorities.join(', ')}
+    Priorities: ${Object.values(TicketPriority).join(', ')}
 
-    Sentiment: ${TicketClassificationSentiments.join(', ')}
+    Sentiment: ${Object.values(AllowedTicketSentiments).join(', ')}
 
     Return ONLY valid JSON.
     Do NOT wrap the response in markdown.
