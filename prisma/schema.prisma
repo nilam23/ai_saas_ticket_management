@@ -7,11 +7,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
+enum UserRole {
   ADMIN
   AGENT
   CUSTOMER
   SYSTEM
+}
+
+enum AgentLevel {
+  JUNIOR
+  MID
+  SENIOR
 }
 
 model User {
@@ -19,7 +25,8 @@ model User {
   email        String
   name         String
   passwordHash String
-  role         Role     @default(AGENT)
+  role         UserRole     @default(AGENT)
+  agentLevel   AgentLevel?
   tenantId     String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -175,9 +182,18 @@ model AgentWorkload {
   @@map("agent_workload")
 }
 
- model AgentSkillMap {
+enum AgentSkill {
+  BUG
+  FEATURE_REQUEST
+  BILLING
+  TECHNICAL
+  SUPPORT
+  GENERAL
+}
+
+model AgentSkillMap {
   agentId    String
-  skill      TicketCategory
+  skill      AgentSkill
   tenantId   String
 
   agent    User @relation(fields: [agentId], references: [id], onDelete: Cascade)

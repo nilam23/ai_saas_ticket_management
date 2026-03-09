@@ -1,4 +1,4 @@
-import { Role } from '@prisma/client';
+import { UserRole } from '@prisma/client';
 import {
   IsEmail,
   IsEnum,
@@ -24,7 +24,7 @@ export class RegisterDto {
   @IsNotEmpty()
   tenantName: string;
 
-  @IsEnum(Role)
+  @IsEnum(UserRole)
   @IsOptional()
-  role?: Role;
+  role?: UserRole;
 }

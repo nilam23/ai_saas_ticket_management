@@ -10,6 +10,8 @@ import { ASSIGNMENT_STRATEGY } from './strategies/strategy.interface';
 import { AuditModule } from '../audit/audit.module';
 import { UserModule } from '../user/user.module';
 import { TicketClassifiedEventHandler } from './handlers/kafka/ticket-classified-event.handler';
+import { AgentSkillMapService } from './service/agent-skill-map.service';
+import { AgentSkillMapRepository } from './repository/agent-skill-map.repository';
 
 @Module({
   imports: [
@@ -27,6 +29,8 @@ import { TicketClassifiedEventHandler } from './handlers/kafka/ticket-classified
     AgentWorkloadService,
     TicketAssignmentService,
     AgentWorkloadRepository,
+    AgentSkillMapService,
+    AgentSkillMapRepository,
   ],
   exports: [
     AgentWorkloadService,

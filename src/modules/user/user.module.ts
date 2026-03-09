@@ -6,11 +6,11 @@ import { GetUserDataHandler } from './handlers/get-user-data.handler';
 import { UserRepository } from './repository/user.repository';
 import { DatabaseModule } from 'src/infra/prisma/prisma.module';
 import { AuthModule } from '../auth/auth.module';
-import { CreateUserHandler } from './handlers/create-user.handler';
 import { GetTenantUsersHandler } from './handlers/get-tenant-users.handler';
 import { AuditModule } from '../audit/audit.module';
 import { RoutingModule } from '../ticket-routing/routing.module';
 import { KafkaModule } from 'src/infra/kafka/kafka.module';
+import { CreateAgentHandler } from './handlers/create-agent.handler';
 
 @Module({
   imports: [
@@ -25,7 +25,7 @@ import { KafkaModule } from 'src/infra/kafka/kafka.module';
     UserService,
     UserRepository,
     GetUserDataHandler,
-    CreateUserHandler,
+    CreateAgentHandler,
     GetTenantUsersHandler,
   ],
   exports: [UserService],
