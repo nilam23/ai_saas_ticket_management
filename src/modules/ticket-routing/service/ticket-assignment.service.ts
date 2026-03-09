@@ -78,17 +78,16 @@ export class TicketAssignmentService {
     );
 
     await Promise.all([
-      this.agentWorkloadService.updateAgentWorkload({
-        agentId: selectedAgentId,
-        tenantId: assignTicketInput.tenantId,
-        delta: 1,
-      }),
       this.ticketService.updateTicket({
         ticketId: assignTicketInput.ticketId,
         tenantId: assignTicketInput.tenantId,
         assignedToId: selectedAgentId,
         status: TicketStatus.IN_PROGRESS,
-        ...assignTicketInput.classificationResult,
+      }),
+      this.agentWorkloadService.updateAgentWorkload({
+        agentId: selectedAgentId,
+        tenantId: assignTicketInput.tenantId,
+        delta: 1,
       }),
       this.auditService.createAuditLog({
         tenantId: assignTicketInput.tenantId,
@@ -96,10 +95,7 @@ export class TicketAssignmentService {
         action: AuditLogAction.ASSIGN_TICKET,
         entityId: assignTicketInput.ticketId,
         entityType: AuditLogEntityType.TICKET,
-        afterState: {
-          assignedTo: selectedAgentId,
-          ...assignTicketInput.classificationResult,
-        },
+        afterState: { assignedTo: selectedAgentId },
       }),
     ]);
 

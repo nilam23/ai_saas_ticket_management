@@ -3,7 +3,6 @@ import { generateTicketClassificationPrompt } from '../utils/prompt.utils';
 import {
   TicketClassificationRawResult,
   TicketClassificationInput,
-  TicketClassificationResult,
 } from '../types/ticket-classification.type';
 import { AiProviderService } from './ai-provider.service';
 import { TicketClassificationSchema } from '../types/ticket-classification.schema';
@@ -14,6 +13,7 @@ import {
   AuditLogAction,
   AuditLogEntityType,
 } from 'src/modules/audit/enums/audit-log.enum';
+import { TicketService } from 'src/modules/tickets/service/ticket.service';
 
 @Injectable()
 export class TicketClassificationService {
@@ -21,13 +21,14 @@ export class TicketClassificationService {
 
   constructor(
     private readonly aiProviderService: AiProviderService,
+    private readonly ticketService: TicketService,
     private readonly auditService: AuditService,
     private readonly userService: UserService,
   ) {}
 
   public async classifyTicket(
     classificationInput: TicketClassificationInput,
-  ): Promise<TicketClassificationResult> {
+  ): Promise<void> {
     const { ticketId, subject, message } = classificationInput;
 
     this.logger.log(`Classifying the ticket ${ticketId}`);
@@ -50,6 +51,12 @@ export class TicketClassificationService {
       `Classification generated for the ticket ${ticketId}. Result: ${JSON.stringify(validation.data)}`,
     );
 
+    await this.ticketService.updateTicket({
+      tenantId: classificationInput.tenantId,
+      ticketId: classificationInput.ticketId,
+      ...validation.data,
+    });
+
     const systemUser = await this.userService.getUserData({
       tenantId: classificationInput.tenantId,
       email: getTenantSystemUserEmail(classificationInput.tenantId),
@@ -67,7 +74,5 @@ export class TicketClassificationService {
       entityId: classificationInput.ticketId,
       afterState: { ...validation.data },
     });
-
-    return validation.data;
   }
 }

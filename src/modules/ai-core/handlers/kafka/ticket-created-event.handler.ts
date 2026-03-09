@@ -25,10 +25,9 @@ export class TicketCreatedEventHandler {
       `${KafkaEvent.TICKET_CREATED} event with ID ${event.id} consumed. Paylod: ${JSON.stringify(event.payload)}`,
     );
 
-    const classificationResult =
-      await this.ticketClassificationService.classifyTicket({
-        ...event.payload,
-      });
+    await this.ticketClassificationService.classifyTicket({
+      ...event.payload,
+    });
 
     this.logger.log(
       `${KafkaEvent.TICKET_CREATED} event with ID ${event.id} processed successfully`,
@@ -37,9 +36,11 @@ export class TicketCreatedEventHandler {
     const ticketClassifiedEvent = new TicketClassifiedEvent({
       ticketId: event.payload.ticketId,
       tenantId: event.payload.tenantId,
-      classificationResult,
     });
 
+    this.logger.log(
+      `Emitting event. Topic: ${KafkaTopic.EVENT_BUS}, Event: ${event.name}, Event ID: ${event.id}`,
+    );
     this.kafkaProducer.emit(KafkaTopic.EVENT_BUS, ticketClassifiedEvent);
   }
 }
