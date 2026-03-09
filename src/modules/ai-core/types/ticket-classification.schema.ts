@@ -1,10 +1,13 @@
-import { TicketPriority } from '@prisma/client';
-import { AllowedTicketCategories, AllowedTicketSentiments } from 'src/modules/tickets/enums/ticket.enum';
+import {
+  TicketCategory,
+  TicketPriority,
+  TicketSentiment,
+} from '@prisma/client';
 import { z } from 'zod';
 
 export const TicketClassificationSchema = z.object({
-  category: z.enum(AllowedTicketCategories),
+  category: z.enum(TicketCategory),
   priority: z.enum(TicketPriority),
-  sentiment: z.enum(AllowedTicketSentiments),
+  sentiment: z.enum(TicketSentiment),
   confidence: z.number().min(0).max(1),
 });

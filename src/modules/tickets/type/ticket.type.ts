@@ -1,4 +1,9 @@
-import { TicketPriority, TicketStatus } from '@prisma/client';
+import {
+  TicketCategory,
+  TicketPriority,
+  TicketSentiment,
+  TicketStatus,
+} from '@prisma/client';
 
 export type CreateTicketInput = {
   subject: string;
@@ -18,8 +23,8 @@ export type UpdateTicketInput = {
   assignedToId?: string;
   status?: TicketStatus;
   priority?: TicketPriority;
-  category?: string;
-  sentiment?: string;
+  category?: TicketCategory;
+  sentiment?: TicketSentiment;
   confidence?: number;
 };
 
@@ -30,9 +35,9 @@ export type UpdateTicketFilterQuery = {
 
 export type UpdateTicketUpdateQuery = {
   status?: TicketStatus;
-  assignedTo?: object;
   priority?: TicketPriority;
-  category?: string;
-  sentiment?: string;
+  category?: TicketCategory;
+  sentiment?: TicketSentiment;
+  assignedTo?: { connect: { id: string } };
   updatedAt: Date;
 };

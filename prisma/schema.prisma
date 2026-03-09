@@ -30,6 +30,7 @@ model User {
   assignedTickets Ticket[]       @relation("TicketAssignee")
   messages        Message[]
   workload        AgentWorkload?
+  skills          AgentSkillMap[]
 
   @@unique([tenantId, email])
   @@index([tenantId])
@@ -44,6 +45,7 @@ model Tenant {
 
   users         User[]
   AgentWorkload AgentWorkload[]
+  AgentSkillMap AgentSkillMap[]
 
   @@map("tenants")
 }
@@ -87,6 +89,22 @@ enum TicketStatus {
   CLOSED
 }
 
+enum TicketCategory {
+  BUG
+  FEATURE_REQUEST
+  BILLING
+  TECHNICAL
+  SUPPORT
+  GENERAL
+}
+
+enum TicketSentiment {
+  POSITIVE
+  NEUTRAL
+  NEGATIVE
+  FRUSTRATED
+}
+
 enum TicketPriority {
   LOW
   MEDIUM
@@ -101,8 +119,8 @@ model Ticket {
   subject      String
   status       TicketStatus   @default(OPEN)
   priority     TicketPriority @default(MEDIUM)
-  category     String?
-  sentiment    String?
+  category     TicketCategory?
+  sentiment    TicketSentiment?
   aiConfidence Float?
   version      Int            @default(1)
   createdAt    DateTime       @default(now())
@@ -155,4 +173,19 @@ model AgentWorkload {
   @@index([tenantId])
   @@index([activeTicketCount])
   @@map("agent_workload")
+}
+
+ model AgentSkillMap {
+  agentId    String
+  skill      TicketCategory
+  tenantId   String
+
+  agent    User @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@id([agentId, skill])
+  @@index([agentId])
+  @@index([tenantId])
+  @@index([skill])
+  @@map("agent_skill_map")
 }
