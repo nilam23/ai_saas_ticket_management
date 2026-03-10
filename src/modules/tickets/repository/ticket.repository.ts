@@ -6,7 +6,7 @@ import {
   FindTicketByIdInput,
   UpdateTicketFilterQuery,
   UpdateTicketUpdateQuery,
-} from '../type/ticket.type';
+} from '../types/ticket.type';
 
 @Injectable()
 export class TicketRepository {

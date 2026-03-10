@@ -4,7 +4,7 @@ import {
   HttpResponse,
 } from '../../../shared/handlers/base-http.handler';
 import { normalizeError } from 'src/shared/utils/error.utils';
-import { CreateTicketApiHandlerEvent } from '../type/api-handler-event.type';
+import { CreateTicketApiHandlerEvent } from '../types/api-handler-event.type';
 import { TicketService } from '../service/ticket.service';
 
 @Injectable()
