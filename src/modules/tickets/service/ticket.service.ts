@@ -5,7 +5,7 @@ import {
   UpdateTicketFilterQuery,
   UpdateTicketInput,
   UpdateTicketUpdateQuery,
-} from '../type/ticket.type';
+} from '../types/ticket.type';
 import { AuditContext } from 'src/modules/audit/types/audit.type';
 import { TicketRepository } from '../repository/ticket.repository';
 import { MessageRepository } from '../repository/message.repository';

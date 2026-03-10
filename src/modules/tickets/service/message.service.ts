@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MessageRepository } from '../repository/message.repository';
-import { CreateMessageInput } from '../type/message.type';
+import { CreateMessageInput } from '../types/message.type';
 
 @Injectable()
 export class MessageService {

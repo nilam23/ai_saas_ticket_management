@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { generateTicketClassificationPrompt } from '../utils/prompt.utils';
+import { generateTicketClassificationPrompt } from '../../ai-core/utils/prompt.utils';
 import {
   TicketClassificationRawResult,
   TicketClassificationInput,
 } from '../types/ticket-classification.type';
-import { AiProviderService } from './ai-provider.service';
+import { AiProviderService } from '../../ai-core/service/ai-provider.service';
 import { TicketClassificationSchema } from '../types/ticket-classification.schema';
 import { AuditService } from 'src/modules/audit/service/audit.service';
 import { UserService } from 'src/modules/user/service/user.service';
