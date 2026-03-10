@@ -20,6 +20,7 @@ import { AgentRoutingRepository } from '../repository/agent-routing.repository';
 @Injectable()
 export class TicketAssignmentService {
   private readonly logger = new Logger(TicketAssignmentService.name);
+  private readonly AI_CONFIDENCE_THRESHOLD = 0.7;
 
   constructor(
     private readonly ticketService: TicketService,
@@ -44,7 +45,7 @@ export class TicketAssignmentService {
     assignTicketInput: AssignTicketInput,
   ): Promise<void> {
     this.logger.log(
-      `Assigning the ticket ${assignTicketInput.ticketId} to an agent`,
+      `Handling assignment of the ticket ${assignTicketInput.ticketId} to an agent for the tenant ${assignTicketInput.tenantId}`,
     );
 
     const ticket = await this.ticketService.findTicketById(assignTicketInput);
@@ -59,10 +60,19 @@ export class TicketAssignmentService {
     this.logger.log(
       `Picking the best agent for the ticket ${assignTicketInput.ticketId}`,
     );
+
+    const requiredLevel = this.getRequiredAgentLevel(ticket.priority);
+    const requiredSkill =
+      ticket.category &&
+      ticket.aiConfidence !== null &&
+      ticket.aiConfidence > this.AI_CONFIDENCE_THRESHOLD
+        ? (ticket.category as AgentSkill)
+        : AgentSkill.GENERAL;
+
     const pickedAgentResult = await this.agentRoutingRepository.pickAgent({
       tenantId: assignTicketInput.tenantId,
-      skill: AgentSkill[ticket.category!],
-      requiredLevel: this.getRequiredAgentLevel(ticket.priority),
+      skill: requiredSkill,
+      level: requiredLevel,
     });
 
     if (!pickedAgentResult) {
@@ -108,7 +118,7 @@ export class TicketAssignmentService {
     ]);
 
     this.logger.log(
-      `Ticket ${assignTicketInput.ticketId} has been assigned to the agent ${pickedAgentResult.agentId}`,
+      `Ticket ${assignTicketInput.ticketId} has been assigned to the agent ${pickedAgentResult.agentId} for the tenant ${assignTicketInput.tenantId}`,
     );
   }
 }

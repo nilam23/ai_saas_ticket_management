@@ -20,7 +20,7 @@ export class AgentRoutingRepository {
       WHERE
         u."tenantId" = ${pickAgentQueryInput.tenantId}
         AND s."skill" = ${pickAgentQueryInput.skill}::"AgentSkill"
-        AND u."agentLevel" >= ${pickAgentQueryInput.requiredLevel}::"AgentLevel"
+        AND u."agentLevel" >= ${pickAgentQueryInput.level}::"AgentLevel"
       ORDER BY w."activeTicketCount" ASC
       LIMIT 1
       FOR UPDATE SKIP LOCKED
