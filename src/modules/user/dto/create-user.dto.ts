@@ -1,13 +1,7 @@
-import { Role } from '@prisma/client';
-import {
-  IsEmail,
-  IsEnum,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { AgentLevel, AgentSkill } from '@prisma/client';
+import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
-export class CreateUserDto {
+export class CreateAgentDto {
   @IsString()
   @IsNotEmpty()
   name: string;
@@ -16,7 +10,11 @@ export class CreateUserDto {
   @IsNotEmpty()
   email: string;
 
-  @IsEnum(Role)
-  @IsOptional()
-  role?: Role;
+  @IsEnum(AgentLevel)
+  @IsNotEmpty()
+  level: AgentLevel;
+
+  @IsEnum(AgentSkill, { each: true })
+  @IsNotEmpty()
+  skills: AgentSkill[];
 }

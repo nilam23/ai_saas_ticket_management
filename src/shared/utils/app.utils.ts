@@ -47,9 +47,9 @@ export const useMicroservice = async (app: INestApplication) => {
       },
       consumer: {
         groupId: KAFKA_GROUP_ID,
-        sessionTimeout: 6000,
+        sessionTimeout: 30000,
         rebalanceTimeout: 6000,
-        heartbeatInterval: 2000,
+        heartbeatInterval: 3000,
       },
     },
   });

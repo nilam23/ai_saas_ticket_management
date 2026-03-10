@@ -4,7 +4,7 @@ import { comparePassword } from 'src/modules/auth/utils/password.utils';
 import { JwtApplicationService } from './jwt.service';
 import { UserService } from 'src/modules/user/service/user.service';
 import { TenantService } from 'src/modules/tenants/service/tenant.service';
-import { Role } from '@prisma/client';
+import { UserRole } from '@prisma/client';
 import { JwtPayload } from 'src/modules/user/types/user.type';
 import {
   RegisterCustomerInput,
@@ -51,14 +51,14 @@ export class AuthService {
         email: registerInput.email,
         password: registerInput.password,
         tenantId: newTenant.id,
-        role: Role.ADMIN,
+        role: UserRole.ADMIN,
       }),
       this.userService.createUser({
         name: 'System',
         email: getTenantSystemUserEmail(newTenant.id),
         password: USER_DEFAULT_PASSWORD,
         tenantId: newTenant.id,
-        role: Role.SYSTEM,
+        role: UserRole.SYSTEM,
       }),
     ]);
 
@@ -168,7 +168,7 @@ export class AuthService {
       email,
       password,
       tenantId,
-      role: Role.CUSTOMER,
+      role: UserRole.CUSTOMER,
     });
 
     this.logger.log(
@@ -185,7 +185,7 @@ export class AuthService {
         id: newCustomer.id,
         email: registerCustomerInput.email,
         name: registerCustomerInput.name,
-        role: Role.ADMIN,
+        role: UserRole.ADMIN,
         tenantId: registerCustomerInput.tenantId,
       },
       ipAddress: auditContext.ipAddress,

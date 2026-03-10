@@ -1,4 +1,4 @@
-import { Role, User } from '@prisma/client';
+import { UserRole, User, AgentLevel, AgentSkill } from '@prisma/client';
 
 export type GetUserDataInput = {
   email: string;
@@ -12,7 +12,9 @@ export type CreateUserInput = {
   email: string;
   password: string;
   tenantId: string;
-  role?: Role;
+  role?: UserRole;
+  agentLevel?: AgentLevel;
+  agentSkills?: AgentSkill[];
 };
 
 export type GetTenantUsersInput = {
@@ -23,10 +25,10 @@ export type GetTenantUsersOutput = Omit<User, 'passwordHash' | 'tenantId'>[];
 
 export type JwtPayload = Omit<
   User,
-  'name' | 'passwordHash' | 'createdAt' | 'updatedAt'
+  'name' | 'passwordHash' | 'agentLevel' | 'createdAt' | 'updatedAt'
 >;
 
 export type UserInfoInRequest = Omit<
   User,
-  'passwordHash' | 'createdAt' | 'updatedAt'
+  'passwordHash' | 'agentLevel' | 'createdAt' | 'updatedAt'
 >;

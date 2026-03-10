@@ -41,6 +41,7 @@ export class UserRepository {
         },
       },
       ...(createUserInput.role && { role: createUserInput.role }),
+      agentLevel: createUserInput.agentLevel,
     };
 
     return this.prisma.user.create({
@@ -60,6 +61,7 @@ export class UserRepository {
         email: true,
         name: true,
         role: true,
+        agentLevel: true,
         createdAt: true,
         updatedAt: true,
       },

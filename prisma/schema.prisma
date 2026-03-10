@@ -7,11 +7,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
+enum UserRole {
   ADMIN
   AGENT
   CUSTOMER
   SYSTEM
+}
+
+enum AgentLevel {
+  JUNIOR
+  MID
+  SENIOR
 }
 
 model User {
@@ -19,7 +25,8 @@ model User {
   email        String
   name         String
   passwordHash String
-  role         Role     @default(AGENT)
+  role         UserRole     @default(AGENT)
+  agentLevel   AgentLevel?
   tenantId     String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -30,6 +37,7 @@ model User {
   assignedTickets Ticket[]       @relation("TicketAssignee")
   messages        Message[]
   workload        AgentWorkload?
+  skills          AgentSkillMap[]
 
   @@unique([tenantId, email])
   @@index([tenantId])
@@ -44,6 +52,7 @@ model Tenant {
 
   users         User[]
   AgentWorkload AgentWorkload[]
+  AgentSkillMap AgentSkillMap[]
 
   @@map("tenants")
 }
@@ -87,6 +96,22 @@ enum TicketStatus {
   CLOSED
 }
 
+enum TicketCategory {
+  BUG
+  FEATURE_REQUEST
+  BILLING
+  TECHNICAL
+  SUPPORT
+  GENERAL
+}
+
+enum TicketSentiment {
+  POSITIVE
+  NEUTRAL
+  NEGATIVE
+  FRUSTRATED
+}
+
 enum TicketPriority {
   LOW
   MEDIUM
@@ -101,6 +126,9 @@ model Ticket {
   subject      String
   status       TicketStatus   @default(OPEN)
   priority     TicketPriority @default(MEDIUM)
+  category     TicketCategory?
+  sentiment    TicketSentiment?
+  aiConfidence Float?
   version      Int            @default(1)
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
@@ -152,4 +180,28 @@ model AgentWorkload {
   @@index([tenantId])
   @@index([activeTicketCount])
   @@map("agent_workload")
+}
+
+enum AgentSkill {
+  BUG
+  FEATURE_REQUEST
+  BILLING
+  TECHNICAL
+  SUPPORT
+  GENERAL
+}
+
+model AgentSkillMap {
+  agentId    String
+  skill      AgentSkill
+  tenantId   String
+
+  agent    User @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@id([agentId, skill])
+  @@index([agentId])
+  @@index([tenantId])
+  @@index([skill])
+  @@map("agent_skill_map")
 }

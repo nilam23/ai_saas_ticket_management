@@ -1,11 +1,11 @@
-import { Role } from '@prisma/client';
+import { UserRole } from '@prisma/client';
 
 export type RegisterInput = {
   name: string;
   email: string;
   password: string;
   tenantName: string;
-  role?: Role;
+  role?: UserRole;
 };
 
 export type UserSignInInput = {

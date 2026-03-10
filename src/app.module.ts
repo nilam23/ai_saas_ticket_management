@@ -9,6 +9,7 @@ import { TenantGuard } from './shared/guards/tenant.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { AuditModule } from './modules/audit/audit.module';
 import { TicketModule } from './modules/tickets/ticket.module';
+import { AiCoreModule } from './modules/ai-core/ai-core.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { TicketModule } from './modules/tickets/ticket.module';
     UserModule,
     AuditModule,
     TicketModule,
+    AiCoreModule,
   ],
   providers: [
     {

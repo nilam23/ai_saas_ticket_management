@@ -1,11 +1,12 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { AssignTicketInput } from '../types/ticket-assignment.type';
 import { TicketService } from 'src/modules/tickets/service/ticket.service';
 import {
-  ASSIGNMENT_STRATEGY,
-  type AssignmentStrategy,
-} from '../strategies/strategy.interface';
-import { TicketStatus } from '@prisma/client';
+  AgentLevel,
+  AgentSkill,
+  TicketPriority,
+  TicketStatus,
+} from '@prisma/client';
 import { AgentWorkloadService } from './agent-workload.service';
 import { AuditService } from 'src/modules/audit/service/audit.service';
 import {
@@ -14,25 +15,37 @@ import {
 } from 'src/modules/audit/enums/audit-log.enum';
 import { UserService } from 'src/modules/user/service/user.service';
 import { getTenantSystemUserEmail } from 'src/shared/utils/common.utils';
+import { AgentRoutingRepository } from '../repository/agent-routing.repository';
 
 @Injectable()
 export class TicketAssignmentService {
   private readonly logger = new Logger(TicketAssignmentService.name);
+  private readonly AI_CONFIDENCE_THRESHOLD = 0.7;
 
   constructor(
     private readonly ticketService: TicketService,
     private readonly agentWorkloadService: AgentWorkloadService,
-    @Inject(ASSIGNMENT_STRATEGY)
-    private readonly pickAgentStrategy: AssignmentStrategy,
+    private readonly agentRoutingRepository: AgentRoutingRepository,
     private readonly auditService: AuditService,
     private readonly userService: UserService,
   ) {}
+
+  private getRequiredAgentLevel = (priority: TicketPriority) => {
+    switch (priority) {
+      case TicketPriority.HIGH:
+        return AgentLevel.SENIOR;
+      case TicketPriority.MEDIUM:
+        return AgentLevel.MID;
+      default:
+        return AgentLevel.JUNIOR;
+    }
+  };
 
   public async assignTicket(
     assignTicketInput: AssignTicketInput,
   ): Promise<void> {
     this.logger.log(
-      `Assigning the ticket ${assignTicketInput.ticketId} to an agent`,
+      `Handling assignment of the ticket ${assignTicketInput.ticketId} to an agent for the tenant ${assignTicketInput.tenantId}`,
     );
 
     const ticket = await this.ticketService.findTicketById(assignTicketInput);
@@ -44,29 +57,34 @@ export class TicketAssignmentService {
       return;
     }
 
-    const availableAgents = await this.agentWorkloadService.pickAgents({
+    this.logger.log(
+      `Picking the best agent for the ticket ${assignTicketInput.ticketId}`,
+    );
+
+    const requiredLevel = this.getRequiredAgentLevel(ticket.priority);
+    const requiredSkill =
+      ticket.category &&
+      ticket.aiConfidence !== null &&
+      ticket.aiConfidence > this.AI_CONFIDENCE_THRESHOLD
+        ? (ticket.category as AgentSkill)
+        : AgentSkill.GENERAL;
+
+    const pickedAgentResult = await this.agentRoutingRepository.pickAgent({
       tenantId: assignTicketInput.tenantId,
+      skill: requiredSkill,
+      level: requiredLevel,
     });
 
-    if (!availableAgents.length) {
+    if (!pickedAgentResult) {
       this.logger.error(
-        `No available agents found for the ticket ${assignTicketInput.ticketId}`,
+        `No available agent found for the ticket ${assignTicketInput.ticketId}`,
       );
       return;
     }
 
     this.logger.log(
-      `${availableAgents.length} available agents picked for the ticket ${assignTicketInput.ticketId}`,
+      `Agent: ${pickedAgentResult.agentId} picked for the ticket ${assignTicketInput.ticketId}`,
     );
-
-    const selectedAgentId = this.pickAgentStrategy.select(availableAgents);
-
-    if (!selectedAgentId) {
-      this.logger.error(
-        `Agent selection failed for the ticket ${assignTicketInput.ticketId}`,
-      );
-      return;
-    }
 
     const systemUser = await this.userService.getUserData({
       tenantId: assignTicketInput.tenantId,
@@ -78,29 +96,29 @@ export class TicketAssignmentService {
     );
 
     await Promise.all([
-      this.agentWorkloadService.updateAgentWorkload({
-        agentId: selectedAgentId,
-        tenantId: assignTicketInput.tenantId,
-        delta: 1,
-      }),
       this.ticketService.updateTicket({
         ticketId: assignTicketInput.ticketId,
         tenantId: assignTicketInput.tenantId,
-        assignedToId: selectedAgentId,
+        assignedToId: pickedAgentResult.agentId,
         status: TicketStatus.IN_PROGRESS,
+      }),
+      this.agentWorkloadService.updateAgentWorkload({
+        agentId: pickedAgentResult.agentId,
+        tenantId: assignTicketInput.tenantId,
+        delta: 1,
       }),
       this.auditService.createAuditLog({
         tenantId: assignTicketInput.tenantId,
         actorUserId: systemUser.id,
-        action: AuditLogAction.TICKET_ASSIGNED,
+        action: AuditLogAction.ASSIGN_TICKET,
         entityId: assignTicketInput.ticketId,
         entityType: AuditLogEntityType.TICKET,
-        afterState: { assignedTo: selectedAgentId },
+        afterState: { assignedTo: pickedAgentResult.agentId },
       }),
     ]);
 
     this.logger.log(
-      `Ticket ${assignTicketInput.ticketId} has been assigned to the agent ${selectedAgentId}`,
+      `Ticket ${assignTicketInput.ticketId} has been assigned to the agent ${pickedAgentResult.agentId} for the tenant ${assignTicketInput.tenantId}`,
     );
   }
 }

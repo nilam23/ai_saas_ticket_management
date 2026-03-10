@@ -11,6 +11,8 @@ export enum EnvConfigEnum {
   KAFKA_CLIENT_ID = 'KAFKA_CLIENT_ID',
   KAFKA_GROUP_ID = 'KAFKA_GROUP_ID',
   KAFKA_BROKER = 'KAFKA_BROKER',
+  OLLAMA_URL = 'OLLAMA_URL',
+  OLLAMA_MODEL = 'OLLAMA_MODEL',
 }
 
 export enum NodeEnvironmentEnum {

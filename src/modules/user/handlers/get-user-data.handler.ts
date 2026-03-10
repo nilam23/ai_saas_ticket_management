@@ -34,6 +34,7 @@ export class GetUserDataHandler extends BaseHttpHandler<
         email: user.email,
         name: user.name,
         role: user.role,
+        agentLevel: user.agentLevel,
         tenantId: user.tenantId,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,

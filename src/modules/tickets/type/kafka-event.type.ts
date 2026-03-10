@@ -1,5 +1,6 @@
 export type TicketCreatedEventPayload = {
   tenantId: string;
   ticketId: string;
-  createdBy: string;
+  subject: string;
+  message: string;
 };

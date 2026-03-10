@@ -1,6 +1,6 @@
 import { UserRepository } from '../repository/user.repository';
 import { Injectable, Logger } from '@nestjs/common';
-import { Role, User } from '@prisma/client';
+import { UserRole, User } from '@prisma/client';
 import {
   UserAlreadyExistsException,
   UserNotFoundException,
@@ -18,7 +18,7 @@ import {
 } from 'src/modules/audit/enums/audit-log.enum';
 import { AuditContext } from 'src/modules/audit/types/audit.type';
 import { KafkaProducer } from 'src/infra/kafka/service/kafka-producer.service';
-import { KafkaTopic } from 'src/infra/kafka/enums/kafka.enums';
+import { KafkaTopic } from 'src/infra/kafka/enums/kafka.enum';
 import { AgentCreatedEvent } from '../events/agent-created.event';
 
 @Injectable()
@@ -68,13 +68,14 @@ export class UserService {
     );
     const newUser = await this.userRepository.createUser(createUserInput);
 
-    if (newUser.role === Role.AGENT) {
+    if (newUser.role === UserRole.AGENT) {
       this.logger.log(
         `An agent has been created. Agent ID: ${newUser.id}, Tenant ID: ${newUser.tenantId}`,
       );
       const event = new AgentCreatedEvent({
         agentId: newUser.id,
         tenantId: newUser.tenantId,
+        skills: createUserInput.agentSkills!,
       });
       this.logger.log(
         `Emitting event. Topic: ${KafkaTopic.EVENT_BUS}, Event: ${event.name}, Event ID: ${event.id}`,
@@ -87,7 +88,7 @@ export class UserService {
         tenantId: createUserInput.tenantId,
         actorUserId: auditContext.actorUserId!,
         action:
-          createUserInput.role === Role.ADMIN
+          createUserInput.role === UserRole.ADMIN
             ? AuditLogAction.ADMIN_CREATE
             : AuditLogAction.AGENT_CREATE,
         entityType: AuditLogEntityType.USER,
