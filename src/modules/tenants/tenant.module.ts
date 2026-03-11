@@ -11,6 +11,7 @@ import { UploadDocHandler } from './handlers/upload-doc.handler';
 import { AwsModule } from 'src/infra/aws/aws.module';
 import { TenantDocRepository } from './repository/tenant-doc.repository';
 import { TenantDocService } from './service/tenant-doc.service';
+import { KafkaModule } from 'src/infra/kafka/kafka.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { TenantDocService } from './service/tenant-doc.service';
     forwardRef(() => AuthModule),
     forwardRef(() => UserModule),
     AwsModule,
+    KafkaModule,
   ],
   controllers: [TenantController],
   providers: [
@@ -31,4 +33,4 @@ import { TenantDocService } from './service/tenant-doc.service';
   ],
   exports: [TenantService, TenantRepository],
 })
-export class TenantsModule {}
+export class TenantModule {}

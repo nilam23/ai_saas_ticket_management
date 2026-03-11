@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './modules/auth/auth.module';
-import { TenantsModule } from './modules/tenants/tenants.module';
+import { TenantModule } from './modules/tenants/tenant.module';
 import { HealthModule } from './modules/health/health.module';
 import { UserModule } from './modules/user/user.module';
 import { DatabaseModule } from './infra/prisma/prisma.module';
@@ -11,6 +11,7 @@ import { AuditModule } from './modules/audit/audit.module';
 import { TicketModule } from './modules/tickets/ticket.module';
 import { AiCoreModule } from './modules/ai-core/ai-core.module';
 import { ClassificationModule } from './modules/ticket-classification/classification.module';
+import { KnowledgeBaseModule } from './modules/knowledge-base/knowledge-base.module';
 
 @Module({
   imports: [
@@ -20,13 +21,14 @@ import { ClassificationModule } from './modules/ticket-classification/classifica
     }),
     DatabaseModule,
     AuthModule,
-    TenantsModule,
+    TenantModule,
     HealthModule,
     UserModule,
     AuditModule,
     TicketModule,
     AiCoreModule,
     ClassificationModule,
+    KnowledgeBaseModule,
   ],
   providers: [
     {

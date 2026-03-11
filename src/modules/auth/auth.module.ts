@@ -9,7 +9,7 @@ import { UserSignInHandler } from './handlers/user-signin.handler';
 import { EnvConfigEnum } from 'src/shared/enums/env-config.enum';
 import { JwtApplicationService } from './service/jwt.service';
 import { UserModule } from '../user/user.module';
-import { TenantsModule } from '../tenants/tenants.module';
+import { TenantModule } from '../tenants/tenant.module';
 import { AuditModule } from '../audit/audit.module';
 import { RegisterCustomerHandler } from './handlers/register-customer.handler';
 
@@ -25,7 +25,7 @@ import { RegisterCustomerHandler } from './handlers/register-customer.handler';
       inject: [ConfigService],
     }),
     forwardRef(() => UserModule),
-    forwardRef(() => TenantsModule),
+    forwardRef(() => TenantModule),
     AuditModule,
   ],
   controllers: [AuthController],
