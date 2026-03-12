@@ -8,15 +8,18 @@ import { AwsModule } from 'src/infra/aws/aws.module';
 import { KnowledgeIngestionService } from './service/knowledge-ingestion.service';
 import { TextCleanerService } from './service/text-cleaner.service';
 import { TextChunkerService } from './service/text-chunker.service';
+import { AiCoreModule } from '../ai-core/ai-core.module';
+import { EmbeddingsGeneratorService } from './service/embeddings-generator.service';
 
 @Module({
-  imports: [DatabaseModule, AuditModule, KafkaModule, AwsModule],
+  imports: [DatabaseModule, AuditModule, KafkaModule, AwsModule, AiCoreModule],
   controllers: [TenantDocUploadedEventHandler],
   providers: [
     KnowledgeIngestionService,
     DocParserService,
     TextCleanerService,
     TextChunkerService,
+    EmbeddingsGeneratorService,
   ],
 })
 export class KnowledgeBaseModule {}

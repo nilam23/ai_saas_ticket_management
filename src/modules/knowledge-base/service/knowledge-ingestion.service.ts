@@ -4,6 +4,7 @@ import { DocParserService } from './doc-parser.service';
 import { AwsS3Service } from 'src/infra/aws/aws-s3.service';
 import { TextCleanerService } from './text-cleaner.service';
 import { TextChunkerService } from './text-chunker.service';
+import { EmbeddingsGeneratorService } from './embeddings-generator.service';
 
 @Injectable()
 export class KnowledgeIngestionService {
@@ -14,6 +15,7 @@ export class KnowledgeIngestionService {
     private readonly docParserService: DocParserService,
     private readonly textCleanerService: TextCleanerService,
     private readonly textChunkerService: TextChunkerService,
+    private readonly embeddingsGeneratorService: EmbeddingsGeneratorService,
   ) {}
 
   public async ingestDocument(ingestDocInput: IngestDocInput): Promise<void> {
@@ -40,14 +42,20 @@ export class KnowledgeIngestionService {
       text: extractedText,
     });
 
-    const docChunks = this.textChunkerService.chunkText({
+    const chunks = this.textChunkerService.chunkText({
       docId,
       text: cleanedText,
       options: { chunkSize: 500, chunkOverlap: 100 },
     });
 
+    this.logger.log(`Generated ${chunks.length} chunks for document ${docId}`);
+
+    const embeddings = await this.embeddingsGeneratorService.generateEmbeddings(
+      { docId, chunks },
+    );
+
     this.logger.log(
-      `Generated ${docChunks.length} chunks for document ${docId}`,
+      `Generated ${embeddings.length} embeddings for document ${docId}`,
     );
 
     this.logger.log(
