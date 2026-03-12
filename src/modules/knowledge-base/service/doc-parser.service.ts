@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DocParserInput } from '../types/doc-parser.type';
-import { AwsS3Service } from 'src/infra/aws/aws-s3.service';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { TextItem } from 'pdfjs-dist/types/src/display/api';
 
@@ -8,7 +7,7 @@ import { TextItem } from 'pdfjs-dist/types/src/display/api';
 export class DocParserService {
   private readonly logger = new Logger(DocParserService.name);
 
-  constructor(private readonly s3Service: AwsS3Service) {}
+  constructor() {}
 
   private async parseTextFromPdf(
     fileBuffer: Buffer<ArrayBufferLike>,
@@ -27,18 +26,16 @@ export class DocParserService {
       fullText += `\n--- Page ${i} ---\n${pageText}`;
     }
 
-    return fullText;
+    return fullText.replace(/\n+/g, ' ');
   }
 
-  public async extractDocText(docPaserInput: DocParserInput): Promise<void> {
-    this.logger.log(`Handling parsing of the doc ${docPaserInput.docId}`);
+  public async extractDocText(docPaserInput: DocParserInput): Promise<string> {
+    const { docId, fileBuffer } = docPaserInput;
 
-    const fileBuffer = await this.s3Service.getFile(docPaserInput.fileKey);
+    this.logger.log(`Extracting text from the doc ${docId}`);
+    const extractedText = await this.parseTextFromPdf(fileBuffer);
+    this.logger.log(`Text extraction successful for the doc ${docId}`);
 
-    this.logger.log(`Extracting text from the doc ${docPaserInput.docId}`);
-
-    await this.parseTextFromPdf(fileBuffer);
-
-    this.logger.log(`Text extracted from the doc ${docPaserInput.docId}`);
+    return extractedText;
   }
 }
