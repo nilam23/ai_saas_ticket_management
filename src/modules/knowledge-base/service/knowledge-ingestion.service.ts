@@ -5,6 +5,7 @@ import { AwsS3Service } from 'src/infra/aws/aws-s3.service';
 import { TextCleanerService } from './text-cleaner.service';
 import { TextChunkerService } from './text-chunker.service';
 import { EmbeddingsGeneratorService } from './embeddings-generator.service';
+import { KnowledgeChunksRepository } from '../repositories/knowledge-chunk.repository';
 
 @Injectable()
 export class KnowledgeIngestionService {
@@ -16,6 +17,7 @@ export class KnowledgeIngestionService {
     private readonly textCleanerService: TextCleanerService,
     private readonly textChunkerService: TextChunkerService,
     private readonly embeddingsGeneratorService: EmbeddingsGeneratorService,
+    private readonly knowledgeChunksRepository: KnowledgeChunksRepository,
   ) {}
 
   public async ingestDocument(ingestDocInput: IngestDocInput): Promise<void> {
@@ -57,6 +59,22 @@ export class KnowledgeIngestionService {
     this.logger.log(
       `Generated ${embeddings.length} embeddings for document ${docId}`,
     );
+
+    this.logger.log(`Storing embeddings for the doc ${docId}`);
+
+    const knowledgeChunksRecords = chunks.map((chunk, index) => ({
+      tenantId,
+      docId,
+      chunkIndex: index,
+      content: chunk.content,
+      embedding: embeddings[index],
+    }));
+
+    await this.knowledgeChunksRepository.createKnowledgeChunks(
+      knowledgeChunksRecords,
+    );
+
+    this.logger.log(`Embeddings stored successfully for the doc ${docId}`);
 
     this.logger.log(
       `Ingestion completed for the doc ${docId} of the tenant ${tenantId}`,

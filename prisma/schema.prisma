@@ -205,3 +205,17 @@ model AgentSkillMap {
   @@index([skill])
   @@map("agent_skill_map")
 }
+
+model KnowledgeChunk {
+  id          String   @id @default(uuid())
+  tenantId    String
+  documentId  String
+  chunkIndex  Int
+  content     String
+  embedding   Unsupported("vector(768)")
+  createdAt   DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([documentId])
+  @@map("knowledge_chunks")
+}

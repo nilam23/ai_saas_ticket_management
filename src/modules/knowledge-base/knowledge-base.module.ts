@@ -10,6 +10,7 @@ import { TextCleanerService } from './service/text-cleaner.service';
 import { TextChunkerService } from './service/text-chunker.service';
 import { AiCoreModule } from '../ai-core/ai-core.module';
 import { EmbeddingsGeneratorService } from './service/embeddings-generator.service';
+import { KnowledgeChunksRepository } from './repositories/knowledge-chunk.repository';
 
 @Module({
   imports: [DatabaseModule, AuditModule, KafkaModule, AwsModule, AiCoreModule],
@@ -20,6 +21,7 @@ import { EmbeddingsGeneratorService } from './service/embeddings-generator.servi
     TextCleanerService,
     TextChunkerService,
     EmbeddingsGeneratorService,
+    KnowledgeChunksRepository,
   ],
 })
 export class KnowledgeBaseModule {}
