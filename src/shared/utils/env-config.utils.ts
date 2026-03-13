@@ -39,6 +39,9 @@ export const OLLAMA_TEXT_GENERATION_URL = configService.get<string>(
 export const OLLAMA_EMBEDDING_GENERATION_URL = configService.get<string>(
   EnvConfigEnum.OLLAMA_EMBEDDING_GENERATION_URL,
 );
-export const OLLAMA_MODEL = configService.get<string>(
-  EnvConfigEnum.OLLAMA_MODEL,
+export const OLLAMA_TEXT_GENERATION_MODEL = configService.get<string>(
+  EnvConfigEnum.OLLAMA_TEXT_GENERATION_MODEL,
+);
+export const OLLAMA_EMBEDDING_GENERATION_MODEL = configService.get<string>(
+  EnvConfigEnum.OLLAMA_EMBEDDING_GENERATION_MODEL,
 );

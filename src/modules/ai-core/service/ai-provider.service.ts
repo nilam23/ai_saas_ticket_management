@@ -8,8 +8,9 @@ import {
   OllamaModelOptions,
 } from '../types/ollama.type';
 import {
+  OLLAMA_EMBEDDING_GENERATION_MODEL,
   OLLAMA_EMBEDDING_GENERATION_URL,
-  OLLAMA_MODEL,
+  OLLAMA_TEXT_GENERATION_MODEL,
   OLLAMA_TEXT_GENERATION_URL,
 } from 'src/shared/utils/env-config.utils';
 
@@ -29,7 +30,7 @@ export class AiProviderService {
       OllamaGenerateRequest,
       OllamaGenerateResponse
     >('POST', OLLAMA_TEXT_GENERATION_URL, {
-      model: OLLAMA_MODEL,
+      model: OLLAMA_TEXT_GENERATION_MODEL,
       prompt,
       stream: false,
       ...(options && { options }),
@@ -45,7 +46,7 @@ export class AiProviderService {
       OllamaEmbeddingRequest,
       OllamaEmbeddingResponse
     >('POST', OLLAMA_EMBEDDING_GENERATION_URL, {
-      model: OLLAMA_MODEL,
+      model: OLLAMA_EMBEDDING_GENERATION_MODEL,
       prompt: text,
     });
     return response.data.embedding;

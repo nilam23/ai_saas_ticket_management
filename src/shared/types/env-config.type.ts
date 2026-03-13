@@ -15,5 +15,6 @@ export type EnvVariablesType = {
   [EnvConfigEnum.KAFKA_BROKER]: string;
   [EnvConfigEnum.OLLAMA_TEXT_GENERATION_URL]: string;
   [EnvConfigEnum.OLLAMA_EMBEDDING_GENERATION_URL]: string;
-  [EnvConfigEnum.OLLAMA_MODEL]: string;
+  [EnvConfigEnum.OLLAMA_TEXT_GENERATION_MODEL]: string;
+  [EnvConfigEnum.OLLAMA_EMBEDDING_GENERATION_MODEL]: string;
 };
