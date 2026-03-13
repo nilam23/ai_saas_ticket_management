@@ -5,3 +5,9 @@ export type CreateKnowledgeChunksInput = {
   content: string;
   embedding: number[];
 };
+
+export type FetchKnowledgeChunksInput = {
+  tenantId: string;
+  embeddingVector: string;
+  topK: number;
+};

@@ -5,7 +5,7 @@ import { AwsS3Service } from 'src/infra/aws/aws-s3.service';
 import { TextCleanerService } from './text-cleaner.service';
 import { TextChunkerService } from './text-chunker.service';
 import { EmbeddingsGeneratorService } from './embeddings-generator.service';
-import { KnowledgeChunksRepository } from '../repositories/knowledge-chunk.repository';
+import { KnowledgeChunkRepository } from '../repositories/knowledge-chunk.repository';
 
 @Injectable()
 export class KnowledgeIngestionService {
@@ -17,7 +17,7 @@ export class KnowledgeIngestionService {
     private readonly textCleanerService: TextCleanerService,
     private readonly textChunkerService: TextChunkerService,
     private readonly embeddingsGeneratorService: EmbeddingsGeneratorService,
-    private readonly knowledgeChunksRepository: KnowledgeChunksRepository,
+    private readonly knowledgeChunkRepository: KnowledgeChunkRepository,
   ) {}
 
   public async ingestDocument(ingestDocInput: IngestDocInput): Promise<void> {
@@ -70,7 +70,7 @@ export class KnowledgeIngestionService {
       embedding: embeddings[chunk.index],
     }));
 
-    await this.knowledgeChunksRepository.createKnowledgeChunks(
+    await this.knowledgeChunkRepository.createKnowledgeChunks(
       knowledgeChunksRecords,
     );
 

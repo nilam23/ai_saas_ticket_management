@@ -10,18 +10,21 @@ import { TextCleanerService } from './service/text-cleaner.service';
 import { TextChunkerService } from './service/text-chunker.service';
 import { AiCoreModule } from '../ai-core/ai-core.module';
 import { EmbeddingsGeneratorService } from './service/embeddings-generator.service';
-import { KnowledgeChunksRepository } from './repositories/knowledge-chunk.repository';
+import { KnowledgeChunkRepository } from './repositories/knowledge-chunk.repository';
+import { RetrieveContextEventHandler } from './handlers/kafka/retrieve-context.handler';
+import { SemanticSearchService } from './service/semantic-search.service';
 
 @Module({
   imports: [DatabaseModule, AuditModule, KafkaModule, AwsModule, AiCoreModule],
-  controllers: [TenantDocUploadedEventHandler],
+  controllers: [TenantDocUploadedEventHandler, RetrieveContextEventHandler],
   providers: [
     KnowledgeIngestionService,
     DocParserService,
     TextCleanerService,
     TextChunkerService,
     EmbeddingsGeneratorService,
-    KnowledgeChunksRepository,
+    KnowledgeChunkRepository,
+    SemanticSearchService,
   ],
 })
 export class KnowledgeBaseModule {}

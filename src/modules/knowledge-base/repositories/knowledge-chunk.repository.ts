@@ -1,11 +1,13 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { CreateKnowledgeChunksInput } from '../types/knowledge-chunk.type';
+import { Injectable } from '@nestjs/common';
+import {
+  CreateKnowledgeChunksInput,
+  FetchKnowledgeChunksInput,
+} from '../types/knowledge-chunk.type';
 import { PrismaService } from 'src/infra/prisma/prisma.service';
+import { RetrievedContextResult } from '../types/semantic-search.type';
 
 @Injectable()
-export class KnowledgeChunksRepository {
-  private readonly logger = new Logger(KnowledgeChunksRepository.name);
-
+export class KnowledgeChunkRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   public async createKnowledgeChunks(
@@ -29,5 +31,29 @@ export class KnowledgeChunksRepository {
       (id, "tenantId", "documentId", "chunkIndex", content, embedding)
       VALUES ${values};
     `);
+  }
+
+  public async fetchKnowledgeChunks(
+    fetchKnowledgeChunksInput: FetchKnowledgeChunksInput,
+  ): Promise<RetrievedContextResult[]> {
+    const { tenantId, embeddingVector, topK } = fetchKnowledgeChunksInput;
+    const results = await this.prisma.$queryRawUnsafe<RetrievedContextResult[]>(
+      `
+        SELECT
+          id,
+          content,
+          "chunkIndex",
+          "documentId"
+        FROM knowledge_chunks
+        WHERE "tenantId" = $1
+        ORDER BY embedding <=> $2::vector
+        LIMIT $3
+      `,
+      tenantId,
+      embeddingVector,
+      topK,
+    );
+
+    return results;
   }
 }
