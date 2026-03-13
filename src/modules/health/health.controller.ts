@@ -6,6 +6,7 @@ import { Indicators } from './enums/indicator.enum';
 import { Public } from 'src/shared/decorators/public-route.decorator';
 import type { HealthLivenessResponse } from './types/api-response.type';
 import { AwsHealthIndicator } from './indicators/aws.indicator';
+import { KafkaHealthIndicator } from './indicators/kafka.indicator';
 
 @Controller('health')
 export class HealthController {
@@ -15,6 +16,7 @@ export class HealthController {
     private readonly healthService: HealthCheckService,
     private readonly prismaHealthIndicator: PrismaHealthIndicator,
     private readonly awsHealthIndicator: AwsHealthIndicator,
+    private readonly kafkaHealthIndicator: KafkaHealthIndicator,
   ) {}
 
   @Get('readiness')
@@ -24,6 +26,7 @@ export class HealthController {
     return this.healthService.check([
       () => this.prismaHealthIndicator.isHealthy(Indicators.DATABASE),
       () => this.awsHealthIndicator.isHealthy(Indicators.AWS),
+      () => this.kafkaHealthIndicator.isHealthy(Indicators.KAFKA),
     ]);
   }
 
