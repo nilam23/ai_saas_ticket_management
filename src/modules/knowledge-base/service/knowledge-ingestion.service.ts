@@ -62,12 +62,12 @@ export class KnowledgeIngestionService {
 
     this.logger.log(`Storing embeddings for the doc ${docId}`);
 
-    const knowledgeChunksRecords = chunks.map((chunk, index) => ({
+    const knowledgeChunksRecords = chunks.map((chunk) => ({
       tenantId,
       docId,
-      chunkIndex: index,
+      chunkIndex: chunk.index,
       content: chunk.content,
-      embedding: embeddings[index],
+      embedding: embeddings[chunk.index],
     }));
 
     await this.knowledgeChunksRepository.createKnowledgeChunks(
