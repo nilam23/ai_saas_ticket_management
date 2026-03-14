@@ -6,6 +6,15 @@ import { TextCleanerService } from './text-cleaner.service';
 import { TextChunkerService } from './text-chunker.service';
 import { EmbeddingsGeneratorService } from './embeddings-generator.service';
 import { KnowledgeChunkRepository } from '../repositories/knowledge-chunk.repository';
+import { TenantDocService } from 'src/modules/tenants/service/tenant-doc.service';
+import { DocStatus } from '@prisma/client';
+import { AuditService } from 'src/modules/audit/service/audit.service';
+import { UserService } from 'src/modules/user/service/user.service';
+import { getTenantSystemUserEmail } from 'src/shared/utils/common.utils';
+import {
+  AuditLogAction,
+  AuditLogEntityType,
+} from 'src/modules/audit/enums/audit-log.enum';
 
 @Injectable()
 export class KnowledgeIngestionService {
@@ -18,6 +27,9 @@ export class KnowledgeIngestionService {
     private readonly textChunkerService: TextChunkerService,
     private readonly embeddingsGeneratorService: EmbeddingsGeneratorService,
     private readonly knowledgeChunkRepository: KnowledgeChunkRepository,
+    private readonly tenantDocService: TenantDocService,
+    private readonly userService: UserService,
+    private readonly auditService: AuditService,
   ) {}
 
   public async ingestDocument(ingestDocInput: IngestDocInput): Promise<void> {
@@ -56,10 +68,6 @@ export class KnowledgeIngestionService {
       { docId, chunks },
     );
 
-    this.logger.log(
-      `Generated ${embeddings.length} embeddings for document ${docId}`,
-    );
-
     this.logger.log(`Storing embeddings for the doc ${docId}`);
 
     const knowledgeChunksRecords = chunks.map((chunk) => ({
@@ -75,6 +83,28 @@ export class KnowledgeIngestionService {
     );
 
     this.logger.log(`Embeddings stored successfully for the doc ${docId}`);
+
+    await this.tenantDocService.updateTenantDoc({
+      docId,
+      tenantId,
+      status: DocStatus.PROCESSED,
+    });
+
+    const systemUser = await this.userService.getUserData({
+      tenantId,
+      email: getTenantSystemUserEmail(tenantId),
+    });
+
+    this.logger.log(`System user fetched for the tenant ${tenantId}`);
+
+    await this.auditService.createAuditLog({
+      tenantId,
+      actorUserId: systemUser.id,
+      action: AuditLogAction.DOC_KNOWLEDGE_INGEST,
+      entityType: AuditLogEntityType.TENANT_DOC,
+      entityId: docId,
+      afterState: { status: DocStatus.PROCESSED },
+    });
 
     this.logger.log(
       `Ingestion completed for the doc ${docId} of the tenant ${tenantId}`,

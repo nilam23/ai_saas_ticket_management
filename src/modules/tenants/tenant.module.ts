@@ -31,6 +31,6 @@ import { KafkaModule } from 'src/infra/kafka/kafka.module';
     PrismaService,
     UploadDocHandler,
   ],
-  exports: [TenantService, TenantRepository],
+  exports: [TenantService, TenantRepository, TenantDocService],
 })
 export class TenantModule {}

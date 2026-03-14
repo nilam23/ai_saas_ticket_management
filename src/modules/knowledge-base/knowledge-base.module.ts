@@ -13,9 +13,20 @@ import { EmbeddingsGeneratorService } from './service/embeddings-generator.servi
 import { KnowledgeChunkRepository } from './repositories/knowledge-chunk.repository';
 import { RetrieveContextEventHandler } from './handlers/kafka/retrieve-context.handler';
 import { SemanticSearchService } from './service/semantic-search.service';
+import { TenantModule } from '../tenants/tenant.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
-  imports: [DatabaseModule, AuditModule, KafkaModule, AwsModule, AiCoreModule],
+  imports: [
+    DatabaseModule,
+    AuditModule,
+    KafkaModule,
+    AwsModule,
+    AiCoreModule,
+    TenantModule,
+    AuditModule,
+    UserModule,
+  ],
   controllers: [TenantDocUploadedEventHandler, RetrieveContextEventHandler],
   providers: [
     KnowledgeIngestionService,

@@ -29,7 +29,7 @@ export class EmbeddingsGeneratorService {
       embeddings.push(...batchEmbeddings);
     }
 
-    this.logger.log(`Embeddings generated for doc ${docId}`);
+    this.logger.log(`Generated ${embeddings.length} embeddings for doc ${docId}`);
 
     return embeddings;
   }

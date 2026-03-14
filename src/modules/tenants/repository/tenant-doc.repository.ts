@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/infra/prisma/prisma.service';
-import { CreateTenantDocInput } from '../types/tenant-doc.type';
+import {
+  CreateTenantDocInput,
+  UpdateTenantDocFilterQuery,
+  UpdateTenantDocUpdateQuery,
+} from '../types/tenant-doc.type';
 import { Prisma, TenantDoc } from '@prisma/client';
 
 @Injectable()
@@ -18,6 +22,16 @@ export class TenantDocRepository {
     };
     return this.prisma.tenantDoc.create({
       data: docMetadata,
+    });
+  }
+
+  public async updateTenantDoc(
+    filterQuery: UpdateTenantDocFilterQuery,
+    updateQuery: UpdateTenantDocUpdateQuery,
+  ): Promise<TenantDoc> {
+    return this.prisma.tenantDoc.update({
+      where: filterQuery,
+      data: updateQuery,
     });
   }
 }
