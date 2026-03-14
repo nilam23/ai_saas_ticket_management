@@ -15,16 +15,16 @@ export class TextCleanerService {
   ];
 
   public clean(textCleanerInput: TextCleanerInput): string {
-    const { docId, text } = textCleanerInput;
+    const { tenantId, docId, text } = textCleanerInput;
 
     this.logger.log(
-      `Cleaning text for the doc ${docId}. Input length: ${text.length}`,
+      `Cleaning text. DocID: ${docId}, TenantID: ${tenantId}, Input length: ${text.length}`,
     );
 
     const cleanedText = this.pipeline.reduce((acc, fn) => fn(acc), text);
 
     this.logger.log(
-      `Cleaning completed for the doc ${docId}. Output length: ${cleanedText.length}`,
+      `Cleaning completed. DocID: ${docId}, TenantID: ${tenantId}, Output length: ${cleanedText.length}`,
     );
 
     return cleanedText;

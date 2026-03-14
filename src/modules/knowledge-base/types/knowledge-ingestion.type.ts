@@ -1,5 +1,4 @@
-export type IngestDocInput = {
+export type ProcessDocIngestionInput = {
   tenantId: string;
   docId: string;
-  fileKey: string;
 };

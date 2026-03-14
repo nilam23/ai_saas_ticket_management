@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from 'src/infra/prisma/prisma.module';
 import { AuditModule } from '../audit/audit.module';
-import { TenantDocUploadedEventHandler } from './handlers/kafka/tenant-doc-uploaded.handler';
 import { KafkaModule } from 'src/infra/kafka/kafka.module';
 import { DocParserService } from './service/doc-parser.service';
 import { AwsModule } from 'src/infra/aws/aws.module';
@@ -15,6 +14,10 @@ import { RetrieveContextEventHandler } from './handlers/kafka/retrieve-context.h
 import { SemanticSearchService } from './service/semantic-search.service';
 import { TenantModule } from '../tenants/tenant.module';
 import { UserModule } from '../user/user.module';
+import { TenantDocParserEventHandler } from './handlers/kafka/parse-doc.handler';
+import { TenantDocTextChunkerEventHandler } from './handlers/kafka/chunk-doc-text.handler';
+import { TenantDocEmbeddingGeneratorEventHandler } from './handlers/kafka/generate-doc-embedding.handler';
+import { TenantDocIngestionFinalizationEventHandler } from './handlers/kafka/ingestion-finalization.handler';
 
 @Module({
   imports: [
@@ -27,7 +30,13 @@ import { UserModule } from '../user/user.module';
     AuditModule,
     UserModule,
   ],
-  controllers: [TenantDocUploadedEventHandler, RetrieveContextEventHandler],
+  controllers: [
+    TenantDocParserEventHandler,
+    TenantDocTextChunkerEventHandler,
+    TenantDocEmbeddingGeneratorEventHandler,
+    TenantDocIngestionFinalizationEventHandler,
+    RetrieveContextEventHandler,
+  ],
   providers: [
     KnowledgeIngestionService,
     DocParserService,

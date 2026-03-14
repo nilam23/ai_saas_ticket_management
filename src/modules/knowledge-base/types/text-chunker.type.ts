@@ -13,6 +13,7 @@ export type TextChunk = {
 
 export type ChunkTextInput = {
   docId: string;
+  tenantId: string;
   text: string;
   options: ChunkOptions;
 };

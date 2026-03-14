@@ -1,4 +1,5 @@
 export type DocParserInput = {
+  tenantId: string;
   docId: string;
-  fileBuffer: Buffer;
+  fileKey: string;
 };

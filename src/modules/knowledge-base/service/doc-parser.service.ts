@@ -2,12 +2,17 @@ import { Injectable, Logger } from '@nestjs/common';
 import { DocParserInput } from '../types/doc-parser.type';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { TextItem } from 'pdfjs-dist/types/src/display/api';
+import { AwsS3Service } from 'src/infra/aws/aws-s3.service';
+import { TextCleanerService } from './text-cleaner.service';
 
 @Injectable()
 export class DocParserService {
   private readonly logger = new Logger(DocParserService.name);
 
-  constructor() {}
+  constructor(
+    private readonly s3Service: AwsS3Service,
+    private readonly textCleanerService: TextCleanerService,
+  ) {}
 
   private async parseTextFromPdf(
     fileBuffer: Buffer<ArrayBufferLike>,
@@ -29,13 +34,33 @@ export class DocParserService {
     return fullText.replace(/\n+/g, ' ');
   }
 
-  public async extractDocText(docPaserInput: DocParserInput): Promise<string> {
-    const { docId, fileBuffer } = docPaserInput;
+  public async parseDoc(docPaserInput: DocParserInput): Promise<string> {
+    const { tenantId, docId, fileKey } = docPaserInput;
 
-    this.logger.log(`Extracting text from the doc ${docId}`);
+    const fileBuffer = await this.s3Service.getFile(fileKey);
+
+    this.logger.log(`Parsing doc. DocID: ${docId}, TenantID: ${tenantId}`);
     const extractedText = await this.parseTextFromPdf(fileBuffer);
-    this.logger.log(`Text extraction successful for the doc ${docId}`);
 
-    return extractedText;
+    if (!extractedText || extractedText.length === 0) {
+      this.logger.error(
+        `No text extracted. DocID: ${docId}, TenantID: ${tenantId}`,
+      );
+      throw new Error(
+        `No text extracted. DocID: ${docId}, TenantID: ${tenantId}`,
+      );
+    }
+
+    this.logger.log(
+      `Parsing completed. DocID: ${docId}, TenantID: ${tenantId}`,
+    );
+
+    const cleanedText = this.textCleanerService.clean({
+      tenantId,
+      docId,
+      text: extractedText,
+    });
+
+    return cleanedText;
   }
 }

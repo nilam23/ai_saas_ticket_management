@@ -9,12 +9,12 @@ export class TextChunkerService {
   constructor() {}
 
   public chunkText(chunkTextInput: ChunkTextInput): TextChunk[] {
-    const { docId, text, options } = chunkTextInput;
+    const { tenantId, docId, text, options } = chunkTextInput;
     const { chunkSize, chunkOverlap } = options;
     const separators = options.separators ?? this.DEFAULT_SEPARATORS;
 
     this.logger.log(
-      `Chunking text for the doc ${docId}. Text length: ${text.length}, Chunk Size: ${chunkSize}, Overlap: ${chunkOverlap}`,
+      `Chunking text. DocID: ${docId}, TenantID: ${tenantId}, Text length: ${text.length}, Chunk Size: ${chunkSize}, Overlap: ${chunkOverlap}`,
     );
 
     if (chunkOverlap >= chunkSize) {
