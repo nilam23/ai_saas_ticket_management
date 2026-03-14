@@ -12,18 +12,18 @@ export class RetrieveContextEventHandler {
 
   constructor(private readonly semanticSearchService: SemanticSearchService) {}
 
-  @KafkaEventPattern(KafkaTopic.EVENT_BUS, KafkaEvent.RETRIEVE_CONTEXT)
+  @KafkaEventPattern(KafkaTopic.EVENT_BUS, KafkaEvent.USER_QUERY_RECEIVED)
   async retrieveContext(
     @Payload() event: EventEnvelope<RetrieveContextEventPayload>,
   ) {
     this.logger.log(
-      `${KafkaEvent.RETRIEVE_CONTEXT} event with ID ${event.id} consumed. Paylod: ${JSON.stringify(event.payload)}`,
+      `${KafkaEvent.USER_QUERY_RECEIVED} event with ID ${event.id} consumed. Paylod: ${JSON.stringify(event.payload)}`,
     );
 
-    await this.semanticSearchService.retrieveContext({ ...event.payload });
+    await this.semanticSearchService.retrieveContext(event.payload);
 
     this.logger.log(
-      `${KafkaEvent.RETRIEVE_CONTEXT} event with ID ${event.id} processed successfully`,
+      `${KafkaEvent.USER_QUERY_RECEIVED} event with ID ${event.id} processed successfully`,
     );
   }
 }
