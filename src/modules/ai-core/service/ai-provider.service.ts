@@ -1,11 +1,18 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { invokeAPI } from 'src/shared/utils/axios.utils';
 import {
+  OllamaEmbeddingRequest,
+  OllamaEmbeddingResponse,
   OllamaGenerateRequest,
   OllamaGenerateResponse,
   OllamaModelOptions,
 } from '../types/ollama.type';
-import { OLLAMA_MODEL, OLLAMA_URL } from 'src/shared/utils/env-config.utils';
+import {
+  OLLAMA_EMBEDDING_GENERATION_MODEL,
+  OLLAMA_EMBEDDING_GENERATION_URL,
+  OLLAMA_TEXT_GENERATION_MODEL,
+  OLLAMA_TEXT_GENERATION_URL,
+} from 'src/shared/utils/env-config.utils';
 
 @Injectable()
 export class AiProviderService {
@@ -13,7 +20,7 @@ export class AiProviderService {
 
   constructor() {}
 
-  public async generate<T>(
+  public async generateText<T>(
     prompt: string,
     options?: OllamaModelOptions,
   ): Promise<T> {
@@ -22,8 +29,8 @@ export class AiProviderService {
     const response = await invokeAPI<
       OllamaGenerateRequest,
       OllamaGenerateResponse
-    >('POST', OLLAMA_URL, {
-      model: OLLAMA_MODEL,
+    >('POST', OLLAMA_TEXT_GENERATION_URL, {
+      model: OLLAMA_TEXT_GENERATION_MODEL,
       prompt,
       stream: false,
       ...(options && { options }),
@@ -32,5 +39,16 @@ export class AiProviderService {
     this.logger.log('AI generation completed');
 
     return response.data.response as unknown as T;
+  }
+
+  public async generateEmbedding(text: string): Promise<number[]> {
+    const response = await invokeAPI<
+      OllamaEmbeddingRequest,
+      OllamaEmbeddingResponse
+    >('POST', OLLAMA_EMBEDDING_GENERATION_URL, {
+      model: OLLAMA_EMBEDDING_GENERATION_MODEL,
+      prompt: text,
+    });
+    return response.data.embedding;
   }
 }

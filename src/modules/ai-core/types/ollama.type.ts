@@ -17,3 +17,13 @@ export type OllamaGenerateResponse = {
   response: string;
   done: boolean;
 };
+
+export type OllamaEmbeddingRequest = {
+  model: string;
+  prompt: string;
+  options?: OllamaModelOptions;
+};
+
+export type OllamaEmbeddingResponse = {
+  embedding: number[];
+};

@@ -57,12 +57,23 @@ model Tenant {
   @@map("tenants")
 }
 
+enum DocStatus {
+  UPLOADED
+  SCANNING
+  SCANNED
+  SCANNING_FAILED
+  PROCESSING
+  PROCESSED
+  PROCESSING_FAILED
+}
+
 model TenantDoc {
   id         String   @id @default(uuid())
   tenantId   String
   uploadedBy String
   fileName   String
   fileKey    String
+  status     DocStatus @default(UPLOADED)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -204,4 +215,18 @@ model AgentSkillMap {
   @@index([tenantId])
   @@index([skill])
   @@map("agent_skill_map")
+}
+
+model KnowledgeChunk {
+  id          String   @id @default(uuid())
+  tenantId    String
+  documentId  String
+  chunkIndex  Int
+  content     String
+  embedding   Unsupported("vector(768)")
+  createdAt   DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([documentId])
+  @@map("knowledge_chunks")
 }

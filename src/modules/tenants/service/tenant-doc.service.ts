@@ -8,6 +8,10 @@ import {
   AuditLogEntityType,
 } from 'src/modules/audit/enums/audit-log.enum';
 import { TenantDocRepository } from '../repository/tenant-doc.repository';
+import { TenantDocUploadedEvent } from '../events/tenant-doc-uploaded.event';
+import { KafkaTopic } from 'src/infra/kafka/enums/kafka.enum';
+import { KafkaProducer } from 'src/infra/kafka/service/kafka-producer.service';
+import { UpdateTenantDocInput } from '../types/tenant-doc.type';
 
 @Injectable()
 export class TenantDocService {
@@ -17,6 +21,7 @@ export class TenantDocService {
     private readonly tenantDocRepository: TenantDocRepository,
     private s3Service: AwsS3Service,
     private auditService: AuditService,
+    private readonly kafkaProducer: KafkaProducer,
   ) {}
 
   public async uploadTenantDoc(
@@ -56,5 +61,32 @@ export class TenantDocService {
     this.logger.log(
       `Doc: ${file.originalname} uploaded successfully for the tenant: ${auditContext.tenantId}`,
     );
+
+    const event = new TenantDocUploadedEvent({
+      tenantId: auditContext.tenantId!,
+      docId: docMetadata.id,
+      fileKey,
+    });
+    this.logger.log(
+      `Emitting event. Topic: ${KafkaTopic.EVENT_BUS}, Event: ${event.name}, Event ID: ${event.id}`,
+    );
+    this.kafkaProducer.emit(KafkaTopic.EVENT_BUS, event);
+  }
+
+  public async updateTenantDoc(
+    updateTenantDocInput: UpdateTenantDocInput,
+  ): Promise<void> {
+    const { docId, tenantId, status } = updateTenantDocInput;
+    this.logger.log(`Updating doc with id ${docId} for the tenant ${tenantId}`);
+
+    await this.tenantDocRepository.updateTenantDoc(
+      { id: docId, tenantId: tenantId },
+      {
+        ...(status && { status }),
+        updatedAt: new Date(),
+      },
+    );
+
+    this.logger.log(`Doc updated with id ${docId} for the tenant ${tenantId}`);
   }
 }

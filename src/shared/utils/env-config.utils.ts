@@ -33,7 +33,15 @@ export const KAFKA_GROUP_ID = configService.get<string>(
 export const KAFKA_BROKER = configService.get<string>(
   EnvConfigEnum.KAFKA_BROKER,
 );
-export const OLLAMA_URL = configService.get<string>(EnvConfigEnum.OLLAMA_URL);
-export const OLLAMA_MODEL = configService.get<string>(
-  EnvConfigEnum.OLLAMA_MODEL,
+export const OLLAMA_TEXT_GENERATION_URL = configService.get<string>(
+  EnvConfigEnum.OLLAMA_TEXT_GENERATION_URL,
+);
+export const OLLAMA_EMBEDDING_GENERATION_URL = configService.get<string>(
+  EnvConfigEnum.OLLAMA_EMBEDDING_GENERATION_URL,
+);
+export const OLLAMA_TEXT_GENERATION_MODEL = configService.get<string>(
+  EnvConfigEnum.OLLAMA_TEXT_GENERATION_MODEL,
+);
+export const OLLAMA_EMBEDDING_GENERATION_MODEL = configService.get<string>(
+  EnvConfigEnum.OLLAMA_EMBEDDING_GENERATION_MODEL,
 );
