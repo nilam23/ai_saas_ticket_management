@@ -9,6 +9,8 @@ import { KnowledgeChunkRepository } from '../repositories/knowledge-chunk.reposi
 @Injectable()
 export class SemanticSearchService {
   private readonly logger = new Logger(SemanticSearchService.name);
+  private readonly TOP_K = 5;
+  private readonly MIN_SIMILARITY = 0.6;
 
   constructor(
     private readonly aiProviderService: AiProviderService,
@@ -18,10 +20,10 @@ export class SemanticSearchService {
   public async retrieveContext(
     retrieveContextInput: RetrieveContextInput,
   ): Promise<RetrievedContextResult[]> {
-    const { tenantId, query, topK } = retrieveContextInput;
+    const { tenantId, query } = retrieveContextInput;
 
     this.logger.log(
-      `Retrieving context for the query ${query} for the tenant ${tenantId}`,
+      `Retrieving context. Query: ${query}, TenantID: ${tenantId}`,
     );
 
     const queryEmbeddings =
@@ -31,13 +33,17 @@ export class SemanticSearchService {
       await this.knowledgeChunkRepository.fetchKnowledgeChunks({
         tenantId,
         embeddingVector,
-        topK,
+        topK: this.TOP_K,
       });
 
-    this.logger.log(
-      `Context retrieved for the query ${query} for the tenant ${tenantId}`,
+    const relevantContext = retrievedContext.filter(
+      (ctx) => ctx.similarityScore >= this.MIN_SIMILARITY,
     );
 
-    return retrievedContext;
+    this.logger.log(
+      `Context retrieved. Query: "${query}", TenantId=${tenantId}, Total: ${retrievedContext.length}, Above Threshold: ${relevantContext.length}`,
+    );
+
+    return relevantContext;
   }
 }

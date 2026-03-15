@@ -39,14 +39,18 @@ export class KnowledgeChunkRepository {
     const { tenantId, embeddingVector, topK } = fetchKnowledgeChunksInput;
     const results = await this.prisma.$queryRawUnsafe<RetrievedContextResult[]>(
       `
+        WITH query_vector AS (
+          SELECT $2::vector AS embedding
+        )
         SELECT
-          id,
-          content,
-          "chunkIndex",
-          "documentId"
-        FROM knowledge_chunks
-        WHERE "tenantId" = $1
-        ORDER BY embedding <=> $2::vector
+          kc.id,
+          kc.content,
+          kc."chunkIndex",
+          kc."documentId",
+          1 - (kc.embedding <=> qv.embedding) AS "similarityScore"
+        FROM knowledge_chunks kc, query_vector qv
+        WHERE kc."tenantId" = $1
+        ORDER BY kc.embedding <=> qv.embedding
         LIMIT $3
       `,
       tenantId,

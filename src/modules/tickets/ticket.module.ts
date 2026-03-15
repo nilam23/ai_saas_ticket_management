@@ -11,6 +11,10 @@ import { CreateTicketHandler } from './handlers/create-ticket.handler';
 import { MessageRepository } from './repository/message.repository';
 import { KafkaModule } from 'src/infra/kafka/kafka.module';
 import { RoutingModule } from '../ticket-routing/routing.module';
+import { GenerateAiResponseHandler } from './handlers/generate-ai-response.handler';
+import { TicketResponseService } from './service/ticket-response.service';
+import { AiCoreModule } from '../ai-core/ai-core.module';
+import { KnowledgeBaseModule } from '../knowledge-base/knowledge-base.module';
 
 @Module({
   imports: [
@@ -20,6 +24,8 @@ import { RoutingModule } from '../ticket-routing/routing.module';
     forwardRef(() => RoutingModule),
     forwardRef(() => AuthModule),
     forwardRef(() => UserModule),
+    forwardRef(() => AiCoreModule),
+    forwardRef(() => KnowledgeBaseModule),
   ],
   controllers: [TicketController],
   providers: [
@@ -28,6 +34,8 @@ import { RoutingModule } from '../ticket-routing/routing.module';
     MessageRepository,
     PrismaService,
     CreateTicketHandler,
+    GenerateAiResponseHandler,
+    TicketResponseService,
   ],
   exports: [TicketService, TicketRepository],
 })

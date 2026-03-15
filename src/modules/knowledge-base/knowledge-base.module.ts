@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { DatabaseModule } from 'src/infra/prisma/prisma.module';
 import { AuditModule } from '../audit/audit.module';
 import { KafkaModule } from 'src/infra/kafka/kafka.module';
@@ -10,7 +10,6 @@ import { TextChunkerService } from './service/text-chunker.service';
 import { AiCoreModule } from '../ai-core/ai-core.module';
 import { EmbeddingsGeneratorService } from './service/embeddings-generator.service';
 import { KnowledgeChunkRepository } from './repositories/knowledge-chunk.repository';
-import { RetrieveContextEventHandler } from './handlers/kafka/retrieve-context.handler';
 import { SemanticSearchService } from './service/semantic-search.service';
 import { TenantModule } from '../tenants/tenant.module';
 import { UserModule } from '../user/user.module';
@@ -27,15 +26,13 @@ import { TenantDocIngestionFinalizationEventHandler } from './handlers/kafka/ing
     AwsModule,
     AiCoreModule,
     TenantModule,
-    AuditModule,
-    UserModule,
+    forwardRef(() => UserModule),
   ],
   controllers: [
     TenantDocParserEventHandler,
     TenantDocTextChunkerEventHandler,
     TenantDocEmbeddingGeneratorEventHandler,
     TenantDocIngestionFinalizationEventHandler,
-    RetrieveContextEventHandler,
   ],
   providers: [
     KnowledgeIngestionService,
@@ -46,5 +43,6 @@ import { TenantDocIngestionFinalizationEventHandler } from './handlers/kafka/ing
     KnowledgeChunkRepository,
     SemanticSearchService,
   ],
+  exports: [SemanticSearchService],
 })
 export class KnowledgeBaseModule {}

@@ -34,12 +34,9 @@ export class TicketClassificationService {
     this.logger.log(`Classifying the ticket ${ticketId}`);
 
     const prompt = generateTicketClassificationPrompt(subject, message);
-    const aiResponse = await this.aiProviderService.generateText<string>(
-      prompt,
-      {
-        stop: ['Explanation:', 'Ticket Subject:', 'You are', '\n\n'],
-      },
-    );
+    const aiResponse = await this.aiProviderService.generateText(prompt, {
+      stop: ['Explanation:', 'Ticket Subject:', 'You are', '\n\n'],
+    });
     const rawResponse = JSON.parse(aiResponse) as TicketClassificationRawResult;
     const validation = TicketClassificationSchema.safeParse(rawResponse);
 

@@ -1,7 +1,6 @@
 export type RetrieveContextInput = {
   tenantId: string;
   query: string;
-  topK: number;
 };
 
 export type RetrievedContextResult = {
@@ -9,4 +8,5 @@ export type RetrievedContextResult = {
   content: string;
   chunkIndex: number;
   documentId: string;
+  similarityScore: number;
 };
