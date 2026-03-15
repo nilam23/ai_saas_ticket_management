@@ -7,12 +7,11 @@ import { KafkaProducer } from 'src/infra/kafka/service/kafka-producer.service';
 import { TextChunkerService } from '../../service/text-chunker.service';
 import { TenantDocParsedEventPayload } from '../../types/kafka-event.type';
 import { TenantDocChunkedEvent } from '../../events/tenant-doc-chunked.event';
+import { DOC_CHUNK_OVERLAP, DOC_CHUNK_SIZE } from '../../utils/constants';
 
 @Controller()
 export class TenantDocTextChunkerEventHandler {
   private readonly logger = new Logger(TenantDocTextChunkerEventHandler.name);
-  private readonly CHUNK_SIZE = 500;
-  private readonly CHUNK_OVERLAP = 100;
 
   constructor(
     private readonly textChunkerService: TextChunkerService,
@@ -33,7 +32,7 @@ export class TenantDocTextChunkerEventHandler {
       docId,
       tenantId,
       text: cleanedText,
-      options: { chunkSize: this.CHUNK_SIZE, chunkOverlap: this.CHUNK_OVERLAP },
+      options: { chunkSize: DOC_CHUNK_SIZE, chunkOverlap: DOC_CHUNK_OVERLAP },
     });
 
     this.logger.log(

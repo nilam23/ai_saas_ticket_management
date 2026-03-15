@@ -5,12 +5,14 @@ import {
 } from '../types/semantic-search.type';
 import { AiProviderService } from 'src/modules/ai-core/service/ai-provider.service';
 import { KnowledgeChunkRepository } from '../repositories/knowledge-chunk.repository';
+import {
+  CONTEXT_RETRIEVAL_TOP_K,
+  CONTEXT_SIMILARITY_THRESHOLD,
+} from '../utils/constants';
 
 @Injectable()
 export class SemanticSearchService {
   private readonly logger = new Logger(SemanticSearchService.name);
-  private readonly TOP_K = 5;
-  private readonly MIN_SIMILARITY = 0.6;
 
   constructor(
     private readonly aiProviderService: AiProviderService,
@@ -33,11 +35,11 @@ export class SemanticSearchService {
       await this.knowledgeChunkRepository.fetchKnowledgeChunks({
         tenantId,
         embeddingVector,
-        topK: this.TOP_K,
+        topK: CONTEXT_RETRIEVAL_TOP_K,
       });
 
     const relevantContext = retrievedContext.filter(
-      (ctx) => ctx.similarityScore >= this.MIN_SIMILARITY,
+      (ctx) => ctx.similarityScore >= CONTEXT_SIMILARITY_THRESHOLD,
     );
 
     this.logger.log(

@@ -16,11 +16,11 @@ import {
 import { UserService } from 'src/modules/user/service/user.service';
 import { getTenantSystemUserEmail } from 'src/shared/utils/common.utils';
 import { AgentRoutingRepository } from '../repository/agent-routing.repository';
+import { CLASSIFICATION_CONFIDENCE_THRESHOLD } from '../utils/constants';
 
 @Injectable()
 export class TicketAssignmentService {
   private readonly logger = new Logger(TicketAssignmentService.name);
-  private readonly AI_CONFIDENCE_THRESHOLD = 0.7;
 
   constructor(
     private readonly ticketService: TicketService,
@@ -65,7 +65,7 @@ export class TicketAssignmentService {
     const requiredSkill =
       ticket.category &&
       ticket.aiConfidence !== null &&
-      ticket.aiConfidence > this.AI_CONFIDENCE_THRESHOLD
+      ticket.aiConfidence > CLASSIFICATION_CONFIDENCE_THRESHOLD
         ? (ticket.category as AgentSkill)
         : AgentSkill.GENERAL;
 

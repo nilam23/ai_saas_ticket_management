@@ -2,11 +2,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import { GenerateEmbeddingsInput } from '../types/embeddings-generator.type';
 import { AiProviderService } from 'src/modules/ai-core/service/ai-provider.service';
 import { KnowledgeChunkRepository } from '../repositories/knowledge-chunk.repository';
+import { EMBEDDING_GENERATION_BATCH_SIZE } from '../utils/constants';
 
 @Injectable()
 export class EmbeddingsGeneratorService {
   private readonly logger = new Logger(EmbeddingsGeneratorService.name);
-  private readonly BATCH_SIZE = 10;
 
   constructor(
     private readonly aiProviderService: AiProviderService,
@@ -23,8 +23,8 @@ export class EmbeddingsGeneratorService {
       `Generating batched embeddings. Doc: ${docId}, Tenant: ${tenantId}, Total chunks: ${chunks.length}`,
     );
 
-    for (let i = 0; i < chunks.length; i += this.BATCH_SIZE) {
-      const batch = chunks.slice(i, i + this.BATCH_SIZE);
+    for (let i = 0; i < chunks.length; i += EMBEDDING_GENERATION_BATCH_SIZE) {
+      const batch = chunks.slice(i, i + EMBEDDING_GENERATION_BATCH_SIZE);
       const batchEmbeddings = await Promise.all(
         batch.map((chunk) =>
           this.aiProviderService.generateEmbedding(chunk.content),

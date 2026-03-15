@@ -1,0 +1,5 @@
+export const DOC_CHUNK_SIZE = 300;
+export const DOC_CHUNK_OVERLAP = 20;
+export const CONTEXT_RETRIEVAL_TOP_K = 5;
+export const CONTEXT_SIMILARITY_THRESHOLD = 0.6;
+export const EMBEDDING_GENERATION_BATCH_SIZE = 10;
