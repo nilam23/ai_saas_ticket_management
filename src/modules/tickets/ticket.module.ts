@@ -15,6 +15,7 @@ import { GenerateAiResponseHandler } from './handlers/generate-ai-response.handl
 import { TicketResponseService } from './service/ticket-response.service';
 import { AiCoreModule } from '../ai-core/ai-core.module';
 import { KnowledgeBaseModule } from '../knowledge-base/knowledge-base.module';
+import { AiResponseValidationService } from './service/ai-response-validation.service';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { KnowledgeBaseModule } from '../knowledge-base/knowledge-base.module';
     CreateTicketHandler,
     GenerateAiResponseHandler,
     TicketResponseService,
+    AiResponseValidationService,
   ],
   exports: [TicketService, TicketRepository],
 })

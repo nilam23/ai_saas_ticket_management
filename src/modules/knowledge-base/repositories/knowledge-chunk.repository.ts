@@ -4,7 +4,10 @@ import {
   FetchKnowledgeChunksInput,
 } from '../types/knowledge-chunk.type';
 import { PrismaService } from 'src/infra/prisma/prisma.service';
-import { RetrievedContextResult } from '../types/semantic-search.type';
+import {
+  RawRetrievedContextResult,
+  RetrievedContextResult,
+} from '../types/semantic-search.type';
 
 @Injectable()
 export class KnowledgeChunkRepository {
@@ -37,27 +40,26 @@ export class KnowledgeChunkRepository {
     fetchKnowledgeChunksInput: FetchKnowledgeChunksInput,
   ): Promise<RetrievedContextResult[]> {
     const { tenantId, embeddingVector, topK } = fetchKnowledgeChunksInput;
-    const results = await this.prisma.$queryRawUnsafe<RetrievedContextResult[]>(
-      `
-        WITH query_vector AS (
-          SELECT $2::vector AS embedding
-        )
-        SELECT
-          kc.id,
-          kc.content,
-          kc."chunkIndex",
-          kc."documentId",
-          1 - (kc.embedding <=> qv.embedding) AS "similarityScore"
-        FROM knowledge_chunks kc, query_vector qv
-        WHERE kc."tenantId" = $1
-        ORDER BY kc.embedding <=> qv.embedding
-        LIMIT $3
-      `,
-      tenantId,
-      embeddingVector,
-      topK,
-    );
+    const results = await this.prisma.$queryRaw<RawRetrievedContextResult[]>`
+      WITH query_vector AS (
+        SELECT ${embeddingVector}::vector AS embedding
+      )
+      SELECT
+        kc.id,
+        kc.content,
+        kc."chunkIndex",
+        kc."documentId",
+        kc.embedding::text AS embedding,
+        1 - (kc.embedding <=> qv.embedding) AS "similarityScore"
+      FROM knowledge_chunks kc, query_vector qv
+      WHERE kc."tenantId" = ${tenantId}
+      ORDER BY kc.embedding <=> qv.embedding
+      LIMIT ${topK}
+    `;
 
-    return results;
+    return results.map((row) => ({
+      ...row,
+      embedding: row.embedding.slice(1, -1).split(',').map(Number),
+    }));
   }
 }

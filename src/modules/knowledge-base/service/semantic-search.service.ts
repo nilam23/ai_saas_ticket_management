@@ -3,7 +3,6 @@ import {
   RetrieveContextInput,
   RetrievedContextResult,
 } from '../types/semantic-search.type';
-import { AiProviderService } from 'src/modules/ai-core/service/ai-provider.service';
 import { KnowledgeChunkRepository } from '../repositories/knowledge-chunk.repository';
 import {
   CONTEXT_RETRIEVAL_TOP_K,
@@ -15,21 +14,18 @@ export class SemanticSearchService {
   private readonly logger = new Logger(SemanticSearchService.name);
 
   constructor(
-    private readonly aiProviderService: AiProviderService,
     private readonly knowledgeChunkRepository: KnowledgeChunkRepository,
   ) {}
 
   public async retrieveContext(
     retrieveContextInput: RetrieveContextInput,
   ): Promise<RetrievedContextResult[]> {
-    const { tenantId, query } = retrieveContextInput;
+    const { tenantId, query, queryEmbeddings } = retrieveContextInput;
 
     this.logger.log(
       `Retrieving context. Query: ${query}, TenantID: ${tenantId}`,
     );
 
-    const queryEmbeddings =
-      await this.aiProviderService.generateEmbedding(query);
     const embeddingVector = `[${queryEmbeddings.join(',')}]`;
     const retrievedContext =
       await this.knowledgeChunkRepository.fetchKnowledgeChunks({
