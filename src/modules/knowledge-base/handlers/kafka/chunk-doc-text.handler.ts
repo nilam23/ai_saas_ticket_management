@@ -7,7 +7,10 @@ import { KafkaProducer } from 'src/infra/kafka/service/kafka-producer.service';
 import { TextChunkerService } from '../../service/text-chunker.service';
 import { TenantDocParsedEventPayload } from '../../types/kafka-event.type';
 import { TenantDocChunkedEvent } from '../../events/tenant-doc-chunked.event';
-import { DOC_CHUNK_OVERLAP, DOC_CHUNK_SIZE } from '../../utils/constants';
+import {
+  DOC_CHUNK_OVERLAP,
+  DOC_CHUNK_SIZE,
+} from '../../constants/common.constants';
 
 @Controller()
 export class TenantDocTextChunkerEventHandler {

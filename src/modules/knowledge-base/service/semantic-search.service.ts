@@ -8,7 +8,7 @@ import { KnowledgeChunkRepository } from '../repositories/knowledge-chunk.reposi
 import {
   CONTEXT_RETRIEVAL_TOP_K,
   CONTEXT_SIMILARITY_THRESHOLD,
-} from '../utils/constants';
+} from '../constants/common.constants';
 
 @Injectable()
 export class SemanticSearchService {

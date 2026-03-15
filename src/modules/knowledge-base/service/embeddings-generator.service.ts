@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { GenerateEmbeddingsInput } from '../types/embeddings-generator.type';
 import { AiProviderService } from 'src/modules/ai-core/service/ai-provider.service';
 import { KnowledgeChunkRepository } from '../repositories/knowledge-chunk.repository';
-import { EMBEDDING_GENERATION_BATCH_SIZE } from '../utils/constants';
+import { EMBEDDING_GENERATION_BATCH_SIZE } from '../constants/common.constants';
 
 @Injectable()
 export class EmbeddingsGeneratorService {

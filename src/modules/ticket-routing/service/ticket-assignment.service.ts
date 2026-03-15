@@ -16,7 +16,7 @@ import {
 import { UserService } from 'src/modules/user/service/user.service';
 import { getTenantSystemUserEmail } from 'src/shared/utils/common.utils';
 import { AgentRoutingRepository } from '../repository/agent-routing.repository';
-import { CLASSIFICATION_CONFIDENCE_THRESHOLD } from '../utils/constants';
+import { CLASSIFICATION_CONFIDENCE_THRESHOLD } from '../constants/common.constants';
 
 @Injectable()
 export class TicketAssignmentService {

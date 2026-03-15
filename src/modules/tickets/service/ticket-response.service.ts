@@ -7,7 +7,7 @@ import { getAiResponseGenerationPrompt } from 'src/modules/ai-core/utils/prompt.
 import {
   AI_RESPONSE_GENERATION_LLM_NUM_PREDICT,
   AI_RESPONSE_GENERATION_LLM_TEMP,
-} from '../utils/constants';
+} from '../constants/common.constants';
 
 @Injectable()
 export class TicketResponseService {
