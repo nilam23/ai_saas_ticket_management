@@ -45,7 +45,7 @@ export class RolesGuard implements CanActivate {
     }
 
     this.logger.log(
-      `User ${user.email} has required role ${requiredRoles.join(', ')}. Allowing access`,
+      `User ${user.email} has the required role ${user.role}. Allowing access`,
     );
     return true;
   }
