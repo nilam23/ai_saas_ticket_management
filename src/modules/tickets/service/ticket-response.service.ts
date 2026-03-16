@@ -6,7 +6,8 @@ import { AiProviderService } from 'src/modules/ai-core/service/ai-provider.servi
 import { getAiResponseGenerationPrompt } from 'src/modules/ai-core/utils/prompt.utils';
 import {
   AI_DEFAULT_RESPONSE,
-  RESPONSE_GENERATION_LLM_NUM_PREDICT,
+  RESPONSE_GENERATION_LLM_MAX_TOKENS,
+  RESPONSE_GENERATION_LLM_STOP_SEQUENCES,
   RESPONSE_GENERATION_LLM_TEMP,
 } from '../constants/common.constants';
 import { AiResponseValidationService } from './ai-response-validation.service';
@@ -101,8 +102,8 @@ export class TicketResponseService {
     const prompt = getAiResponseGenerationPrompt(query, queryContext);
     const response = await this.aiProviderService.generateText(prompt, {
       temperature: RESPONSE_GENERATION_LLM_TEMP,
-      num_predict: RESPONSE_GENERATION_LLM_NUM_PREDICT,
-      stop: ['<|end|>', '<|user|>', '<|system|>', 'Rules:'],
+      num_predict: RESPONSE_GENERATION_LLM_MAX_TOKENS,
+      stop: RESPONSE_GENERATION_LLM_STOP_SEQUENCES,
     });
 
     this.logger.log(
