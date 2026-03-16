@@ -9,8 +9,6 @@ export const RESPONSE_GENERATION_LLM_STOP_SEQUENCES = [
 ];
 export const MIN_RESPONSE_LENGTH = 20;
 export const MAX_RESPONSE_LENGTH = 300;
-export const MIN_GROUNDING_SCORE = 0.6;
-export const MIN_RELEVANCE_SCORE = 0.7;
 export const PROMPT_LEAK_PATTERNS = [
   /<\|system\|>/i,
   /<\|user\|>/i,
@@ -28,4 +26,10 @@ export const PROMPT_LEAK_PATTERNS = [
   /customer question/i,
   /rules:/i,
 ];
+export const THRESHOLD_GROUNDING_SCORE = 0.6;
+export const THRESHOLD_RELEVANCE_SCORE = 0.7;
+export const GROUNDING_WEIGHT = 0.4;
+export const RELEVANCE_WEIGHT = 0.6;
+export const AUTO_SEND_THRESHOLD = 0.85;
+export const AGENT_REVIEW_THRESHOLD = 0.7;
 export const AI_DEFAULT_RESPONSE = `I don't have enough information in the knowledge base to answer this question.`;

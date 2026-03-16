@@ -5,11 +5,15 @@ import { SemanticSearchService } from 'src/modules/knowledge-base/service/semant
 import { AiProviderService } from 'src/modules/ai-core/service/ai-provider.service';
 import { getAiResponseGenerationPrompt } from 'src/modules/ai-core/utils/prompt.utils';
 import {
+  AGENT_REVIEW_THRESHOLD,
   AI_DEFAULT_RESPONSE,
+  AUTO_SEND_THRESHOLD,
+  GROUNDING_WEIGHT,
+  RELEVANCE_WEIGHT,
   RESPONSE_GENERATION_LLM_MAX_TOKENS,
   RESPONSE_GENERATION_LLM_STOP_SEQUENCES,
   RESPONSE_GENERATION_LLM_TEMP,
-} from '../constants/common.constants';
+} from '../constants/ai-validation.constants';
 import { AiResponseValidationService } from './ai-response-validation.service';
 import { RetrievedContextResult } from 'src/modules/knowledge-base/types/semantic-search.type';
 
@@ -65,11 +69,32 @@ export class TicketResponseService {
         queryEmbeddings,
         responseEmbeddings,
       );
-    if (!groundingValidation.passed) {
+    if (!semanticRelevanceValidation.passed) {
       this.logger.warn(`Semantic relevance validation failed.`, {
         reason: semanticRelevanceValidation.reason,
         responsePreview: response,
       });
+      // handle
+    }
+
+    const confidenceScore =
+      groundingValidation.score * GROUNDING_WEIGHT +
+      semanticRelevanceValidation.score * RELEVANCE_WEIGHT;
+
+    if (confidenceScore >= AUTO_SEND_THRESHOLD) {
+      this.logger.log(
+        `Confidence score reliable, auto sending the AI response. Confidence Score: ${confidenceScore}`,
+      );
+      // handle
+    } else if (confidenceScore >= AGENT_REVIEW_THRESHOLD) {
+      this.logger.warn(
+        `Confidence score not reliable, assigning for Agnet review. Confidence Score: ${confidenceScore}`,
+      );
+      // handle
+    } else {
+      this.logger.warn(
+        `Confidence score too low, discarding AI response. Confidence Score: ${confidenceScore}`,
+      );
       // handle
     }
   }

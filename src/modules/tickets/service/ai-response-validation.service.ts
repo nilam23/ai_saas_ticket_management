@@ -6,11 +6,11 @@ import {
 } from 'src/shared/types/ai-validation.type';
 import {
   MAX_RESPONSE_LENGTH,
-  MIN_GROUNDING_SCORE,
-  MIN_RELEVANCE_SCORE,
+  THRESHOLD_GROUNDING_SCORE,
+  THRESHOLD_RELEVANCE_SCORE,
   MIN_RESPONSE_LENGTH,
   PROMPT_LEAK_PATTERNS,
-} from '../constants/common.constants';
+} from '../constants/ai-validation.constants';
 import { RetrievedContextResult } from 'src/modules/knowledge-base/types/semantic-search.type';
 
 @Injectable()
@@ -66,10 +66,11 @@ export class AiResponseValidationService {
       this.cosineSimilarity(responseEmbeddings, chunk.embedding),
     );
     const bestScore = scores.reduce((max, curr) => (curr > max ? curr : max));
-    const passed = bestScore >= MIN_GROUNDING_SCORE;
+    const passed = bestScore >= THRESHOLD_GROUNDING_SCORE;
 
     return {
       passed,
+      score: bestScore,
       reason: passed
         ? undefined
         : `Response not grounded in any chunk (best score: ${bestScore.toFixed(2)})`,
@@ -84,10 +85,11 @@ export class AiResponseValidationService {
       responseEmbeddings,
       queryEmbedding,
     );
-    const passed = relevaceScore >= MIN_RELEVANCE_SCORE;
+    const passed = relevaceScore >= THRESHOLD_RELEVANCE_SCORE;
 
     return {
       passed,
+      score: relevaceScore,
       reason: passed
         ? undefined
         : `Response not relevant to user query (relevance score: ${relevaceScore.toFixed(2)})`,
