@@ -30,6 +30,5 @@ export const THRESHOLD_GROUNDING_SCORE = 0.6;
 export const THRESHOLD_RELEVANCE_SCORE = 0.7;
 export const GROUNDING_WEIGHT = 0.4;
 export const RELEVANCE_WEIGHT = 0.6;
-export const AUTO_SEND_THRESHOLD = 0.85;
+export const AUTO_SEND_THRESHOLD = 0.8;
 export const AGENT_REVIEW_THRESHOLD = 0.7;
-export const AI_DEFAULT_RESPONSE = `I don't have enough information in the knowledge base to answer this question.`;

@@ -10,8 +10,14 @@ import {
   THRESHOLD_RELEVANCE_SCORE,
   MIN_RESPONSE_LENGTH,
   PROMPT_LEAK_PATTERNS,
+  GROUNDING_WEIGHT,
+  RELEVANCE_WEIGHT,
+  AUTO_SEND_THRESHOLD,
+  AGENT_REVIEW_THRESHOLD,
 } from '../constants/ai-validation.constants';
 import { RetrievedContextResult } from 'src/modules/knowledge-base/types/semantic-search.type';
+import { AiResponseValidationResult } from '../types/message.type';
+import { AiResponseStatus } from '@prisma/client';
 
 @Injectable()
 export class AiResponseValidationService {
@@ -94,5 +100,88 @@ export class AiResponseValidationService {
         ? undefined
         : `Response not relevant to user query (relevance score: ${relevaceScore.toFixed(2)})`,
     };
+  }
+
+  public validateAiResponse(
+    response: string,
+    responseEmbeddings: number[],
+    queryContext: RetrievedContextResult[],
+    queryEmbeddings: number[],
+  ): AiResponseValidationResult {
+    const structuralValidation = this.validateStructure(response);
+    if (!structuralValidation.passed) {
+      this.logger.warn(`Structural validation failed.`, {
+        reasons: structuralValidation.reasons,
+        responsePreview: response,
+      });
+      return {
+        status: AiResponseStatus.FAILED,
+        confidence: 0,
+        error: 'Structural validation failed',
+      };
+    }
+
+    const groundingValidation = this.validateGrounding(
+      responseEmbeddings,
+      queryContext,
+    );
+    if (!groundingValidation.passed) {
+      this.logger.warn(`Grounding validation failed.`, {
+        reason: groundingValidation.reason,
+        responsePreview: response,
+      });
+      return {
+        status: AiResponseStatus.FAILED,
+        confidence: 0,
+        error: 'Grounding validation failed',
+      };
+    }
+
+    const semanticRelevanceValidation = this.validateSemanticRelevance(
+      queryEmbeddings,
+      responseEmbeddings,
+    );
+    if (!semanticRelevanceValidation.passed) {
+      this.logger.warn(`Semantic relevance validation failed.`, {
+        reason: semanticRelevanceValidation.reason,
+        responsePreview: response,
+      });
+      return {
+        status: AiResponseStatus.FAILED,
+        confidence: 0,
+        error: 'Semantic relevance validation failed',
+      };
+    }
+
+    const confidenceScore =
+      groundingValidation.score * GROUNDING_WEIGHT +
+      semanticRelevanceValidation.score * RELEVANCE_WEIGHT;
+
+    if (confidenceScore >= AUTO_SEND_THRESHOLD) {
+      this.logger.log(
+        `Confidence score reliable, auto sending the AI response. Confidence Score: ${confidenceScore}`,
+      );
+      return {
+        status: AiResponseStatus.AUTO_SEND,
+        confidence: confidenceScore,
+      };
+    } else if (confidenceScore >= AGENT_REVIEW_THRESHOLD) {
+      this.logger.warn(
+        `Confidence score not reliable, assigning for agent review. Confidence Score: ${confidenceScore}`,
+      );
+      return {
+        status: AiResponseStatus.QUEUE_FOR_REVIEW,
+        confidence: confidenceScore,
+      };
+    } else {
+      this.logger.warn(
+        `Confidence score too low, discarding AI response. Confidence Score: ${confidenceScore}`,
+      );
+      return {
+        status: AiResponseStatus.FAILED,
+        confidence: confidenceScore,
+        error: 'AI confidence score is too low',
+      };
+    }
   }
 }

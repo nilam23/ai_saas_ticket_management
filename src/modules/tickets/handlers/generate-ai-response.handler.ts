@@ -10,7 +10,7 @@ import { TicketResponseService } from '../service/ticket-response.service';
 @Injectable()
 export class GenerateAiResponseHandler extends BaseHttpHandler<
   GenerateAiResponseHandlerEvent,
-  string
+  void
 > {
   private readonly logger = new Logger(GenerateAiResponseHandler.name);
 
@@ -20,20 +20,20 @@ export class GenerateAiResponseHandler extends BaseHttpHandler<
 
   public async handle(
     event: GenerateAiResponseHandlerEvent,
-  ): Promise<HttpResponse<string>> {
+  ): Promise<HttpResponse<void>> {
     const { generateAiResponseInput, auditContext } = event;
     try {
       this.logger.log(
         `Handling request to generate AI response. TicketID: ${generateAiResponseInput.ticketId}, AgentID: ${auditContext.actorUserId}, TenantID: ${generateAiResponseInput.tenantId}`,
       );
-      const response = await this.ticketResponseService.generateAiResponse(
+      await this.ticketResponseService.generateAiResponse(
         generateAiResponseInput,
         auditContext,
       );
       this.logger.log(
         `AI response generated. TicketID: ${generateAiResponseInput.ticketId}, AgentID: ${auditContext.actorUserId}, TenantID: ${generateAiResponseInput.tenantId}`,
       );
-      return this.ok(response);
+      return this.ok();
     } catch (error) {
       const { message } = normalizeError(error);
       this.logger.error(

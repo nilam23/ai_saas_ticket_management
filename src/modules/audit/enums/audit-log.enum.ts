@@ -10,6 +10,7 @@ export enum AuditLogAction {
   CREATE_TICKET = 'CREATE_TICKET',
   CLASSIFY_TICKET = 'CLASSIFY_TICKET',
   ASSIGN_TICKET = 'ASSIGN_TICKET',
+  GENERATE_AI_RESPONSE = 'GENERATE_AI_RESPONSE',
 }
 
 export enum AuditLogEntityType {
@@ -17,4 +18,5 @@ export enum AuditLogEntityType {
   USER = 'USER',
   TENANT_DOC = 'TENANT_DOC',
   TICKET = 'TICKET',
+  MESSAGE = 'MESSAGE',
 }

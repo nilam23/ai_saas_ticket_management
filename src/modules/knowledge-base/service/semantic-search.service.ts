@@ -23,7 +23,7 @@ export class SemanticSearchService {
     const { tenantId, query, queryEmbeddings } = retrieveContextInput;
 
     this.logger.log(
-      `Retrieving context. Query: ${query}, TenantID: ${tenantId}`,
+      `Retrieving context. Query: "${query}", TenantID: ${tenantId}`,
     );
 
     const embeddingVector = `[${queryEmbeddings.join(',')}]`;
@@ -39,7 +39,7 @@ export class SemanticSearchService {
     );
 
     this.logger.log(
-      `Context retrieved. Query: "${query}", TenantId=${tenantId}, Total: ${retrievedContext.length}, Above Threshold: ${relevantContext.length}`,
+      `Context retrieved. Query: "${query}", TenantId:${tenantId}, Total: ${retrievedContext.length}, Above Threshold: ${relevantContext.length}`,
     );
 
     return relevantContext;

@@ -17,9 +17,20 @@ export class MessageRepository {
         },
       },
       senderType: createMessageInput.senderType,
-      content: createMessageInput.content,
+      ...(createMessageInput.content && {
+        content: createMessageInput.content,
+      }),
       ...(createMessageInput.senderId && {
         sender: { connect: { id: createMessageInput.senderId } },
+      }),
+      ...(createMessageInput.aiResponseStatus && {
+        aiResponseStatus: createMessageInput.aiResponseStatus,
+      }),
+      ...(createMessageInput.aiResponseConfidence && {
+        aiResponseConfidence: createMessageInput.aiResponseConfidence,
+      }),
+      ...(createMessageInput.aiResponseError && {
+        aiResponseError: createMessageInput.aiResponseError,
       }),
     };
 

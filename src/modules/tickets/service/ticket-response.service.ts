@@ -5,17 +5,19 @@ import { SemanticSearchService } from 'src/modules/knowledge-base/service/semant
 import { AiProviderService } from 'src/modules/ai-core/service/ai-provider.service';
 import { getAiResponseGenerationPrompt } from 'src/modules/ai-core/utils/prompt.utils';
 import {
-  AGENT_REVIEW_THRESHOLD,
-  AI_DEFAULT_RESPONSE,
-  AUTO_SEND_THRESHOLD,
-  GROUNDING_WEIGHT,
-  RELEVANCE_WEIGHT,
   RESPONSE_GENERATION_LLM_MAX_TOKENS,
   RESPONSE_GENERATION_LLM_STOP_SEQUENCES,
   RESPONSE_GENERATION_LLM_TEMP,
 } from '../constants/ai-validation.constants';
 import { AiResponseValidationService } from './ai-response-validation.service';
-import { RetrievedContextResult } from 'src/modules/knowledge-base/types/semantic-search.type';
+import { AiResponseGenerationResult } from '../types/message.type';
+import { AiResponseStatus, SenderType } from '@prisma/client';
+import { MessageRepository } from '../repository/message.repository';
+import { AuditService } from 'src/modules/audit/service/audit.service';
+import {
+  AuditLogAction,
+  AuditLogEntityType,
+} from 'src/modules/audit/enums/audit-log.enum';
 
 @Injectable()
 export class TicketResponseService {
@@ -25,6 +27,8 @@ export class TicketResponseService {
     private readonly semanticSearchService: SemanticSearchService,
     private readonly aiProviderService: AiProviderService,
     private readonly aiResponseValidationService: AiResponseValidationService,
+    private readonly messageRepository: MessageRepository,
+    private readonly auditService: AuditService,
   ) {}
 
   private cleanAiResponse(response: string): string {
@@ -35,74 +39,10 @@ export class TicketResponseService {
       .trim();
   }
 
-  private validateAiResponse(
-    response: string,
-    responseEmbeddings: number[],
-    queryContext: RetrievedContextResult[],
-    queryEmbeddings: number[],
-  ) {
-    const structuralValidation =
-      this.aiResponseValidationService.validateStructure(response);
-    if (!structuralValidation.passed) {
-      this.logger.warn(`Structural validation failed.`, {
-        reasons: structuralValidation.reasons,
-        responsePreview: response,
-      });
-      // handle
-    }
-
-    const groundingValidation =
-      this.aiResponseValidationService.validateGrounding(
-        responseEmbeddings,
-        queryContext,
-      );
-    if (!groundingValidation.passed) {
-      this.logger.warn(`Grounding validation failed.`, {
-        reason: groundingValidation.reason,
-        responsePreview: response,
-      });
-      // handle
-    }
-
-    const semanticRelevanceValidation =
-      this.aiResponseValidationService.validateSemanticRelevance(
-        queryEmbeddings,
-        responseEmbeddings,
-      );
-    if (!semanticRelevanceValidation.passed) {
-      this.logger.warn(`Semantic relevance validation failed.`, {
-        reason: semanticRelevanceValidation.reason,
-        responsePreview: response,
-      });
-      // handle
-    }
-
-    const confidenceScore =
-      groundingValidation.score * GROUNDING_WEIGHT +
-      semanticRelevanceValidation.score * RELEVANCE_WEIGHT;
-
-    if (confidenceScore >= AUTO_SEND_THRESHOLD) {
-      this.logger.log(
-        `Confidence score reliable, auto sending the AI response. Confidence Score: ${confidenceScore}`,
-      );
-      // handle
-    } else if (confidenceScore >= AGENT_REVIEW_THRESHOLD) {
-      this.logger.warn(
-        `Confidence score not reliable, assigning for Agnet review. Confidence Score: ${confidenceScore}`,
-      );
-      // handle
-    } else {
-      this.logger.warn(
-        `Confidence score too low, discarding AI response. Confidence Score: ${confidenceScore}`,
-      );
-      // handle
-    }
-  }
-
   public async generateAiResponse(
     generateAiResponseInput: GenerateAiResponseInput,
     auditContext: AuditContext,
-  ): Promise<string> {
+  ): Promise<void> {
     const { tenantId, ticketId, query } = generateAiResponseInput;
     this.logger.log(
       `Generating AI Response. TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}, TenantID: ${tenantId}`,
@@ -115,44 +55,75 @@ export class TicketResponseService {
       query,
       queryEmbeddings,
     });
+    let responseGenerationResult: AiResponseGenerationResult = {
+      confidence: 0,
+      status: AiResponseStatus.QUEUE_FOR_REVIEW,
+    };
 
-    if (queryContext.length === 0) {
-      this.logger.warn(
-        `No relevant context found for user query Returning default AI response. TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}, TenantID: ${tenantId}`,
+    if (queryContext.length) {
+      this.logger.log(
+        `Query context retrieved, generating response. Contexts: ${queryContext.length}, TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}, TenantID: ${tenantId}`,
+      );
+      const prompt = getAiResponseGenerationPrompt(query, queryContext);
+      const rawResponse = await this.aiProviderService.generateText(prompt, {
+        temperature: RESPONSE_GENERATION_LLM_TEMP,
+        num_predict: RESPONSE_GENERATION_LLM_MAX_TOKENS,
+        stop: RESPONSE_GENERATION_LLM_STOP_SEQUENCES,
+      });
+
+      this.logger.log(
+        `Cleaning, generating embeddings and validating AI response. Response: "${rawResponse}", TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}, tenantID: ${tenantId}`,
       );
 
-      return AI_DEFAULT_RESPONSE; // handle
+      const cleanedResponse = this.cleanAiResponse(rawResponse);
+      const responseEmbeddings =
+        await this.aiProviderService.generateEmbedding(rawResponse);
+      responseGenerationResult = {
+        response: cleanedResponse,
+        ...this.aiResponseValidationService.validateAiResponse(
+          cleanedResponse,
+          responseEmbeddings,
+          queryContext,
+          queryEmbeddings,
+        ),
+      };
+    } else {
+      this.logger.warn(
+        `No relevant context found for user query. TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}, TenantID: ${tenantId}`,
+      );
+      responseGenerationResult.error = 'No context found';
+      responseGenerationResult.status = AiResponseStatus.FAILED;
     }
 
-    const prompt = getAiResponseGenerationPrompt(query, queryContext);
-    const response = await this.aiProviderService.generateText(prompt, {
-      temperature: RESPONSE_GENERATION_LLM_TEMP,
-      num_predict: RESPONSE_GENERATION_LLM_MAX_TOKENS,
-      stop: RESPONSE_GENERATION_LLM_STOP_SEQUENCES,
+    const messageData = {
+      ticketId,
+      senderType: SenderType.AI,
+      ...(responseGenerationResult.status !== AiResponseStatus.FAILED && {
+        content: responseGenerationResult.response,
+      }),
+      aiResponseStatus: responseGenerationResult.status,
+      aiResponseConfidence: responseGenerationResult.confidence,
+      ...(responseGenerationResult.error && {
+        aiResponseError: responseGenerationResult.error,
+      }),
+    };
+    this.logger.log(
+      `Creating message data. Message: ${JSON.stringify(messageData)}`,
+    );
+    const message = await this.messageRepository.createMessage(messageData);
+
+    await this.auditService.createAuditLog({
+      tenantId,
+      actorUserId: auditContext.actorUserId!,
+      action: AuditLogAction.GENERATE_AI_RESPONSE,
+      entityType: AuditLogEntityType.MESSAGE,
+      entityId: message.id,
+      ipAddress: auditContext.ipAddress,
+      userAgent: auditContext.userAgent,
     });
 
     this.logger.log(
-      `AI response generated. TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}, TenantID: ${tenantId}`,
+      `AI response generation attempt completed. Final Response: ${JSON.stringify(responseGenerationResult)}, TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}, tenantID: ${tenantId}`,
     );
-
-    this.logger.log(
-      `Cleaning and validating generated AI response. Raw Response: ${response}, TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}, tenantID: ${tenantId}`,
-    );
-
-    const cleanedResponse = this.cleanAiResponse(response);
-    const responseEmbeddings =
-      await this.aiProviderService.generateEmbedding(response);
-    this.validateAiResponse(
-      cleanedResponse,
-      responseEmbeddings,
-      queryContext,
-      queryEmbeddings,
-    );
-
-    this.logger.log(
-      `Cleaning and validation of AI response completed. Final Response: ${response}, TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}, tenantID: ${tenantId}`,
-    );
-
-    return cleanedResponse;
   }
 }
