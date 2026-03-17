@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MessageRepository } from '../repository/message.repository';
 import { CreateMessageInput } from '../types/message.type';
+import { Message } from '@prisma/client';
 
 @Injectable()
 export class MessageService {
@@ -8,7 +9,9 @@ export class MessageService {
 
   constructor(private readonly messageRepository: MessageRepository) {}
 
-  public async createMessage(createMessageInput: CreateMessageInput) {
+  public async createMessage(
+    createMessageInput: CreateMessageInput,
+  ): Promise<Message> {
     this.logger.log(
       `Creating message. Ticket ID: ${createMessageInput.ticketId}`,
     );
@@ -17,5 +20,7 @@ export class MessageService {
     this.logger.log(
       `Message created. Message ID: ${createdMessage.id}, Ticket ID: ${createMessageInput.ticketId}`,
     );
+
+    return createdMessage;
   }
 }

@@ -8,7 +8,6 @@ import {
 } from '../types/ticket.type';
 import { AuditContext } from 'src/modules/audit/types/audit.type';
 import { TicketRepository } from '../repository/ticket.repository';
-import { MessageRepository } from '../repository/message.repository';
 import { SenderType, Ticket } from '@prisma/client';
 import { AuditService } from 'src/modules/audit/service/audit.service';
 import {
@@ -19,6 +18,7 @@ import { TicketCreatedEvent } from '../events/ticket-created.event';
 import { KafkaProducer } from 'src/infra/kafka/service/kafka-producer.service';
 import { KafkaTopic } from 'src/infra/kafka/enums/kafka.enum';
 import { TicketNotFoundException } from '../exceptions/ticket-service.exception';
+import { MessageService } from './message.service';
 
 @Injectable()
 export class TicketService {
@@ -26,7 +26,7 @@ export class TicketService {
 
   constructor(
     private readonly ticketRepository: TicketRepository,
-    private readonly messageRepository: MessageRepository,
+    private readonly messageService: MessageService,
     private readonly auditService: AuditService,
     private readonly kafkaProducer: KafkaProducer,
   ) {}
@@ -39,7 +39,7 @@ export class TicketService {
     const createdTicket =
       await this.ticketRepository.createTicket(createTicketInput);
 
-    await this.messageRepository.createMessage({
+    await this.messageService.createMessage({
       ticketId: createdTicket.id,
       content: createTicketInput.message,
       senderId: createTicketInput.createdById,

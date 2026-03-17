@@ -12,12 +12,12 @@ import {
 import { AiResponseValidationService } from './ai-response-validation.service';
 import { AiResponseGenerationResult } from '../types/message.type';
 import { AiResponseStatus, SenderType } from '@prisma/client';
-import { MessageRepository } from '../repository/message.repository';
 import { AuditService } from 'src/modules/audit/service/audit.service';
 import {
   AuditLogAction,
   AuditLogEntityType,
 } from 'src/modules/audit/enums/audit-log.enum';
+import { MessageService } from './message.service';
 
 @Injectable()
 export class TicketResponseService {
@@ -27,7 +27,7 @@ export class TicketResponseService {
     private readonly semanticSearchService: SemanticSearchService,
     private readonly aiProviderService: AiProviderService,
     private readonly aiResponseValidationService: AiResponseValidationService,
-    private readonly messageRepository: MessageRepository,
+    private readonly messageService: MessageService,
     private readonly auditService: AuditService,
   ) {}
 
@@ -110,7 +110,7 @@ export class TicketResponseService {
     this.logger.log(
       `Creating message data. Message: ${JSON.stringify(messageData)}`,
     );
-    const message = await this.messageRepository.createMessage(messageData);
+    const message = await this.messageService.createMessage(messageData);
 
     await this.auditService.createAuditLog({
       tenantId,
