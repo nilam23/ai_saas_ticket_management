@@ -9,13 +9,14 @@ import { TicketRepository } from './repository/ticket.repository';
 import { PrismaService } from 'src/infra/prisma/prisma.service';
 import { CreateTicketHandler } from './handlers/create-ticket.handler';
 import { MessageRepository } from './repository/message.repository';
+import { MessageService } from './service/message.service';
 import { KafkaModule } from 'src/infra/kafka/kafka.module';
 import { RoutingModule } from '../ticket-routing/routing.module';
-import { GenerateAiResponseHandler } from './handlers/generate-ai-response.handler';
 import { TicketResponseService } from './service/ticket-response.service';
 import { AiCoreModule } from '../ai-core/ai-core.module';
 import { KnowledgeBaseModule } from '../knowledge-base/knowledge-base.module';
 import { AiResponseValidationService } from './service/ai-response-validation.service';
+import { TicketAssignedEventHandler } from './handlers/kafka/ticket-assigned-event.handler';
 
 @Module({
   imports: [
@@ -28,14 +29,14 @@ import { AiResponseValidationService } from './service/ai-response-validation.se
     forwardRef(() => AiCoreModule),
     forwardRef(() => KnowledgeBaseModule),
   ],
-  controllers: [TicketController],
+  controllers: [TicketController, TicketAssignedEventHandler],
   providers: [
     TicketService,
     TicketRepository,
     MessageRepository,
+    MessageService,
     PrismaService,
     CreateTicketHandler,
-    GenerateAiResponseHandler,
     TicketResponseService,
     AiResponseValidationService,
   ],

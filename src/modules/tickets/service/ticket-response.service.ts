@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { GenerateAiResponseInput } from '../types/ticket.type';
-import { AuditContext } from 'src/modules/audit/types/audit.type';
 import { SemanticSearchService } from 'src/modules/knowledge-base/service/semantic-search.service';
 import { AiProviderService } from 'src/modules/ai-core/service/ai-provider.service';
 import { getAiResponseGenerationPrompt } from 'src/modules/ai-core/utils/prompt.utils';
@@ -18,6 +17,8 @@ import {
   AuditLogEntityType,
 } from 'src/modules/audit/enums/audit-log.enum';
 import { MessageService } from './message.service';
+import { UserService } from 'src/modules/user/service/user.service';
+import { getTenantSystemUserEmail } from 'src/shared/utils/common.utils';
 
 @Injectable()
 export class TicketResponseService {
@@ -28,6 +29,7 @@ export class TicketResponseService {
     private readonly aiProviderService: AiProviderService,
     private readonly aiResponseValidationService: AiResponseValidationService,
     private readonly messageService: MessageService,
+    private readonly userService: UserService,
     private readonly auditService: AuditService,
   ) {}
 
@@ -41,11 +43,10 @@ export class TicketResponseService {
 
   public async generateAiResponse(
     generateAiResponseInput: GenerateAiResponseInput,
-    auditContext: AuditContext,
   ): Promise<void> {
     const { tenantId, ticketId, query } = generateAiResponseInput;
     this.logger.log(
-      `Generating AI Response. TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}, TenantID: ${tenantId}`,
+      `Generating AI Response. TicketID: ${ticketId}, TenantID: ${tenantId}`,
     );
 
     const queryEmbeddings =
@@ -62,7 +63,7 @@ export class TicketResponseService {
 
     if (queryContext.length) {
       this.logger.log(
-        `Query context retrieved, generating response. Contexts: ${queryContext.length}, TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}, TenantID: ${tenantId}`,
+        `Query context retrieved, generating response. Contexts: ${queryContext.length}, TicketID: ${ticketId}, TenantID: ${tenantId}`,
       );
       const prompt = getAiResponseGenerationPrompt(query, queryContext);
       const rawResponse = await this.aiProviderService.generateText(prompt, {
@@ -72,7 +73,7 @@ export class TicketResponseService {
       });
 
       this.logger.log(
-        `Cleaning, generating embeddings and validating AI response. Response: "${rawResponse}", TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}, tenantID: ${tenantId}`,
+        `Cleaning, generating embeddings and validating AI response. Response: "${rawResponse}", TicketID: ${ticketId}, tenantID: ${tenantId}`,
       );
 
       const cleanedResponse = this.cleanAiResponse(rawResponse);
@@ -89,7 +90,7 @@ export class TicketResponseService {
       };
     } else {
       this.logger.warn(
-        `No relevant context found for user query. TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}, TenantID: ${tenantId}`,
+        `No relevant context found for user query. TicketID: ${ticketId}, TenantID: ${tenantId}`,
       );
       responseGenerationResult.error = 'No context found';
       responseGenerationResult.status = AiResponseStatus.FAILED;
@@ -112,18 +113,22 @@ export class TicketResponseService {
     );
     const message = await this.messageService.createMessage(messageData);
 
+    const systemUser = await this.userService.getUserData({
+      tenantId,
+      email: getTenantSystemUserEmail(tenantId),
+    });
+    this.logger.log(`System user fetched for the tenant ${tenantId}`);
+
     await this.auditService.createAuditLog({
       tenantId,
-      actorUserId: auditContext.actorUserId!,
+      actorUserId: systemUser.id,
       action: AuditLogAction.GENERATE_AI_RESPONSE,
       entityType: AuditLogEntityType.MESSAGE,
       entityId: message.id,
-      ipAddress: auditContext.ipAddress,
-      userAgent: auditContext.userAgent,
     });
 
     this.logger.log(
-      `AI response generation attempt completed. Final Response: ${JSON.stringify(responseGenerationResult)}, TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}, tenantID: ${tenantId}`,
+      `AI response generation attempt completed. Final Response: ${JSON.stringify(responseGenerationResult)}, TicketID: ${ticketId}, tenantID: ${tenantId}`,
     );
   }
 }
