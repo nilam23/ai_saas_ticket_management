@@ -4,12 +4,12 @@ import { KafkaEvent, KafkaTopic } from 'src/infra/kafka/enums/kafka.enum';
 import type { EventEnvelope } from 'src/infra/kafka/type/kafka.type';
 import { KafkaEventPattern } from 'src/infra/kafka/decorators/event-pattern.decorator';
 import { TicketAssignedEventPayload } from 'src/modules/ticket-classification/types/kafka-event.type';
-import { TicketResponseService } from '../../service/ticket-response.service';
+import { AiResponseService } from '../../service/ai-response.service';
 @Controller()
 export class TicketAssignedEventHandler {
   private readonly logger = new Logger(TicketAssignedEventHandler.name);
 
-  constructor(private readonly ticketResponseService: TicketResponseService) {}
+  constructor(private readonly aiResponseService: AiResponseService) {}
 
   @KafkaEventPattern(KafkaTopic.EVENT_BUS, KafkaEvent.TICKET_ASSIGNED)
   async handleTicketAssigned(
@@ -20,7 +20,7 @@ export class TicketAssignedEventHandler {
     );
 
     const { tenantId, ticketId, message } = event.payload;
-    await this.ticketResponseService.generateAiResponse({
+    await this.aiResponseService.generateAiResponse({
       tenantId,
       ticketId,
       query: message,

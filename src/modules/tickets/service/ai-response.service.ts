@@ -21,8 +21,8 @@ import { UserService } from 'src/modules/user/service/user.service';
 import { getTenantSystemUserEmail } from 'src/shared/utils/common.utils';
 
 @Injectable()
-export class TicketResponseService {
-  private readonly logger = new Logger(TicketResponseService.name);
+export class AiResponseService {
+  private readonly logger = new Logger(AiResponseService.name);
 
   constructor(
     private readonly semanticSearchService: SemanticSearchService,

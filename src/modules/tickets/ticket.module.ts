@@ -12,7 +12,7 @@ import { MessageRepository } from './repository/message.repository';
 import { MessageService } from './service/message.service';
 import { KafkaModule } from 'src/infra/kafka/kafka.module';
 import { RoutingModule } from '../ticket-routing/routing.module';
-import { TicketResponseService } from './service/ticket-response.service';
+import { AiResponseService } from './service/ai-response.service';
 import { AiCoreModule } from '../ai-core/ai-core.module';
 import { KnowledgeBaseModule } from '../knowledge-base/knowledge-base.module';
 import { AiResponseValidationService } from './service/ai-response-validation.service';
@@ -37,7 +37,7 @@ import { TicketAssignedEventHandler } from './handlers/kafka/ticket-assigned-eve
     MessageService,
     PrismaService,
     CreateTicketHandler,
-    TicketResponseService,
+    AiResponseService,
     AiResponseValidationService,
   ],
   exports: [TicketService, TicketRepository],
