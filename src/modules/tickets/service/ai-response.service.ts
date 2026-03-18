@@ -162,7 +162,7 @@ export class AiResponseService {
 
     if (ticket.assignedToId !== agentId) {
       this.logger.error(
-        `Agent not allowed to review. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${agentId}`,
+        `Agent not allowed to review AI response. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${agentId}`,
       );
 
       throw new AgentReviewForbiddenException();
@@ -174,10 +174,6 @@ export class AiResponseService {
       aiResponseStatus,
       ...(updatedResponse && { content: updatedResponse }),
     });
-
-    this.logger.log(
-      `AI response reviewed. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${agentId}, Action: ${action}`,
-    );
 
     await this.auditService.createAuditLog({
       tenantId,

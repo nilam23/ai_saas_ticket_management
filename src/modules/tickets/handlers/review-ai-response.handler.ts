@@ -23,23 +23,23 @@ export class ReviewAiResponseHandler extends BaseHttpHandler<
     event: ReviewAiResponseApiHandlerEvent,
   ): Promise<HttpResponse<void>> {
     const { reviewAiResponseInput, auditContext } = event;
-    const { tenantId, ticketId, messageId } = reviewAiResponseInput;
+    const { tenantId, ticketId, messageId, agentId } = reviewAiResponseInput;
     try {
       this.logger.log(
-        `Handling request to review AI response. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}, TenantID: ${tenantId}`,
+        `Handling request to review AI response. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${agentId}, TenantID: ${tenantId}`,
       );
       await this.aiResponseService.reviewAiResponse(
         reviewAiResponseInput,
         auditContext,
       );
       this.logger.log(
-        `AI response reviewed. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}, TenantID: ${tenantId}`,
+        `AI response reviewed. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${agentId}, TenantID: ${tenantId}`,
       );
       return this.ok();
     } catch (error) {
       const { message } = normalizeError(error);
       this.logger.error(
-        `Error reviewing AI response. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}, TenantID: ${tenantId}, Error: ${message}`,
+        `Error reviewing AI response. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${agentId}, TenantID: ${tenantId}, Error: ${message}`,
       );
       if (error instanceof AgentReviewForbiddenException) {
         return this.forbidden(message);
