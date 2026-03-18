@@ -145,14 +145,14 @@ export class AiResponseService {
     reviewAiResponseInput: ReviewAiResponseInput,
     auditContext: AuditContext,
   ) {
-    const { tenantId, ticketId, messageId, action, updatedResponse } =
+    const { tenantId, ticketId, messageId, agentId, action, updatedResponse } =
       reviewAiResponseInput;
     const aiResponseStatus = AgentReviewAction.APPROVED
       ? AiResponseStatus.APPROVED
       : AiResponseStatus.REJECTED;
 
     this.logger.log(
-      `Reviewing AI response. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}, Action: ${action}`,
+      `Reviewing AI response. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${agentId}, Action: ${action}`,
     );
 
     const ticket = await this.ticketService.findTicketById({
@@ -160,9 +160,9 @@ export class AiResponseService {
       ticketId,
     });
 
-    if (ticket.assignedToId !== auditContext.actorUserId!) {
+    if (ticket.assignedToId !== agentId) {
       this.logger.error(
-        `Agent not allowed to review. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}`,
+        `Agent not allowed to review. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${agentId}`,
       );
 
       throw new AgentReviewForbiddenException();
@@ -176,16 +176,21 @@ export class AiResponseService {
     });
 
     this.logger.log(
-      `AI response reviewed. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}, Action: ${action}`,
+      `AI response reviewed. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${agentId}, Action: ${action}`,
     );
 
     await this.auditService.createAuditLog({
       tenantId,
-      actorUserId: auditContext.actorUserId,
+      actorUserId: agentId,
       action: AuditLogAction.REVIEW_AI_RESPONSE,
       entityType: AuditLogEntityType.MESSAGE,
       entityId: messageId,
-      afterState: { aiResponse: updatedMessage.content, aiResponseStatus },
+      afterState: {
+        aiResponse: updatedMessage.content,
+        action,
+        aiResponseStatus,
+        reviewedBy: agentId,
+      },
       ipAddress: auditContext.ipAddress,
       userAgent: auditContext.userAgent,
     });

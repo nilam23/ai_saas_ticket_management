@@ -35,17 +35,15 @@ export class ReviewAiResponseHandler extends BaseHttpHandler<
       this.logger.log(
         `AI response reviewed. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}, TenantID: ${tenantId}`,
       );
-      return this.created();
+      return this.ok();
     } catch (error) {
       const { message } = normalizeError(error);
       this.logger.error(
         `Error reviewing AI response. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}, TenantID: ${tenantId}, Error: ${message}`,
       );
-
       if (error instanceof AgentReviewForbiddenException) {
         return this.forbidden(message);
       }
-
       return this.handleUnknownError(message);
     }
   }

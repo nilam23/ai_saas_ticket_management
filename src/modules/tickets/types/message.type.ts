@@ -34,6 +34,7 @@ export type ReviewAiResponseInput = {
   tenantId: string;
   ticketId: string;
   messageId: string;
+  agentId: string;
   action: AgentReviewAction;
   updatedResponse?: string;
 };

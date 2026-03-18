@@ -70,10 +70,10 @@ export class TicketController {
         tenantId,
         ticketId,
         messageId,
+        agentId: request.user.id,
         ...reviewAiResponseDto,
       },
       auditContext: {
-        actorUserId: request.user.id,
         ipAddress: request.ip,
         userAgent: request.headers['user-agent'],
       },
