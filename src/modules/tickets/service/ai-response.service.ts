@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { GenerateAiResponseInput } from '../types/ticket.type';
 import { SemanticSearchService } from 'src/modules/knowledge-base/service/semantic-search.service';
 import { AiProviderService } from 'src/modules/ai-core/service/ai-provider.service';
 import { getAiResponseGenerationPrompt } from 'src/modules/ai-core/utils/prompt.utils';
@@ -9,7 +8,11 @@ import {
   RESPONSE_GENERATION_LLM_TEMP,
 } from '../constants/ai-validation.constants';
 import { AiResponseValidationService } from './ai-response-validation.service';
-import { AiResponseGenerationResult } from '../types/message.type';
+import {
+  GenerateAiResponseInput,
+  GenerateAiResponseResult,
+  ReviewAiResponseInput,
+} from '../types/message.type';
 import { AiResponseStatus, SenderType } from '@prisma/client';
 import { AuditService } from 'src/modules/audit/service/audit.service';
 import {
@@ -19,6 +22,10 @@ import {
 import { MessageService } from './message.service';
 import { UserService } from 'src/modules/user/service/user.service';
 import { getTenantSystemUserEmail } from 'src/shared/utils/common.utils';
+import { AuditContext } from 'src/modules/audit/types/audit.type';
+import { AgentReviewAction } from '../enums/message.enum';
+import { TicketService } from './ticket.service';
+import { AgentReviewForbiddenException } from '../exceptions/ticket-service.exception';
 
 @Injectable()
 export class AiResponseService {
@@ -31,6 +38,7 @@ export class AiResponseService {
     private readonly messageService: MessageService,
     private readonly userService: UserService,
     private readonly auditService: AuditService,
+    private readonly ticketService: TicketService,
   ) {}
 
   private cleanAiResponse(response: string): string {
@@ -56,7 +64,7 @@ export class AiResponseService {
       query,
       queryEmbeddings,
     });
-    let responseGenerationResult: AiResponseGenerationResult = {
+    let responseGenerationResult: GenerateAiResponseResult = {
       confidence: 0,
       status: AiResponseStatus.QUEUE_FOR_REVIEW,
     };
@@ -125,10 +133,61 @@ export class AiResponseService {
       action: AuditLogAction.GENERATE_AI_RESPONSE,
       entityType: AuditLogEntityType.MESSAGE,
       entityId: message.id,
+      afterState: responseGenerationResult,
     });
 
     this.logger.log(
-      `AI response generation attempt completed. Final Response: ${JSON.stringify(responseGenerationResult)}, TicketID: ${ticketId}, tenantID: ${tenantId}`,
+      `AI response generation attempt completed. Final Result: ${JSON.stringify(responseGenerationResult)}, TicketID: ${ticketId}, tenantID: ${tenantId}`,
     );
+  }
+
+  public async reviewAiResponse(
+    reviewAiResponseInput: ReviewAiResponseInput,
+    auditContext: AuditContext,
+  ) {
+    const { tenantId, ticketId, messageId, action, updatedResponse } =
+      reviewAiResponseInput;
+    const aiResponseStatus = AgentReviewAction.APPROVED
+      ? AiResponseStatus.APPROVED
+      : AiResponseStatus.REJECTED;
+
+    this.logger.log(
+      `Reviewing AI response. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}, Action: ${action}`,
+    );
+
+    const ticket = await this.ticketService.findTicketById({
+      tenantId,
+      ticketId,
+    });
+
+    if (ticket.assignedToId !== auditContext.actorUserId!) {
+      this.logger.error(
+        `Agent not allowed to review. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}`,
+      );
+
+      throw new AgentReviewForbiddenException();
+    }
+
+    const updatedMessage = await this.messageService.updateMessage({
+      ticketId,
+      messageId,
+      aiResponseStatus,
+      ...(updatedResponse && { content: updatedResponse }),
+    });
+
+    this.logger.log(
+      `AI response reviewed. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${auditContext.actorUserId}, Action: ${action}`,
+    );
+
+    await this.auditService.createAuditLog({
+      tenantId,
+      actorUserId: auditContext.actorUserId,
+      action: AuditLogAction.REVIEW_AI_RESPONSE,
+      entityType: AuditLogEntityType.MESSAGE,
+      entityId: messageId,
+      afterState: { aiResponse: updatedMessage.content, aiResponseStatus },
+      ipAddress: auditContext.ipAddress,
+      userAgent: auditContext.userAgent,
+    });
   }
 }

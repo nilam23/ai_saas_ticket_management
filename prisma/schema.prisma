@@ -167,6 +167,8 @@ enum AiResponseStatus {
   AUTO_SEND
   QUEUE_FOR_REVIEW
   FAILED
+  APPROVED
+  REJECTED
 }
 
 model Message {
@@ -179,6 +181,7 @@ model Message {
   aiResponseConfidence Float?
   aiResponseError String?
   createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @default(now())
 
   ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
   sender User?  @relation(fields: [senderId], references: [id])

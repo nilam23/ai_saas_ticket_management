@@ -1,6 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MessageRepository } from '../repository/message.repository';
-import { CreateMessageInput } from '../types/message.type';
+import {
+  CreateMessageInput,
+  UpdateMessageFilterQuery,
+  UpdateMessageUpdateQuery,
+  UpdateMessageInput,
+} from '../types/message.type';
 import { Message } from '@prisma/client';
 
 @Injectable()
@@ -22,5 +27,31 @@ export class MessageService {
     );
 
     return createdMessage;
+  }
+
+  public async updateMessage(
+    updateTicketInput: UpdateMessageInput,
+  ): Promise<Message> {
+    const { ticketId, messageId, content, aiResponseStatus } =
+      updateTicketInput;
+
+    this.logger.log(
+      `Updating message. MessageID: ${messageId}, TicketID: ${ticketId}`,
+    );
+    const filterQuery: UpdateMessageFilterQuery = { id: messageId, ticketId };
+    const updateQuery: UpdateMessageUpdateQuery = {
+      ...(content && { content }),
+      aiResponseStatus,
+      updatedAt: new Date(),
+    };
+    const updatedMessage = await this.messageRepository.updateMessage(
+      filterQuery,
+      updateQuery,
+    );
+    this.logger.log(
+      `Message updated. MessageID: ${messageId}, TicketID: ${ticketId}`,
+    );
+
+    return updatedMessage;
   }
 }

@@ -16,8 +16,8 @@ import {
   AGENT_REVIEW_THRESHOLD,
 } from '../constants/ai-validation.constants';
 import { RetrievedContextResult } from 'src/modules/knowledge-base/types/semantic-search.type';
-import { AiResponseValidationResult } from '../types/message.type';
 import { AiResponseStatus } from '@prisma/client';
+import { ValidateAiResponseResult } from '../types/message.type';
 
 @Injectable()
 export class AiResponseValidationService {
@@ -107,7 +107,7 @@ export class AiResponseValidationService {
     responseEmbeddings: number[],
     queryContext: RetrievedContextResult[],
     queryEmbeddings: number[],
-  ): AiResponseValidationResult {
+  ): ValidateAiResponseResult {
     const structuralValidation = this.validateStructure(response);
     if (!structuralValidation.passed) {
       this.logger.warn(`Structural validation failed.`, {

@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Message, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/infra/prisma/prisma.service';
-import { CreateMessageInput } from '../types/message.type';
+import {
+  CreateMessageInput,
+  UpdateMessageFilterQuery,
+  UpdateMessageUpdateQuery,
+} from '../types/message.type';
 
 @Injectable()
 export class MessageRepository {
@@ -35,5 +39,15 @@ export class MessageRepository {
     };
 
     return this.prisma.message.create({ data: messageData });
+  }
+
+  public async updateMessage(
+    filterQuery: UpdateMessageFilterQuery,
+    updateQuery: UpdateMessageUpdateQuery,
+  ): Promise<Message> {
+    return this.prisma.message.update({
+      where: filterQuery,
+      data: updateQuery,
+    });
   }
 }

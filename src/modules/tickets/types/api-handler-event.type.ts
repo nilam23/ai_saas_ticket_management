@@ -1,12 +1,13 @@
 import { AuditContext } from 'src/modules/audit/types/audit.type';
-import { CreateTicketInput, GenerateAiResponseInput } from './ticket.type';
+import { CreateTicketInput } from './ticket.type';
+import { ReviewAiResponseInput } from './message.type';
 
 export type CreateTicketApiHandlerEvent = {
   createTicketInput: CreateTicketInput;
   auditContext: AuditContext;
 };
 
-export type GenerateAiResponseHandlerEvent = {
-  generateAiResponseInput: GenerateAiResponseInput;
+export type ReviewAiResponseApiHandlerEvent = {
+  reviewAiResponseInput: ReviewAiResponseInput;
   auditContext: AuditContext;
 };

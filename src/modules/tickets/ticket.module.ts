@@ -17,6 +17,7 @@ import { AiCoreModule } from '../ai-core/ai-core.module';
 import { KnowledgeBaseModule } from '../knowledge-base/knowledge-base.module';
 import { AiResponseValidationService } from './service/ai-response-validation.service';
 import { TicketAssignedEventHandler } from './handlers/kafka/ticket-assigned-event.handler';
+import { ReviewAiResponseHandler } from './handlers/review-ai-response.handler';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { TicketAssignedEventHandler } from './handlers/kafka/ticket-assigned-eve
     CreateTicketHandler,
     AiResponseService,
     AiResponseValidationService,
+    ReviewAiResponseHandler,
   ],
   exports: [TicketService, TicketRepository],
 })

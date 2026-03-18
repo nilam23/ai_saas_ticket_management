@@ -41,9 +41,3 @@ export type UpdateTicketUpdateQuery = {
   assignedTo?: { connect: { id: string } };
   updatedAt: Date;
 };
-
-export type GenerateAiResponseInput = {
-  tenantId: string;
-  ticketId: string;
-  query: string;
-};
