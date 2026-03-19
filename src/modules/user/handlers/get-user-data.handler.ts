@@ -46,10 +46,10 @@ export class GetUserDataHandler extends BaseHttpHandler<
       );
 
       if (error instanceof UserNotFoundException) {
-        this.notFound(message);
+        return this.notFound(message);
       }
 
-      this.handleUnknownError(message);
+      return this.internalServerError(message);
     }
   }
 }

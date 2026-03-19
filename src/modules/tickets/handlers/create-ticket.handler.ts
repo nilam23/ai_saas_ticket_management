@@ -37,7 +37,7 @@ export class CreateTicketHandler extends BaseHttpHandler<
         `Error creating ticket by customer: ${auditContext.actorUserId} for the tenant: ${createTicketInput.tenantId}. Error: ${message}`,
       );
 
-      this.handleUnknownError(message);
+      return this.internalServerError(message);
     }
   }
 }

@@ -35,7 +35,7 @@ export class GetTenantUsersHandler extends BaseHttpHandler<
       this.logger.error(
         `Error fetching users for the tenant: ${getTenantUsersInput.tenantId}. Error: ${message}`,
       );
-      this.handleUnknownError(message);
+      return this.internalServerError(message);
     }
   }
 }

@@ -40,12 +40,12 @@ export class RegisterHandler extends BaseHttpHandler<
       );
 
       if (error instanceof UserAlreadyExistsException) {
-        this.conflict(message);
+        return this.conflict(message);
       } else if (error instanceof TenantAlreadyExistsException) {
-        this.conflict(message);
+        return this.conflict(message);
       }
 
-      this.handleUnknownError(message);
+      return this.internalServerError(message);
     }
   }
 }

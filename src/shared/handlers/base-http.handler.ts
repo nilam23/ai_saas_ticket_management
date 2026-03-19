@@ -170,17 +170,6 @@ export abstract class BaseHttpHandler<TInput, TOutput> {
     throw new InternalServerErrorException(response);
   }
 
-  protected handleUnknownError(error: unknown): never {
-    const { message } = normalizeError(error);
-    const response: HttpErrorResponse = {
-      status: {
-        code: HttpStatus.INTERNAL_SERVER_ERROR,
-        message,
-      },
-    };
-    throw new InternalServerErrorException(response);
-  }
-
   protected notImplemented(message: string = 'Not Implemented'): never {
     const response: HttpErrorResponse = {
       status: {

@@ -36,10 +36,10 @@ export class UploadDocHandler extends BaseHttpHandler<
       );
 
       if (error instanceof S3UploadException) {
-        this.badRequest(message);
+        return this.badRequest(message);
       }
 
-      this.handleUnknownError(message);
+      return this.internalServerError(message);
     }
   }
 }

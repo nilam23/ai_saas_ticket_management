@@ -43,12 +43,12 @@ export class UserSignInHandler extends BaseHttpHandler<
       );
 
       if (error instanceof UserNotFoundException) {
-        this.notFound(message);
+        return this.notFound(message);
       } else if (error instanceof InvalidPasswordException) {
-        this.unauthorized(message);
+        return this.unauthorized(message);
       }
 
-      this.handleUnknownError(message);
+      return this.internalServerError(message);
     }
   }
 }

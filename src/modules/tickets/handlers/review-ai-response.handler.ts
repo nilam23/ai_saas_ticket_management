@@ -49,7 +49,7 @@ export class ReviewAiResponseHandler extends BaseHttpHandler<
       } else if (error instanceof MessageNotFoundException) {
         return this.badRequest(message);
       }
-      return this.handleUnknownError(message);
+      return this.internalServerError(message);
     }
   }
 }
