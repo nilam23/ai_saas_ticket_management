@@ -19,8 +19,8 @@ export class EmbeddingsGeneratorService {
     const { tenantId, docId, chunks } = generateEmbeddingsInput;
     const embeddings: number[][] = [];
 
-    this.logger.log(
-      `Generating batched embeddings. Doc: ${docId}, Tenant: ${tenantId}, Total chunks: ${chunks.length}`,
+    this.logger.debug(
+      `Generating batched embeddings. DocID: ${docId}, TenantID: ${tenantId}, Total chunks: ${chunks.length}`,
     );
 
     for (let i = 0; i < chunks.length; i += EMBEDDING_GENERATION_BATCH_SIZE) {
@@ -33,11 +33,13 @@ export class EmbeddingsGeneratorService {
       embeddings.push(...batchEmbeddings);
     }
 
-    this.logger.log(
-      `Generated ${embeddings.length} embeddings. Doc: ${docId}, Tenant: ${tenantId}`,
+    this.logger.debug(
+      `Generated ${embeddings.length} embeddings. DocID: ${docId}, TenantID: ${tenantId}`,
     );
 
-    this.logger.log(`Storing embeddings. Doc: ${docId}, Tenant: ${tenantId}`);
+    this.logger.debug(
+      `Storing embeddings. DocID: ${docId}, TenantID: ${tenantId}`,
+    );
 
     const knowledgeChunksRecords = chunks.map((chunk) => ({
       tenantId,
@@ -51,8 +53,8 @@ export class EmbeddingsGeneratorService {
       knowledgeChunksRecords,
     );
 
-    this.logger.log(
-      `Embeddings stored successfully. Doc: ${docId}, Tenant: ${tenantId}`,
+    this.logger.debug(
+      `Embeddings stored successfully. DocID: ${docId}, TenantID: ${tenantId}`,
     );
 
     return embeddings;

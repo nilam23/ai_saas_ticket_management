@@ -23,8 +23,10 @@ export class TenantDocEmbeddingGeneratorEventHandler {
   async handleDocEmbeddingGeneration(
     @Payload() event: EventEnvelope<TenantDocChunkedEventPayload>,
   ) {
+    const { tenantId, docId, chunks } = event.payload;
+
     this.logger.log(
-      `${KafkaEvent.TENANT_DOC_CHUNKED} event with ID ${event.id} consumed. Paylod: { docId: ${event.payload.docId}, tenantId: ${event.payload.tenantId}, chunks: ${event.payload.chunks.length} }`,
+      `${KafkaEvent.TENANT_DOC_CHUNKED} event with ID ${event.id} consumed. Paylod: { docId: ${docId}, tenantId: ${tenantId}, chunks: ${chunks.length} }`,
     );
 
     await this.embeddingGenerator.generateEmbeddings(event.payload);
@@ -34,11 +36,11 @@ export class TenantDocEmbeddingGeneratorEventHandler {
     );
 
     const embeddingGeneratedEvent = new TenantDocEmbeddingGeneratedEvent({
-      tenantId: event.payload.tenantId,
-      docId: event.payload.docId,
+      tenantId,
+      docId,
     });
-    this.logger.log(
-      `Emitting event. Topic: ${KafkaTopic.EVENT_BUS}, Event: ${embeddingGeneratedEvent.name}, Event ID: ${embeddingGeneratedEvent.id}`,
+    this.logger.debug(
+      `Emitting event. Topic: ${KafkaTopic.EVENT_BUS}, Event: ${embeddingGeneratedEvent.name}, EventID: ${embeddingGeneratedEvent.id}`,
     );
     this.kafkaProducer.emit(KafkaTopic.EVENT_BUS, embeddingGeneratedEvent);
   }

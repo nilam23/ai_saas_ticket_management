@@ -65,8 +65,8 @@ export class JwtAuthGuard implements CanActivate {
       tenantId: user.tenantId,
     };
 
-    this.logger.log(
-      `User ${user.email} authenticated for tenant ${request.tenantId}`,
+    this.logger.debug(
+      `User authenticated. Email: ${user.email}, TenantID: ${request.tenantId}`,
     );
     return true;
   }

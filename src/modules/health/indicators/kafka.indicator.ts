@@ -35,7 +35,7 @@ export class KafkaHealthIndicator extends MicroserviceHealthIndicator {
       });
     } catch (error) {
       const { message } = normalizeError(error);
-      this.logger.error(`Kafka health check failed: ${message}`);
+      this.logger.error(`Kafka health check failed. Error: ${message}`);
       throw error;
     }
   }

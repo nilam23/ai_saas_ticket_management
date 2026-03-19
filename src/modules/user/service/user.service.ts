@@ -32,14 +32,14 @@ export class UserService {
   ) {}
 
   public async getUserData(getUserDataInput: GetUserDataInput): Promise<User> {
-    this.logger.log(
-      `Getting user data for email: ${getUserDataInput.email} and tenantId: ${getUserDataInput.tenantId}`,
+    this.logger.debug(
+      `Getting user data. Email: ${getUserDataInput.email}, TenantId: ${getUserDataInput.tenantId}`,
     );
     const user = await this.userRepository.findUserByEmail(getUserDataInput);
 
     if (!user) {
       this.logger.error(
-        `User with email: ${getUserDataInput.email} not found for the tenant: ${getUserDataInput.tenantId}`,
+        `User not found. Email: ${getUserDataInput.email}, TenantID: ${getUserDataInput.tenantId}`,
       );
       throw new UserNotFoundException(getUserDataInput.email);
     }
@@ -51,33 +51,32 @@ export class UserService {
     createUserInput: CreateUserInput,
     auditContext?: AuditContext,
   ): Promise<User> {
-    this.logger.log(
-      `Checking if user with email: ${createUserInput.email} already exists for the tenant: ${createUserInput.tenantId}`,
+    const { name, email, tenantId, agentSkills, role } = createUserInput;
+    this.logger.debug(
+      `Checking user existence within tenant. Email: ${email}, TenantID: ${tenantId}`,
     );
     const user = await this.userRepository.findUserByEmail(createUserInput);
 
     if (user) {
       this.logger.error(
-        `User with email ${createUserInput.email} already exists for the tenant: ${createUserInput.tenantId}`,
+        `User already exists. Email: ${email}, TenantID: ${tenantId}`,
       );
-      throw new UserAlreadyExistsException(createUserInput.email);
+      throw new UserAlreadyExistsException(email);
     }
 
-    this.logger.log(
-      `Creating user with email: ${createUserInput.email} for the tenant: ${createUserInput.tenantId}`,
-    );
+    this.logger.debug(`Creating user. Email: ${email}, TenantID: ${tenantId}`);
     const newUser = await this.userRepository.createUser(createUserInput);
 
     if (newUser.role === UserRole.AGENT) {
-      this.logger.log(
-        `An agent has been created. Agent ID: ${newUser.id}, Tenant ID: ${newUser.tenantId}`,
+      this.logger.debug(
+        `An agent has been created. AgentID: ${newUser.id}, TenantID: ${newUser.tenantId}`,
       );
       const event = new AgentCreatedEvent({
         agentId: newUser.id,
         tenantId: newUser.tenantId,
-        skills: createUserInput.agentSkills!,
+        skills: agentSkills!,
       });
-      this.logger.log(
+      this.logger.debug(
         `Emitting event. Topic: ${KafkaTopic.EVENT_BUS}, Event: ${event.name}, Event ID: ${event.id}`,
       );
       this.kafkaProducer.emit(KafkaTopic.EVENT_BUS, event);
@@ -85,20 +84,20 @@ export class UserService {
 
     if (auditContext) {
       await this.auditService.createAuditLog({
-        tenantId: createUserInput.tenantId,
+        tenantId: tenantId,
         actorUserId: auditContext.actorUserId!,
         action:
-          createUserInput.role === UserRole.ADMIN
+          role === UserRole.ADMIN
             ? AuditLogAction.ADMIN_CREATE
             : AuditLogAction.AGENT_CREATE,
         entityType: AuditLogEntityType.USER,
         entityId: newUser.id,
         afterState: {
           id: newUser.id,
-          email: createUserInput.email,
-          name: createUserInput.name,
-          role: createUserInput.role,
-          tenantId: createUserInput.tenantId,
+          email: email,
+          name: name,
+          role: role,
+          tenantId: tenantId,
         },
         ipAddress: auditContext.ipAddress,
         userAgent: auditContext.userAgent,
@@ -111,8 +110,8 @@ export class UserService {
   public async getUsersByTenantId(
     getTenantUsersInput: GetTenantUsersInput,
   ): Promise<GetTenantUsersOutput> {
-    this.logger.log(
-      `Getting users for the tenant: ${getTenantUsersInput.tenantId}`,
+    this.logger.debug(
+      `Getting tenant users. TenantID: ${getTenantUsersInput.tenantId}`,
     );
     return this.userRepository.getUsersByTenantId(getTenantUsersInput.tenantId);
   }

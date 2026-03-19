@@ -18,12 +18,12 @@ export class MessageService {
   public async createMessage(
     createMessageInput: CreateMessageInput,
   ): Promise<Message> {
-    this.logger.log(
+    this.logger.debug(
       `Creating message. Ticket ID: ${createMessageInput.ticketId}`,
     );
     const createdMessage =
       await this.messageRepository.createMessage(createMessageInput);
-    this.logger.log(
+    this.logger.debug(
       `Message created. Message ID: ${createdMessage.id}, Ticket ID: ${createMessageInput.ticketId}`,
     );
 
@@ -36,7 +36,7 @@ export class MessageService {
     const { ticketId, messageId, content, aiResponseStatus } =
       updateTicketInput;
 
-    this.logger.log(
+    this.logger.debug(
       `Updating message. MessageID: ${messageId}, TicketID: ${ticketId}`,
     );
     const filterQuery: UpdateMessageFilterQuery = { id: messageId, ticketId };
@@ -49,7 +49,7 @@ export class MessageService {
       filterQuery,
       updateQuery,
     );
-    this.logger.log(
+    this.logger.debug(
       `Message updated. MessageID: ${messageId}, TicketID: ${ticketId}`,
     );
 
@@ -60,7 +60,7 @@ export class MessageService {
     findMessageByIdInput: FindMessageByIdInput,
   ): Promise<Message | null> {
     const { ticketId, messageId } = findMessageByIdInput;
-    this.logger.log(
+    this.logger.debug(
       `Fetching message. MessageID: ${messageId}, TicketID: ${ticketId}`,
     );
     return this.messageRepository.findMessageById(findMessageByIdInput);

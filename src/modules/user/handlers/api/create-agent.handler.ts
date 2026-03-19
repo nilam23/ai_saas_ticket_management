@@ -2,11 +2,11 @@ import {
   BaseHttpHandler,
   HttpResponse,
 } from 'src/shared/handlers/base-http.handler';
-import { UserService } from '../service/user.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { normalizeError } from 'src/shared/utils/error.utils';
-import { UserAlreadyExistsException } from '../exceptions/user-service.exception';
-import { CreateAgentApiHandlerEvent } from '../types/api-handler-event.type';
+import { CreateAgentApiHandlerEvent } from '../../types/api-handler-event.type';
+import { UserService } from '../../service/user.service';
+import { UserAlreadyExistsException } from '../../exceptions';
 
 @Injectable()
 export class CreateAgentHandler extends BaseHttpHandler<
@@ -24,24 +24,22 @@ export class CreateAgentHandler extends BaseHttpHandler<
     const { createUserInput, auditContext } = event;
 
     try {
-      this.logger.log(
-        `Handling request to create agent with email: ${createUserInput.email} for the tenant: ${createUserInput.tenantId} by ${auditContext.actorUserId!}`,
+      this.logger.debug(
+        `Handling request to create agent. Email: ${createUserInput.email}, TenantID: ${createUserInput.tenantId}, AdminID: ${auditContext.actorUserId!}`,
       );
       await this.userService.createUser(createUserInput, auditContext);
-      this.logger.log(
-        `Agent created successfully with email: ${createUserInput.email} for the tenant: ${createUserInput.tenantId}`,
+      this.logger.debug(
+        `Agent created successfully. Email: ${createUserInput.email}, TenantID: ${createUserInput.tenantId}`,
       );
       return this.created();
     } catch (error) {
       const { message } = normalizeError(error);
       this.logger.error(
-        `Error creating agent with email: ${createUserInput.email} for the tenant: ${createUserInput.tenantId} by ${auditContext.actorUserId!}. Error: ${message}`,
+        `Error creating agent. Email: ${createUserInput.email}, TenantID: ${createUserInput.tenantId}, AdminID: ${auditContext.actorUserId!}, Error: ${message}`,
       );
-
       if (error instanceof UserAlreadyExistsException) {
         return this.conflict(message);
       }
-
       return this.internalServerError(message);
     }
   }

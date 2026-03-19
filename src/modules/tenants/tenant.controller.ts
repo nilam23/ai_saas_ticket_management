@@ -10,12 +10,12 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import type { Request } from 'express';
-import { UploadDocHandler } from './handlers/upload-doc.handler';
 import { HttpResponse } from 'src/shared/handlers/base-http.handler';
 import { Tenant } from 'src/shared/decorators/tenant.decorator';
 import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { UserRole } from '@prisma/client';
+import { UploadDocHandler } from './handlers/api/upload-doc.handler';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('tenant')
@@ -33,7 +33,7 @@ export class TenantController {
     @Req() request: Request,
   ): Promise<HttpResponse<void>> {
     this.logger.log(
-      `Request to upload document: ${file.originalname} for the tenant: ${tenantId}`,
+      `Request to upload document. File Name: ${file.originalname}, TenantID: ${tenantId}`,
     );
     return this.uploadDocHandler.handle({
       file,

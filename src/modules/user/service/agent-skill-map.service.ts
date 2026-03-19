@@ -12,14 +12,14 @@ export class AgentSkillMapService {
   public async createAgentSkillMap(
     createAgentSkillMapInput: CreateAgentSkillMapInput,
   ): Promise<void> {
-    this.logger.log(
-      `Creating skill: ${createAgentSkillMapInput.skill} for the agent: ${createAgentSkillMapInput.agentId}`,
+    this.logger.debug(
+      `Creating agent skill. Skill: ${createAgentSkillMapInput.skill}, AgentID: ${createAgentSkillMapInput.agentId}`,
     );
     await this.agentSkillMapRepository.createAgentSkillMap(
       createAgentSkillMapInput,
     );
-    this.logger.log(
-      `Skill: ${createAgentSkillMapInput.skill} created for the agent: ${createAgentSkillMapInput.agentId}`,
+    this.logger.debug(
+      `Agent skill created. Skill: ${createAgentSkillMapInput.skill}, AgentID: ${createAgentSkillMapInput.agentId}`,
     );
   }
 }

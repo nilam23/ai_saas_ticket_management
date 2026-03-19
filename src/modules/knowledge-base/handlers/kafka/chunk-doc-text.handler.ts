@@ -38,7 +38,7 @@ export class TenantDocTextChunkerEventHandler {
       options: { chunkSize: DOC_CHUNK_SIZE, chunkOverlap: DOC_CHUNK_OVERLAP },
     });
 
-    this.logger.log(
+    this.logger.debug(
       `Generated ${chunks.length} chunks. DocID: ${docId}, TenantID: ${tenantId}`,
     );
 
@@ -51,8 +51,8 @@ export class TenantDocTextChunkerEventHandler {
       docId,
       chunks,
     });
-    this.logger.log(
-      `Emitting event. Topic: ${KafkaTopic.EVENT_BUS}, Event: ${docChunkedEvent.name}, Event ID: ${docChunkedEvent.id}`,
+    this.logger.debug(
+      `Emitting event. Topic: ${KafkaTopic.EVENT_BUS}, Event: ${docChunkedEvent.name}, EventID: ${docChunkedEvent.id}`,
     );
     this.kafkaProducer.emit(KafkaTopic.EVENT_BUS, docChunkedEvent);
   }

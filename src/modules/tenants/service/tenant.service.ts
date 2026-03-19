@@ -12,7 +12,9 @@ export class TenantService {
   public async createTenant(
     createTenantInput: CreateTenantInput,
   ): Promise<Tenant> {
-    this.logger.log(`Creating tenant: ${createTenantInput.name}`);
+    this.logger.debug(
+      `Creating tenant. Tenant Name: ${createTenantInput.name}`,
+    );
     const newTenant =
       await this.tenantRepository.createTenant(createTenantInput);
     return newTenant;

@@ -17,13 +17,13 @@ export class TextCleanerService {
   public clean(textCleanerInput: TextCleanerInput): string {
     const { tenantId, docId, text } = textCleanerInput;
 
-    this.logger.log(
+    this.logger.debug(
       `Cleaning text. DocID: ${docId}, TenantID: ${tenantId}, Input length: ${text.length}`,
     );
 
     const cleanedText = this.pipeline.reduce((acc, fn) => fn(acc), text);
 
-    this.logger.log(
+    this.logger.debug(
       `Cleaning completed. DocID: ${docId}, TenantID: ${tenantId}, Output length: ${cleanedText.length}`,
     );
 

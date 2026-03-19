@@ -23,7 +23,7 @@ export class AwsHealthIndicator {
       return indicator.up();
     } catch (error) {
       const { message } = normalizeError(error);
-      this.logger.error(`AWS health check failed: ${message}`);
+      this.logger.error(`AWS health check failed. Error: ${message}`);
       return indicator.down({ message });
     }
   }

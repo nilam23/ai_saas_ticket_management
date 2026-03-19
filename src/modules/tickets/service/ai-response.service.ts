@@ -56,7 +56,7 @@ export class AiResponseService {
     generateAiResponseInput: GenerateAiResponseInput,
   ): Promise<void> {
     const { tenantId, ticketId, query } = generateAiResponseInput;
-    this.logger.log(
+    this.logger.debug(
       `Generating AI Response. TicketID: ${ticketId}, TenantID: ${tenantId}`,
     );
 
@@ -73,8 +73,8 @@ export class AiResponseService {
     };
 
     if (queryContext.length) {
-      this.logger.log(
-        `Query context retrieved, generating response. Contexts: ${queryContext.length}, TicketID: ${ticketId}, TenantID: ${tenantId}`,
+      this.logger.debug(
+        `Query context retrieved, generating response. Contexts: ${queryContext.length}, TicketID: ${ticketId}`,
       );
       const prompt = getAiResponseGenerationPrompt(query, queryContext);
       const rawResponse = await this.aiProviderService.generateText(prompt, {
@@ -83,8 +83,8 @@ export class AiResponseService {
         stop: RESPONSE_GENERATION_LLM_STOP_SEQUENCES,
       });
 
-      this.logger.log(
-        `Cleaning, generating embeddings and validating AI response. Response: "${rawResponse}", TicketID: ${ticketId}, tenantID: ${tenantId}`,
+      this.logger.debug(
+        `Cleaning, generating embeddings and validating AI response. Response: "${rawResponse}", TicketID: ${ticketId}`,
       );
 
       const cleanedResponse = this.cleanAiResponse(rawResponse);
@@ -101,7 +101,7 @@ export class AiResponseService {
       };
     } else {
       this.logger.warn(
-        `No relevant context found for user query. TicketID: ${ticketId}, TenantID: ${tenantId}`,
+        `No relevant context found for user query. TicketID: ${ticketId}`,
       );
       responseGenerationResult.error = 'No context found';
       responseGenerationResult.status = AiResponseStatus.FAILED;
@@ -119,7 +119,7 @@ export class AiResponseService {
         aiResponseError: responseGenerationResult.error,
       }),
     };
-    this.logger.log(
+    this.logger.debug(
       `Creating message data. Message: ${JSON.stringify(messageData)}`,
     );
     const message = await this.messageService.createMessage(messageData);
@@ -128,7 +128,7 @@ export class AiResponseService {
       tenantId,
       email: getTenantSystemUserEmail(tenantId),
     });
-    this.logger.log(`System user fetched for the tenant ${tenantId}`);
+    this.logger.debug(`System user fetched. TenantID ${tenantId}`);
 
     await this.auditService.createAuditLog({
       tenantId,
@@ -139,7 +139,7 @@ export class AiResponseService {
       afterState: responseGenerationResult,
     });
 
-    this.logger.log(
+    this.logger.debug(
       `AI response generation attempt completed. Final Result: ${JSON.stringify(responseGenerationResult)}, TicketID: ${ticketId}, tenantID: ${tenantId}`,
     );
   }
@@ -154,7 +154,7 @@ export class AiResponseService {
       ? AiResponseStatus.APPROVED
       : AiResponseStatus.REJECTED;
 
-    this.logger.log(
+    this.logger.debug(
       `Reviewing AI response. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${agentId}, Action: ${action}`,
     );
 

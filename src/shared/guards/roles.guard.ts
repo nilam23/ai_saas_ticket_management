@@ -20,12 +20,12 @@ export class RolesGuard implements CanActivate {
       ROLES_KEY,
       [context.getHandler(), context.getClass()],
     );
-    this.logger.log(
-      `Checking if user has required roles: ${JSON.stringify(requiredRoles)}`,
+    this.logger.debug(
+      `Verifying user access. Required roles: ${JSON.stringify(requiredRoles)}`,
     );
 
     if (!requiredRoles || requiredRoles.length === 0) {
-      this.logger.log('No required roles found, allowing access');
+      this.logger.debug('No required roles found, allowing access');
       return true;
     }
 
@@ -39,13 +39,13 @@ export class RolesGuard implements CanActivate {
 
     if (!requiredRoles.includes(user.role)) {
       this.logger.error(
-        `User ${user.email} does not have required role ${requiredRoles.join(', ')}`,
+        `User does not have required role. Email: ${user.email}, Required roles: ${JSON.stringify(requiredRoles)}`,
       );
       throw new ForbiddenException('Forbidden');
     }
 
-    this.logger.log(
-      `User ${user.email} has the required role ${user.role}. Allowing access`,
+    this.logger.debug(
+      `User has the required role, allowing access. Email: ${user.email}, User role: ${user.role}`,
     );
     return true;
   }

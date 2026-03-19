@@ -39,8 +39,8 @@ export class AwsS3Service {
     contentDisposition: string = '',
   ): Promise<void> {
     try {
-      this.logger.log(
-        `Preparing object to upload to S3. Key: ${key}, Bucket: ${this.bucket}, Acl: ${acl}`,
+      this.logger.debug(
+        `Uploading object to S3. Key: ${key}, Bucket: ${this.bucket}, Acl: ${acl}`,
       );
       const command = new PutObjectCommand({
         Bucket: this.bucket,
@@ -52,9 +52,13 @@ export class AwsS3Service {
       });
 
       await this.s3Client.send(command);
+
+      this.logger.debug(
+        `Object uploaded to S3. Key: ${key}, Bucket: ${this.bucket}, Acl: ${acl}`,
+      );
     } catch (error) {
       const { message } = normalizeError(error);
-      this.logger.log(
+      this.logger.error(
         `Upload to S3 failed. Key: ${key}, Bucket: ${this.bucket}, Acl: ${acl}, Error: ${message}`,
       );
       throw new S3UploadException(message);
@@ -63,7 +67,7 @@ export class AwsS3Service {
 
   public async getFile(key: string): Promise<Buffer> {
     try {
-      this.logger.log(
+      this.logger.debug(
         `Fetching object from S3. Key: ${key}, Bucket: ${this.bucket}`,
       );
 
@@ -81,6 +85,10 @@ export class AwsS3Service {
       for await (const chunk of stream) {
         chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
       }
+
+      this.logger.debug(
+        `Object fetched from S3. Key: ${key}, Bucket: ${this.bucket}`,
+      );
 
       return Buffer.concat(chunks);
     } catch (error) {

@@ -25,7 +25,7 @@ export class KnowledgeIngestionService {
   ): Promise<void> {
     const { tenantId, docId } = processDocIngestionInput;
 
-    this.logger.log(
+    this.logger.debug(
       `Completing ingestion. DocID: ${docId}, TenantID: ${tenantId}`,
     );
 
@@ -40,7 +40,7 @@ export class KnowledgeIngestionService {
       email: getTenantSystemUserEmail(tenantId),
     });
 
-    this.logger.log(`System user fetched. TenatID: ${tenantId}`);
+    this.logger.debug(`System user fetched. TenatID: ${tenantId}`);
 
     await this.auditService.createAuditLog({
       tenantId,
@@ -51,7 +51,7 @@ export class KnowledgeIngestionService {
       afterState: { status: DocStatus.PROCESSED },
     });
 
-    this.logger.log(
+    this.logger.debug(
       `Ingestion completed. DocID: ${docId}, TenantID: ${tenantId}`,
     );
 

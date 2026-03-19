@@ -31,7 +31,7 @@ export class TicketClassificationService {
   ): Promise<void> {
     const { ticketId, subject, message } = classificationInput;
 
-    this.logger.log(`Classifying the ticket ${ticketId}`);
+    this.logger.debug(`Classifying ticket. TicketID: ${ticketId}`);
 
     const prompt = generateTicketClassificationPrompt(subject, message);
     const aiResponse = await this.aiProviderService.generateText(prompt, {
@@ -47,8 +47,8 @@ export class TicketClassificationService {
       throw new Error('AI classification validation failed');
     }
 
-    this.logger.log(
-      `Classification generated for the ticket ${ticketId}. Result: ${JSON.stringify(validation.data)}`,
+    this.logger.debug(
+      `Ticket classified. TicketID: ${ticketId}, Result: ${JSON.stringify(validation.data)}`,
     );
 
     await this.ticketService.updateTicket({
@@ -62,8 +62,8 @@ export class TicketClassificationService {
       email: getTenantSystemUserEmail(classificationInput.tenantId),
     });
 
-    this.logger.log(
-      `System user fetched for the tenant ${classificationInput.tenantId}`,
+    this.logger.debug(
+      `System user fetched. TenantID: ${classificationInput.tenantId}`,
     );
 
     await this.auditService.createAuditLog({

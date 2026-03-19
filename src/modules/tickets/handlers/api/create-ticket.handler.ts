@@ -2,10 +2,10 @@ import { Injectable, Logger } from '@nestjs/common';
 import {
   BaseHttpHandler,
   HttpResponse,
-} from '../../../shared/handlers/base-http.handler';
+} from '../../../../shared/handlers/base-http.handler';
 import { normalizeError } from 'src/shared/utils/error.utils';
-import { CreateTicketApiHandlerEvent } from '../types/api-handler-event.type';
-import { TicketService } from '../service/ticket.service';
+import { CreateTicketApiHandlerEvent } from '../../types/api-handler-event.type';
+import { TicketService } from '../../service/ticket.service';
 
 @Injectable()
 export class CreateTicketHandler extends BaseHttpHandler<
@@ -23,20 +23,19 @@ export class CreateTicketHandler extends BaseHttpHandler<
   ): Promise<HttpResponse<void>> {
     const { createTicketInput, auditContext } = event;
     try {
-      this.logger.log(
-        `Handling request to create ticket by customer: ${auditContext.actorUserId} for tenant: ${createTicketInput.tenantId}`,
+      this.logger.debug(
+        `Handling request to create ticket. CustomerID: ${createTicketInput.createdById}, TenantID: ${createTicketInput.tenantId}`,
       );
       await this.ticketService.createTicket(createTicketInput, auditContext);
-      this.logger.log(
-        `Ticket successfully created by customer: ${createTicketInput.createdById} for the tenant: ${createTicketInput.tenantId}`,
+      this.logger.debug(
+        `Ticket successfully created. CustomerID: ${auditContext.actorUserId}, TenantID: ${createTicketInput.tenantId}`,
       );
       return this.created();
     } catch (error) {
       const { message } = normalizeError(error);
       this.logger.error(
-        `Error creating ticket by customer: ${auditContext.actorUserId} for the tenant: ${createTicketInput.tenantId}. Error: ${message}`,
+        `Error creating ticket. CustomerID: ${auditContext.actorUserId}, TenantID: ${createTicketInput.tenantId}, Error: ${message}`,
       );
-
       return this.internalServerError(message);
     }
   }

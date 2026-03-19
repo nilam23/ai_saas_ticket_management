@@ -2,10 +2,13 @@ import {
   BaseHttpHandler,
   HttpResponse,
 } from 'src/shared/handlers/base-http.handler';
-import { UserService } from '../service/user.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { normalizeError } from 'src/shared/utils/error.utils';
-import { GetTenantUsersInput, GetTenantUsersOutput } from '../types/user.type';
+import {
+  GetTenantUsersInput,
+  GetTenantUsersOutput,
+} from '../../types/user.type';
+import { UserService } from '../../service/user.service';
 
 @Injectable()
 export class GetTenantUsersHandler extends BaseHttpHandler<
@@ -21,19 +24,19 @@ export class GetTenantUsersHandler extends BaseHttpHandler<
     getTenantUsersInput: GetTenantUsersInput,
   ): Promise<HttpResponse<GetTenantUsersOutput>> {
     try {
-      this.logger.log(
-        `Handling request to fetch users for tenant: ${getTenantUsersInput.tenantId}`,
+      this.logger.debug(
+        `Handling request to fetch tenant users. TenantID: ${getTenantUsersInput.tenantId}`,
       );
       const users =
         await this.userService.getUsersByTenantId(getTenantUsersInput);
-      this.logger.log(
-        `Users fetched successfully for the tenant: ${getTenantUsersInput.tenantId}`,
+      this.logger.debug(
+        `Tenant users fetched successfully. TenantID: ${getTenantUsersInput.tenantId}`,
       );
       return this.ok(users);
     } catch (error) {
       const { message } = normalizeError(error);
       this.logger.error(
-        `Error fetching users for the tenant: ${getTenantUsersInput.tenantId}. Error: ${message}`,
+        `Error fetching users. TenantID: ${getTenantUsersInput.tenantId}, Error: ${message}`,
       );
       return this.internalServerError(message);
     }

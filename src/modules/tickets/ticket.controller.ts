@@ -10,14 +10,14 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
-import { CreateTicketHandler } from './handlers/create-ticket.handler';
+import { CreateTicketHandler } from './handlers/api/create-ticket.handler';
 import { Tenant } from 'src/shared/decorators/tenant.decorator';
 import { CreateTicketDto, ReviewAiResponseDto } from './dto/create-ticket.dto';
 import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { UserRole } from '@prisma/client';
-import { ReviewAiResponseHandler } from './handlers/review-ai-response.handler';
 import { HttpResponse } from 'src/shared/handlers/base-http.handler';
+import { ReviewAiResponseHandler } from './handlers/api/review-ai-response.handler';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('tickets')
@@ -37,7 +37,7 @@ export class TicketController {
     @Req() request: Request,
   ): Promise<HttpResponse<void>> {
     this.logger.log(
-      `Request to create ticket by customer: ${request.user.id} for the tenant: ${tenantId}`,
+      `Request to create ticket. CustomerID: ${request.user.id}, TenantID: ${tenantId}`,
     );
     return this.createTicketHandler.handle({
       createTicketInput: {
@@ -63,7 +63,7 @@ export class TicketController {
     @Req() request: Request,
   ): Promise<HttpResponse<void>> {
     this.logger.log(
-      `Request to review AI generated response. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${request.user.id}`,
+      `Request to review AI generated response. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${request.user.id}, TenantID: ${tenantId}`,
     );
     return this.reviewAiResponseHandler.handle({
       reviewAiResponseInput: {

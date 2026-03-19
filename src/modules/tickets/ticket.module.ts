@@ -7,7 +7,7 @@ import { TicketController } from './ticket.controller';
 import { TicketService } from './service/ticket.service';
 import { TicketRepository } from './repository/ticket.repository';
 import { PrismaService } from 'src/infra/prisma/prisma.service';
-import { CreateTicketHandler } from './handlers/create-ticket.handler';
+import { CreateTicketHandler } from './handlers/api/create-ticket.handler';
 import { MessageRepository } from './repository/message.repository';
 import { MessageService } from './service/message.service';
 import { KafkaModule } from 'src/infra/kafka/kafka.module';
@@ -16,11 +16,11 @@ import { AiCoreModule } from '../ai-core/ai-core.module';
 import { KnowledgeBaseModule } from '../knowledge-base/knowledge-base.module';
 import { AiResponseValidationService } from './service/ai-response-validation.service';
 import { TicketAssignedEventHandler } from './handlers/kafka/ticket-assigned-event.handler';
-import { ReviewAiResponseHandler } from './handlers/review-ai-response.handler';
 import { TicketCreatedEventHandler } from './handlers/kafka/ticket-created-event.handler';
 import { TicketClassificationService } from './service/ticket-classification.service';
 import { TicketAssignmentService } from './service/ticket-assignment.service';
 import { TicketClassifiedEventHandler } from './handlers/kafka/ticket-classified-event.handler';
+import { ReviewAiResponseHandler } from './handlers/api/review-ai-response.handler';
 
 @Module({
   imports: [

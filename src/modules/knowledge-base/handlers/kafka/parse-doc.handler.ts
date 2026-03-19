@@ -36,7 +36,7 @@ export class TenantDocParserEventHandler {
       docId: event.payload.docId,
       cleanedText,
     });
-    this.logger.log(
+    this.logger.debug(
       `Emitting event. Topic: ${KafkaTopic.EVENT_BUS}, Event: ${docParsedEvent.name}, Event ID: ${docParsedEvent.id}`,
     );
     this.kafkaProducer.emit(KafkaTopic.EVENT_BUS, docParsedEvent);

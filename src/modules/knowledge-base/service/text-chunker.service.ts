@@ -13,7 +13,7 @@ export class TextChunkerService {
     const { chunkSize, chunkOverlap } = options;
     const separators = options.separators ?? this.DEFAULT_SEPARATORS;
 
-    this.logger.log(
+    this.logger.debug(
       `Chunking text. DocID: ${docId}, TenantID: ${tenantId}, Text length: ${text.length}, Chunk Size: ${chunkSize}, Overlap: ${chunkOverlap}`,
     );
 

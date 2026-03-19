@@ -26,9 +26,7 @@ export class TenantDocIngestionFinalizationEventHandler {
     this.logger.log(
       `${KafkaEvent.TENANT_DOC_EMBEDDINGS_GENERATED} event with ID ${event.id} consumed. Paylod: ${JSON.stringify(event.payload)}`,
     );
-
     await this.knowledgeIngestionService.processIngestion(event.payload);
-
     this.logger.log(
       `${KafkaEvent.TENANT_DOC_EMBEDDINGS_GENERATED} event with ID ${event.id} processed successfully`,
     );

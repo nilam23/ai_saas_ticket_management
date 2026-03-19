@@ -16,7 +16,7 @@ export class KafkaProducer implements OnModuleInit {
   }
 
   emit<T>(topic: string, event: EventEnvelope<T>) {
-    this.logger.log(
+    this.logger.debug(
       `Event received. Topic: ${topic}, Event: ${event.name}, Event ID: ${event.id}`,
     );
     return this.kafkaClient.emit(topic, event);

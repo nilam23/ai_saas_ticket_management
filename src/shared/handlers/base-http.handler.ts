@@ -14,7 +14,6 @@ import {
   UnprocessableEntityException,
   UnsupportedMediaTypeException,
 } from '@nestjs/common';
-import { normalizeError } from '../utils/error.utils';
 
 export interface HttpResponse<TOutput> {
   status: {
