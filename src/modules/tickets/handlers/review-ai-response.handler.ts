@@ -6,7 +6,10 @@ import {
 import { normalizeError } from 'src/shared/utils/error.utils';
 import { ReviewAiResponseApiHandlerEvent } from '../types/api-handler-event.type';
 import { AiResponseService } from '../service/ai-response.service';
-import { AgentReviewForbiddenException } from '../exceptions/ticket-service.exception';
+import {
+  AgentReviewForbiddenException,
+  MessageNotFoundException,
+} from '../exceptions/ticket-service.exception';
 
 @Injectable()
 export class ReviewAiResponseHandler extends BaseHttpHandler<
@@ -43,6 +46,8 @@ export class ReviewAiResponseHandler extends BaseHttpHandler<
       );
       if (error instanceof AgentReviewForbiddenException) {
         return this.forbidden(message);
+      } else if (error instanceof MessageNotFoundException) {
+        return this.badRequest(message);
       }
       return this.handleUnknownError(message);
     }

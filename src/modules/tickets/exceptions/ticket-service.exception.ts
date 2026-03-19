@@ -19,3 +19,14 @@ export class AgentReviewForbiddenException extends Error {
     }
   }
 }
+
+export class MessageNotFoundException extends Error {
+  constructor(id: string) {
+    super(`Message with ID ${id} not found`);
+    this.name = 'MessageNotFoundException';
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, MessageNotFoundException);
+    }
+  }
+}

@@ -3,6 +3,7 @@ import { Message, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/infra/prisma/prisma.service';
 import {
   CreateMessageInput,
+  FindMessageByIdInput,
   UpdateMessageFilterQuery,
   UpdateMessageUpdateQuery,
 } from '../types/message.type';
@@ -48,6 +49,18 @@ export class MessageRepository {
     return this.prisma.message.update({
       where: filterQuery,
       data: updateQuery,
+    });
+  }
+
+  public async findMessageById(
+    findMessageByIdInput: FindMessageByIdInput,
+  ): Promise<Message | null> {
+    return this.prisma.message.findUnique({
+      where: {
+        id: findMessageByIdInput.messageId,
+        ticketId: findMessageByIdInput.ticketId,
+        aiResponseStatus: findMessageByIdInput.aiResponseStatus,
+      },
     });
   }
 }

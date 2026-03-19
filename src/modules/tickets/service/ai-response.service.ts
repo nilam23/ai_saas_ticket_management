@@ -25,7 +25,10 @@ import { getTenantSystemUserEmail } from 'src/shared/utils/common.utils';
 import { AuditContext } from 'src/modules/audit/types/audit.type';
 import { AgentReviewAction } from '../enums/message.enum';
 import { TicketService } from './ticket.service';
-import { AgentReviewForbiddenException } from '../exceptions/ticket-service.exception';
+import {
+  AgentReviewForbiddenException,
+  MessageNotFoundException,
+} from '../exceptions/ticket-service.exception';
 
 @Injectable()
 export class AiResponseService {
@@ -159,13 +162,23 @@ export class AiResponseService {
       tenantId,
       ticketId,
     });
-
     if (ticket.assignedToId !== agentId) {
       this.logger.error(
         `Agent not allowed to review AI response. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${agentId}`,
       );
-
       throw new AgentReviewForbiddenException();
+    }
+
+    const message = await this.messageService.findMessageById({
+      ticketId,
+      messageId,
+      aiResponseStatus: AiResponseStatus.QUEUE_FOR_REVIEW,
+    });
+    if (!message) {
+      this.logger.error(
+        `Message not found or not reviewable. MessageID: ${messageId}, TicketID: ${ticketId}`,
+      );
+      throw new MessageNotFoundException(messageId);
     }
 
     const updatedMessage = await this.messageService.updateMessage({

@@ -5,6 +5,7 @@ import {
   UpdateMessageFilterQuery,
   UpdateMessageUpdateQuery,
   UpdateMessageInput,
+  FindMessageByIdInput,
 } from '../types/message.type';
 import { Message } from '@prisma/client';
 
@@ -53,5 +54,15 @@ export class MessageService {
     );
 
     return updatedMessage;
+  }
+
+  public async findMessageById(
+    findMessageByIdInput: FindMessageByIdInput,
+  ): Promise<Message | null> {
+    const { ticketId, messageId } = findMessageByIdInput;
+    this.logger.log(
+      `Fetching message. MessageID: ${messageId}, TicketID: ${ticketId}`,
+    );
+    return this.messageRepository.findMessageById(findMessageByIdInput);
   }
 }

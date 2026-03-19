@@ -56,3 +56,9 @@ export type UpdateMessageUpdateQuery = {
   aiResponseStatus: AiResponseStatus;
   updatedAt: Date;
 };
+
+export type FindMessageByIdInput = {
+  ticketId: string;
+  messageId: string;
+  aiResponseStatus: AiResponseStatus;
+};
