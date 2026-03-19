@@ -18,6 +18,8 @@ import { KnowledgeBaseModule } from '../knowledge-base/knowledge-base.module';
 import { AiResponseValidationService } from './service/ai-response-validation.service';
 import { TicketAssignedEventHandler } from './handlers/kafka/ticket-assigned-event.handler';
 import { ReviewAiResponseHandler } from './handlers/review-ai-response.handler';
+import { TicketCreatedEventHandler } from './handlers/kafka/ticket-created-event.handler';
+import { TicketClassificationService } from './service/ticket-classification.service';
 
 @Module({
   imports: [
@@ -30,7 +32,11 @@ import { ReviewAiResponseHandler } from './handlers/review-ai-response.handler';
     forwardRef(() => AiCoreModule),
     forwardRef(() => KnowledgeBaseModule),
   ],
-  controllers: [TicketController, TicketAssignedEventHandler],
+  controllers: [
+    TicketController,
+    TicketAssignedEventHandler,
+    TicketCreatedEventHandler,
+  ],
   providers: [
     TicketService,
     TicketRepository,
@@ -41,6 +47,7 @@ import { ReviewAiResponseHandler } from './handlers/review-ai-response.handler';
     AiResponseService,
     AiResponseValidationService,
     ReviewAiResponseHandler,
+    TicketClassificationService,
   ],
   exports: [TicketService, TicketRepository],
 })

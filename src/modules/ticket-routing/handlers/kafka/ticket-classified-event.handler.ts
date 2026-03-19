@@ -4,9 +4,9 @@ import { KafkaEvent, KafkaTopic } from 'src/infra/kafka/enums/kafka.enum';
 import type { EventEnvelope } from 'src/infra/kafka/type/kafka.type';
 import { KafkaEventPattern } from 'src/infra/kafka/decorators/event-pattern.decorator';
 import { TicketAssignmentService } from 'src/modules/ticket-routing/service/ticket-assignment.service';
-import { TicketClassifiedEventPayload } from 'src/modules/ticket-classification/types/kafka-event.type';
-import { TicketAssignedEvent } from 'src/modules/ticket-classification/events/ticket-assigned.event';
 import { KafkaProducer } from 'src/infra/kafka/service/kafka-producer.service';
+import { TicketClassifiedEventPayload } from 'src/modules/tickets/types/kafka-event.type';
+import { TicketAssignedEvent } from '../../events/ticket-assigned.event';
 
 @Controller()
 export class TicketClassifiedEventHandler {

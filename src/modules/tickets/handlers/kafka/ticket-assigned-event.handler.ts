@@ -3,7 +3,7 @@ import { Payload } from '@nestjs/microservices';
 import { KafkaEvent, KafkaTopic } from 'src/infra/kafka/enums/kafka.enum';
 import type { EventEnvelope } from 'src/infra/kafka/type/kafka.type';
 import { KafkaEventPattern } from 'src/infra/kafka/decorators/event-pattern.decorator';
-import { TicketAssignedEventPayload } from 'src/modules/ticket-classification/types/kafka-event.type';
+import { TicketAssignedEventPayload } from 'src/modules/ticket-routing/types/kafka-event.type';
 import { AiResponseService } from '../../service/ai-response.service';
 @Controller()
 export class TicketAssignedEventHandler {

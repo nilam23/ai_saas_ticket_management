@@ -1,11 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { generateTicketClassificationPrompt } from '../../ai-core/utils/prompt.utils';
-import {
-  TicketClassificationRawResult,
-  TicketClassificationInput,
-} from '../types/ticket-classification.type';
 import { AiProviderService } from '../../ai-core/service/ai-provider.service';
-import { TicketClassificationSchema } from '../types/ticket-classification.schema';
 import { AuditService } from 'src/modules/audit/service/audit.service';
 import { UserService } from 'src/modules/user/service/user.service';
 import { getTenantSystemUserEmail } from 'src/shared/utils/common.utils';
@@ -14,6 +9,8 @@ import {
   AuditLogEntityType,
 } from 'src/modules/audit/enums/audit-log.enum';
 import { TicketService } from 'src/modules/tickets/service/ticket.service';
+import { TicketClassificationInput, TicketClassificationRawResult } from '../types/ticket-classification.type';
+import { TicketClassificationSchema } from '../types/ticket-classification.schema';
 
 @Injectable()
 export class TicketClassificationService {
