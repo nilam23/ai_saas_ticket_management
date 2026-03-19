@@ -11,7 +11,6 @@ import { CreateTicketHandler } from './handlers/create-ticket.handler';
 import { MessageRepository } from './repository/message.repository';
 import { MessageService } from './service/message.service';
 import { KafkaModule } from 'src/infra/kafka/kafka.module';
-import { RoutingModule } from '../ticket-routing/routing.module';
 import { AiResponseService } from './service/ai-response.service';
 import { AiCoreModule } from '../ai-core/ai-core.module';
 import { KnowledgeBaseModule } from '../knowledge-base/knowledge-base.module';
@@ -20,13 +19,14 @@ import { TicketAssignedEventHandler } from './handlers/kafka/ticket-assigned-eve
 import { ReviewAiResponseHandler } from './handlers/review-ai-response.handler';
 import { TicketCreatedEventHandler } from './handlers/kafka/ticket-created-event.handler';
 import { TicketClassificationService } from './service/ticket-classification.service';
+import { TicketAssignmentService } from './service/ticket-assignment.service';
+import { TicketClassifiedEventHandler } from './handlers/kafka/ticket-classified-event.handler';
 
 @Module({
   imports: [
     DatabaseModule,
     AuditModule,
     KafkaModule,
-    forwardRef(() => RoutingModule),
     forwardRef(() => AuthModule),
     forwardRef(() => UserModule),
     forwardRef(() => AiCoreModule),
@@ -36,6 +36,7 @@ import { TicketClassificationService } from './service/ticket-classification.ser
     TicketController,
     TicketAssignedEventHandler,
     TicketCreatedEventHandler,
+    TicketClassifiedEventHandler,
   ],
   providers: [
     TicketService,
@@ -48,6 +49,7 @@ import { TicketClassificationService } from './service/ticket-classification.ser
     AiResponseValidationService,
     ReviewAiResponseHandler,
     TicketClassificationService,
+    TicketAssignmentService,
   ],
   exports: [TicketService, TicketRepository],
 })

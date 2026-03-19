@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/infra/prisma/prisma.service';
+import { AgentWorkload, Prisma } from '@prisma/client';
 import {
   CreateAgentWorkloadInput,
   UpdateAgentWorkloadInput,
 } from '../types/agent-workload.type';
-import { AgentWorkload, Prisma } from '@prisma/client';
 
 @Injectable()
 export class AgentWorkloadRepository {

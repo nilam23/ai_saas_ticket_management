@@ -2,11 +2,11 @@ import { Controller, Logger } from '@nestjs/common';
 import { Payload } from '@nestjs/microservices';
 import { KafkaEvent, KafkaTopic } from 'src/infra/kafka/enums/kafka.enum';
 import type { EventEnvelope } from 'src/infra/kafka/type/kafka.type';
-import { AgentWorkloadService } from '../../service/agent-workload.service';
 import { AgentCreatedEventPayload } from 'src/modules/user/types/kafka-event.type';
 import { KafkaEventPattern } from 'src/infra/kafka/decorators/event-pattern.decorator';
-import { AgentSkillMapService } from '../../service/agent-skill-map.service';
 import { AgentSkill } from '@prisma/client';
+import { AgentSkillMapService } from '../../service/agent-skill-map.service';
+import { AgentWorkloadService } from '../../service/agent-workload.service';
 
 @Controller()
 export class AgentCreatedEventHandler {

@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { AssignTicketInput } from '../types/ticket-assignment.type';
 import { TicketService } from 'src/modules/tickets/service/ticket.service';
 import {
   AgentLevel,
@@ -7,7 +6,6 @@ import {
   TicketPriority,
   TicketStatus,
 } from '@prisma/client';
-import { AgentWorkloadService } from './agent-workload.service';
 import { AuditService } from 'src/modules/audit/service/audit.service';
 import {
   AuditLogAction,
@@ -15,8 +13,10 @@ import {
 } from 'src/modules/audit/enums/audit-log.enum';
 import { UserService } from 'src/modules/user/service/user.service';
 import { getTenantSystemUserEmail } from 'src/shared/utils/common.utils';
-import { AgentRoutingRepository } from '../repository/agent-routing.repository';
-import { CLASSIFICATION_CONFIDENCE_THRESHOLD } from '../constants/common.constants';
+import { AgentWorkloadService } from 'src/modules/user/service/agent-workload.service';
+import { AgentRoutingRepository } from 'src/modules/user/repository/agent-routing.repository';
+import { AssignTicketInput } from '../types/ticket-assignment.type';
+import { CLASSIFICATION_CONFIDENCE_THRESHOLD } from '../constants/ticket.constants';
 
 @Injectable()
 export class TicketAssignmentService {

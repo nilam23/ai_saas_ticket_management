@@ -9,7 +9,10 @@ import {
   AuditLogEntityType,
 } from 'src/modules/audit/enums/audit-log.enum';
 import { TicketService } from 'src/modules/tickets/service/ticket.service';
-import { TicketClassificationInput, TicketClassificationRawResult } from '../types/ticket-classification.type';
+import {
+  TicketClassificationInput,
+  TicketClassificationRawResult,
+} from '../types/ticket-classification.type';
 import { TicketClassificationSchema } from '../types/ticket-classification.schema';
 
 @Injectable()

@@ -3,8 +3,8 @@ import { Payload } from '@nestjs/microservices';
 import { KafkaEvent, KafkaTopic } from 'src/infra/kafka/enums/kafka.enum';
 import type { EventEnvelope } from 'src/infra/kafka/type/kafka.type';
 import { KafkaEventPattern } from 'src/infra/kafka/decorators/event-pattern.decorator';
-import { TicketAssignedEventPayload } from 'src/modules/ticket-routing/types/kafka-event.type';
 import { AiResponseService } from '../../service/ai-response.service';
+import { TicketAssignedEventPayload } from '../../types/kafka-event.type';
 @Controller()
 export class TicketAssignedEventHandler {
   private readonly logger = new Logger(TicketAssignedEventHandler.name);

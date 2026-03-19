@@ -10,3 +10,9 @@ export type TicketClassifiedEventPayload = {
   ticketId: string;
   message: string;
 };
+
+export type TicketAssignedEventPayload = {
+  tenantId: string;
+  ticketId: string;
+  message: string;
+};
