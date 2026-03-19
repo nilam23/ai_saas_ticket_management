@@ -33,9 +33,11 @@ export class TicketCreatedEventHandler {
       `${KafkaEvent.TICKET_CREATED} event with ID ${event.id} processed successfully`,
     );
 
+    const { ticketId, tenantId, message } = event.payload;
     const ticketClassifiedEvent = new TicketClassifiedEvent({
-      ticketId: event.payload.ticketId,
-      tenantId: event.payload.tenantId,
+      ticketId,
+      tenantId,
+      message,
     });
 
     this.logger.log(

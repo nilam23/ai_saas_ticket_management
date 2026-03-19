@@ -8,3 +8,25 @@ export class TicketNotFoundException extends Error {
     }
   }
 }
+
+export class AgentReviewForbiddenException extends Error {
+  constructor() {
+    super('Agent review forbidden');
+    this.name = 'AgentReviewForbiddenException';
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, AgentReviewForbiddenException);
+    }
+  }
+}
+
+export class MessageNotFoundException extends Error {
+  constructor(id: string) {
+    super(`Message with ID ${id} not found`);
+    this.name = 'MessageNotFoundException';
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, MessageNotFoundException);
+    }
+  }
+}

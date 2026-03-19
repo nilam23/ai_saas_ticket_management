@@ -21,7 +21,7 @@ export class RolesGuard implements CanActivate {
       [context.getHandler(), context.getClass()],
     );
     this.logger.log(
-      `Checking if user has required roles: ${requiredRoles.join(', ')}`,
+      `Checking if user has required roles: ${JSON.stringify(requiredRoles)}`,
     );
 
     if (!requiredRoles || requiredRoles.length === 0) {

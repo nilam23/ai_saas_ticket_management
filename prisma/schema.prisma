@@ -163,13 +163,25 @@ enum SenderType {
   AI
 }
 
+enum AiResponseStatus {
+  AUTO_SEND
+  QUEUE_FOR_REVIEW
+  FAILED
+  APPROVED
+  REJECTED
+}
+
 model Message {
   id         String     @id @default(uuid())
   ticketId   String
   senderId   String?
   senderType SenderType
-  content    String
+  content    String?
+  aiResponseStatus AiResponseStatus?
+  aiResponseConfidence Float?
+  aiResponseError String?
   createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @default(now())
 
   ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
   sender User?  @relation(fields: [senderId], references: [id])

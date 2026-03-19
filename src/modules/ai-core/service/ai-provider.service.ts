@@ -20,10 +20,10 @@ export class AiProviderService {
 
   constructor() {}
 
-  public async generateText<T>(
+  public async generateText(
     prompt: string,
     options?: OllamaModelOptions,
-  ): Promise<T> {
+  ): Promise<string> {
     this.logger.log('AI generation started');
 
     const response = await invokeAPI<
@@ -38,7 +38,7 @@ export class AiProviderService {
 
     this.logger.log('AI generation completed');
 
-    return response.data.response as unknown as T;
+    return response.data.response;
   }
 
   public async generateEmbedding(text: string): Promise<number[]> {

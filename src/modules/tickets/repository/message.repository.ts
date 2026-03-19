@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Message, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/infra/prisma/prisma.service';
-import { CreateMessageInput } from '../types/message.type';
+import {
+  CreateMessageInput,
+  FindMessageByIdInput,
+  UpdateMessageFilterQuery,
+  UpdateMessageUpdateQuery,
+} from '../types/message.type';
 
 @Injectable()
 export class MessageRepository {
@@ -17,12 +22,45 @@ export class MessageRepository {
         },
       },
       senderType: createMessageInput.senderType,
-      content: createMessageInput.content,
+      ...(createMessageInput.content && {
+        content: createMessageInput.content,
+      }),
       ...(createMessageInput.senderId && {
         sender: { connect: { id: createMessageInput.senderId } },
+      }),
+      ...(createMessageInput.aiResponseStatus && {
+        aiResponseStatus: createMessageInput.aiResponseStatus,
+      }),
+      ...(createMessageInput.aiResponseConfidence && {
+        aiResponseConfidence: createMessageInput.aiResponseConfidence,
+      }),
+      ...(createMessageInput.aiResponseError && {
+        aiResponseError: createMessageInput.aiResponseError,
       }),
     };
 
     return this.prisma.message.create({ data: messageData });
+  }
+
+  public async updateMessage(
+    filterQuery: UpdateMessageFilterQuery,
+    updateQuery: UpdateMessageUpdateQuery,
+  ): Promise<Message> {
+    return this.prisma.message.update({
+      where: filterQuery,
+      data: updateQuery,
+    });
+  }
+
+  public async findMessageById(
+    findMessageByIdInput: FindMessageByIdInput,
+  ): Promise<Message | null> {
+    return this.prisma.message.findUnique({
+      where: {
+        id: findMessageByIdInput.messageId,
+        ticketId: findMessageByIdInput.ticketId,
+        aiResponseStatus: findMessageByIdInput.aiResponseStatus,
+      },
+    });
   }
 }

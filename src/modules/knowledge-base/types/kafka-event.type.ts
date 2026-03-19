@@ -1,11 +1,5 @@
 import { TextChunk } from './text-chunker.type';
 
-export type RetrieveContextEventPayload = {
-  tenantId: string;
-  query: string;
-  topK: number;
-};
-
 export type TenantDocParsedEventPayload = {
   tenantId: string;
   docId: string;

@@ -1,6 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MessageRepository } from '../repository/message.repository';
-import { CreateMessageInput } from '../types/message.type';
+import {
+  CreateMessageInput,
+  UpdateMessageFilterQuery,
+  UpdateMessageUpdateQuery,
+  UpdateMessageInput,
+  FindMessageByIdInput,
+} from '../types/message.type';
+import { Message } from '@prisma/client';
 
 @Injectable()
 export class MessageService {
@@ -8,7 +15,9 @@ export class MessageService {
 
   constructor(private readonly messageRepository: MessageRepository) {}
 
-  public async createMessage(createMessageInput: CreateMessageInput) {
+  public async createMessage(
+    createMessageInput: CreateMessageInput,
+  ): Promise<Message> {
     this.logger.log(
       `Creating message. Ticket ID: ${createMessageInput.ticketId}`,
     );
@@ -17,5 +26,43 @@ export class MessageService {
     this.logger.log(
       `Message created. Message ID: ${createdMessage.id}, Ticket ID: ${createMessageInput.ticketId}`,
     );
+
+    return createdMessage;
+  }
+
+  public async updateMessage(
+    updateTicketInput: UpdateMessageInput,
+  ): Promise<Message> {
+    const { ticketId, messageId, content, aiResponseStatus } =
+      updateTicketInput;
+
+    this.logger.log(
+      `Updating message. MessageID: ${messageId}, TicketID: ${ticketId}`,
+    );
+    const filterQuery: UpdateMessageFilterQuery = { id: messageId, ticketId };
+    const updateQuery: UpdateMessageUpdateQuery = {
+      ...(content && { content }),
+      aiResponseStatus,
+      updatedAt: new Date(),
+    };
+    const updatedMessage = await this.messageRepository.updateMessage(
+      filterQuery,
+      updateQuery,
+    );
+    this.logger.log(
+      `Message updated. MessageID: ${messageId}, TicketID: ${ticketId}`,
+    );
+
+    return updatedMessage;
+  }
+
+  public async findMessageById(
+    findMessageByIdInput: FindMessageByIdInput,
+  ): Promise<Message | null> {
+    const { ticketId, messageId } = findMessageByIdInput;
+    this.logger.log(
+      `Fetching message. MessageID: ${messageId}, TicketID: ${ticketId}`,
+    );
+    return this.messageRepository.findMessageById(findMessageByIdInput);
   }
 }

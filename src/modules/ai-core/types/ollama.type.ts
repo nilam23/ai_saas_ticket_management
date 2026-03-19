@@ -1,6 +1,7 @@
 export type OllamaModelOptions = {
   stop?: string[];
   temperature?: number;
+  num_predict?: number;
   top_p?: number;
 };
 

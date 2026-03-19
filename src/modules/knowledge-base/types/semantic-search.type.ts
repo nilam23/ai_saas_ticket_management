@@ -1,7 +1,7 @@
 export type RetrieveContextInput = {
   tenantId: string;
   query: string;
-  topK: number;
+  queryEmbeddings: number[];
 };
 
 export type RetrievedContextResult = {
@@ -9,4 +9,13 @@ export type RetrievedContextResult = {
   content: string;
   chunkIndex: number;
   documentId: string;
+  similarityScore: number;
+  embedding: number[];
+};
+
+export type RawRetrievedContextResult = Omit<
+  RetrievedContextResult,
+  'embedding'
+> & {
+  embedding: string;
 };

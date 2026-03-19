@@ -8,7 +8,6 @@ import {
 } from '../types/ticket.type';
 import { AuditContext } from 'src/modules/audit/types/audit.type';
 import { TicketRepository } from '../repository/ticket.repository';
-import { MessageRepository } from '../repository/message.repository';
 import { SenderType, Ticket } from '@prisma/client';
 import { AuditService } from 'src/modules/audit/service/audit.service';
 import {
@@ -19,6 +18,7 @@ import { TicketCreatedEvent } from '../events/ticket-created.event';
 import { KafkaProducer } from 'src/infra/kafka/service/kafka-producer.service';
 import { KafkaTopic } from 'src/infra/kafka/enums/kafka.enum';
 import { TicketNotFoundException } from '../exceptions/ticket-service.exception';
+import { MessageService } from './message.service';
 
 @Injectable()
 export class TicketService {
@@ -26,7 +26,7 @@ export class TicketService {
 
   constructor(
     private readonly ticketRepository: TicketRepository,
-    private readonly messageRepository: MessageRepository,
+    private readonly messageService: MessageService,
     private readonly auditService: AuditService,
     private readonly kafkaProducer: KafkaProducer,
   ) {}
@@ -35,11 +35,13 @@ export class TicketService {
     createTicketInput: CreateTicketInput,
     auditContext: AuditContext,
   ) {
-    this.logger.log(`Creating ticket by ${createTicketInput.createdById}`);
+    this.logger.log(
+      `Creating ticket. CustomerID: ${createTicketInput.createdById}`,
+    );
     const createdTicket =
       await this.ticketRepository.createTicket(createTicketInput);
 
-    await this.messageRepository.createMessage({
+    await this.messageService.createMessage({
       ticketId: createdTicket.id,
       content: createTicketInput.message,
       senderId: createTicketInput.createdById,
@@ -63,7 +65,7 @@ export class TicketService {
     });
 
     this.logger.log(
-      `Ticket successfully created by ${createTicketInput.createdById}. Ticket ID: ${createdTicket.id}`,
+      `Ticket created successfully. Ticket ID: ${createdTicket.id}, CustomerID: ${createTicketInput.createdById}`,
     );
 
     const event = new TicketCreatedEvent({
@@ -73,7 +75,7 @@ export class TicketService {
       message: createTicketInput.message,
     });
     this.logger.log(
-      `Emitting event. Topic: ${KafkaTopic.EVENT_BUS}, Event: ${event.name}, Event ID: ${event.id}`,
+      `Emitting event. Topic: ${KafkaTopic.EVENT_BUS}, Event: ${event.name}, EventID: ${event.id}`,
     );
     this.kafkaProducer.emit(KafkaTopic.EVENT_BUS, event);
   }
@@ -81,19 +83,21 @@ export class TicketService {
   public async findTicketById(
     findTicketByIdInput: FindTicketByIdInput,
   ): Promise<Ticket> {
-    this.logger.log(`Fetching ticket with ID: ${findTicketByIdInput.ticketId}`);
+    this.logger.log(
+      `Fetching ticket. TicketID: ${findTicketByIdInput.ticketId}`,
+    );
     const ticket =
       await this.ticketRepository.findTicketById(findTicketByIdInput);
 
     if (!ticket) {
       this.logger.error(
-        `Ticket with ID: ${findTicketByIdInput.ticketId} not found`,
+        `Ticket not found. TicketID: ${findTicketByIdInput.ticketId}`,
       );
       throw new TicketNotFoundException(findTicketByIdInput.ticketId);
     }
 
     this.logger.log(
-      `Ticket with ID: ${findTicketByIdInput.ticketId} fetched successfully`,
+      `Ticket fetched successfully. TicketID: ${findTicketByIdInput.ticketId}`,
     );
     return ticket;
   }
@@ -101,8 +105,6 @@ export class TicketService {
   public async updateTicket(
     updateTicketInput: UpdateTicketInput,
   ): Promise<Ticket> {
-    this.logger.log(`Updating ticket with ID: ${updateTicketInput.ticketId}`);
-
     const filterQuery: UpdateTicketFilterQuery = {
       id: updateTicketInput.ticketId,
       tenantId: updateTicketInput.tenantId,
@@ -128,7 +130,7 @@ export class TicketService {
     };
 
     this.logger.log(
-      `Data to be udpated for ticket ${updateTicketInput.ticketId}: ${JSON.stringify(updateQuery)}`,
+      `Updating ticket. TicketID: ${updateTicketInput.ticketId}, Data: ${JSON.stringify(updateQuery)}`,
     );
 
     const updatedTicket = await this.ticketRepository.updateTicket(
@@ -136,7 +138,7 @@ export class TicketService {
       updateQuery,
     );
 
-    this.logger.log(`Ticket with ID: ${updateTicketInput.ticketId} updated`);
+    this.logger.log(`Ticket updated. TicketID: ${updateTicketInput.ticketId}`);
 
     return updatedTicket;
   }
