@@ -40,8 +40,8 @@ export class TicketCreatedEventHandler {
       message,
     });
 
-    this.logger.log(
-      `Emitting event. Topic: ${KafkaTopic.EVENT_BUS}, Event: ${ticketClassifiedEvent.name}, Event ID: ${event.id}`,
+    this.logger.debug(
+      `Emitting event. Topic: ${KafkaTopic.EVENT_BUS}, Event: ${ticketClassifiedEvent.name}, EventID: ${event.id}`,
     );
     this.kafkaProducer.emit(KafkaTopic.EVENT_BUS, ticketClassifiedEvent);
   }

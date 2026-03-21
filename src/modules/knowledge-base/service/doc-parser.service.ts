@@ -39,7 +39,7 @@ export class DocParserService {
 
     const fileBuffer = await this.s3Service.getFile(fileKey);
 
-    this.logger.log(`Parsing doc. DocID: ${docId}, TenantID: ${tenantId}`);
+    this.logger.debug(`Parsing doc. DocID: ${docId}, TenantID: ${tenantId}`);
     const extractedText = await this.parseTextFromPdf(fileBuffer);
 
     if (!extractedText || extractedText.length === 0) {
@@ -51,7 +51,7 @@ export class DocParserService {
       );
     }
 
-    this.logger.log(
+    this.logger.debug(
       `Parsing completed. DocID: ${docId}, TenantID: ${tenantId}`,
     );
 

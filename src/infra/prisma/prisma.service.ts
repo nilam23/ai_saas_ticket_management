@@ -14,14 +14,14 @@ export class PrismaService
   private readonly logger = new Logger(PrismaService.name);
 
   async onModuleInit(): Promise<void> {
-    this.logger.debug('Initializing Prisma connection...');
+    this.logger.log('Initializing Prisma connection');
     await this.$connect();
-    this.logger.debug('Prisma connection established successfully');
+    this.logger.log('Prisma connection established successfully');
   }
 
   async onModuleDestroy(): Promise<void> {
-    this.logger.debug('Closing Prisma connection...');
+    this.logger.log('Closing Prisma connection');
     await this.$disconnect();
-    this.logger.debug('Prisma connection closed successfully');
+    this.logger.log('Prisma connection closed successfully');
   }
 }

@@ -35,21 +35,24 @@ export class AuthService {
     registerInput: RegisterInput,
     auditContext: AuditContext,
   ): Promise<void> {
-    this.logger.log(
-      `Registering user with email: ${registerInput.email} for the tenant: ${registerInput.tenantName}`,
+    const { name, email, password, tenantName } = registerInput;
+    const { ipAddress, userAgent } = auditContext;
+
+    this.logger.debug(
+      `Registering user. Email: ${email}, Tenant: ${tenantName}`,
     );
 
     const newTenant = await this.tenantService.createTenant({
-      name: registerInput.tenantName,
+      name: tenantName,
     });
 
-    this.logger.log(`Tenant created successfully. Tenant ID: ${newTenant.id}`);
+    this.logger.debug(`Tenant created. TenantID: ${newTenant.id}`);
 
     const [admin, systemUser] = await Promise.all([
       this.userService.createUser({
-        name: registerInput.name,
-        email: registerInput.email,
-        password: registerInput.password,
+        name,
+        email,
+        password,
         tenantId: newTenant.id,
         role: UserRole.ADMIN,
       }),
@@ -62,8 +65,8 @@ export class AuthService {
       }),
     ]);
 
-    this.logger.log(
-      `Admin and User created. Tenant: ${registerInput.tenantName}, Admin ID: ${admin.id}, System ID: ${systemUser.id}`,
+    this.logger.debug(
+      `Admin and System User created. AdminID: ${admin.id}, SystemUserID: ${systemUser.id}, TenantID: ${newTenant.id}`,
     );
 
     await Promise.all([
@@ -78,8 +81,8 @@ export class AuthService {
           name: newTenant.name,
           slug: newTenant.slug,
         },
-        ipAddress: auditContext.ipAddress,
-        userAgent: auditContext.userAgent,
+        ipAddress,
+        userAgent,
       }),
       this.auditService.createAuditLog({
         tenantId: newTenant.id,
@@ -87,44 +90,46 @@ export class AuthService {
         action: AuditLogAction.ADMIN_CREATE,
         entityType: AuditLogEntityType.USER,
         entityId: admin.id,
-        afterState: { id: admin.id, email: registerInput.email },
-        ipAddress: auditContext.ipAddress,
-        userAgent: auditContext.userAgent,
+        afterState: { id: admin.id, email: email },
+        ipAddress,
+        userAgent,
       }),
       this.auditService.createAuditLog({
         tenantId: newTenant.id,
         actorUserId: systemUser.id,
-        action: AuditLogAction.SYSTEM_CREATE,
+        action: AuditLogAction.SYSTEM_USER_CREATE,
         entityType: AuditLogEntityType.USER,
         entityId: systemUser.id,
         afterState: { id: systemUser.id, email: systemUser.email },
-        ipAddress: auditContext.ipAddress,
-        userAgent: auditContext.userAgent,
+        ipAddress,
+        userAgent,
       }),
     ]);
+
+    this.logger.debug(
+      `User and Tenant registration successful. User Email: ${email}, Tenant: ${tenantName}, TenantID: ${newTenant.id}`,
+    );
   }
 
   public async loginUser(
     userSignInInput: UserSignInInput,
     auditContext: AuditContext,
   ): Promise<{ token: string }> {
+    const { tenantId, email, password } = userSignInInput;
+    const { ipAddress, userAgent } = auditContext;
+
     const user = await this.userService.getUserData({
-      email: userSignInInput.email,
-      tenantId: userSignInInput.tenantId,
+      email,
+      tenantId,
     });
 
-    this.logger.log(
-      `User found with email: ${userSignInInput.email} and tenantId: ${userSignInInput.tenantId}`,
-    );
+    this.logger.debug(`User found. Email: ${email}, TenantId: ${tenantId}`);
 
-    const isPasswordValid = await comparePassword(
-      userSignInInput.password,
-      user.passwordHash,
-    );
+    const isPasswordValid = await comparePassword(password, user.passwordHash);
 
     if (!isPasswordValid) {
       this.logger.error(
-        `Invalid password for user with email ${userSignInInput.email} for the tenant: ${userSignInInput.tenantId}`,
+        `Invalid password for user. Email ${email}, TenantID: ${tenantId}`,
       );
       throw new InvalidPasswordException();
     }
@@ -137,19 +142,19 @@ export class AuthService {
     };
     const token = this.jwtService.generateToken(jwtPayload);
 
-    this.logger.log(
-      `User logged in successfully with email: ${userSignInInput.email} and tenantId: ${userSignInInput.tenantId}`,
-    );
-
     await this.auditService.createAuditLog({
-      tenantId: user.tenantId,
+      tenantId,
       actorUserId: user.id,
       action: AuditLogAction.LOGIN_ATTEMPT,
       entityType: AuditLogEntityType.USER,
       entityId: user.id,
-      ipAddress: auditContext.ipAddress,
-      userAgent: auditContext.userAgent,
+      ipAddress,
+      userAgent,
     });
+
+    this.logger.debug(
+      `User logged in successfully. Email ${email}, TenantID: ${tenantId}`,
+    );
 
     return { token };
   }
@@ -157,12 +162,14 @@ export class AuthService {
   public async registerCustomer(
     registerCustomerInput: RegisterCustomerInput,
     auditContext: AuditContext,
-  ) {
-    this.logger.log(
-      `Registering customer with email: ${registerCustomerInput.email} for the tenant: ${registerCustomerInput.tenantId}`,
+  ): Promise<void> {
+    const { name, email, password, tenantId } = registerCustomerInput;
+    const { ipAddress, userAgent } = auditContext;
+
+    this.logger.debug(
+      `Registering customer. Email ${email}, TenantID: ${tenantId}`,
     );
 
-    const { name, email, password, tenantId } = registerCustomerInput;
     const newCustomer = await this.userService.createUser({
       name,
       email,
@@ -171,25 +178,25 @@ export class AuthService {
       role: UserRole.CUSTOMER,
     });
 
-    this.logger.log(
-      `Customer created successfully with email: ${registerCustomerInput.email} for the tenant: ${registerCustomerInput.tenantId}`,
-    );
-
     await this.auditService.createAuditLog({
-      tenantId: registerCustomerInput.tenantId,
+      tenantId,
       actorUserId: newCustomer.id,
       action: AuditLogAction.CUSTOMER_CREATE,
       entityType: AuditLogEntityType.USER,
       entityId: newCustomer.id,
       afterState: {
         id: newCustomer.id,
-        email: registerCustomerInput.email,
-        name: registerCustomerInput.name,
+        email,
+        name,
         role: UserRole.ADMIN,
-        tenantId: registerCustomerInput.tenantId,
+        tenantId,
       },
-      ipAddress: auditContext.ipAddress,
-      userAgent: auditContext.userAgent,
+      ipAddress,
+      userAgent,
     });
+
+    this.logger.debug(
+      `Customer created. Email ${email}, TenantID: ${tenantId}`,
+    );
   }
 }

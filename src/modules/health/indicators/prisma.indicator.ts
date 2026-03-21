@@ -29,7 +29,7 @@ export class PrismaHealthIndicator {
       return indicator.up();
     } catch (error) {
       const { message } = normalizeError(error);
-      this.logger.error(`Database health check failed: ${message}`);
+      this.logger.error(`Database health check failed. Error: ${message}`);
       return indicator.down({ message });
     }
   }

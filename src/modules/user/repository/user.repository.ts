@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/infra/prisma/prisma.service';
 import { User, Prisma } from '@prisma/client';
 import {
@@ -10,11 +10,7 @@ import { hashPassword } from 'src/modules/auth/utils/password.utils';
 
 @Injectable()
 export class UserRepository {
-  private readonly logger = new Logger(UserRepository.name);
-
-  constructor(private readonly prisma: PrismaService) {
-    this.logger.log('UserRepository initialized');
-  }
+  constructor(private readonly prisma: PrismaService) {}
 
   public async findUserByEmail(
     getUserDataInput: GetUserDataInput,

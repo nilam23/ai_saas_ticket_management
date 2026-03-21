@@ -7,16 +7,16 @@ import {
   Post,
   Req,
 } from '@nestjs/common';
-import { RegisterHandler } from './handlers/register.handler';
 import { HttpResponse } from 'src/shared/handlers/base-http.handler';
-import { UserSignInHandler } from './handlers/user-signin.handler';
 import { RegisterDto } from './dto/register.dto';
 import { UserSignInDto } from './dto/user-signin.dto';
 import { Tenant } from 'src/shared/decorators/tenant.decorator';
 import { Public } from 'src/shared/decorators/public-route.decorator';
 import type { Request } from 'express';
-import { RegisterCustomerHandler } from './handlers/register-customer.handler';
+import { RegisterCustomerHandler } from './handlers/api/register-customer.handler';
 import { RegisterCustomerDto } from './dto/register-customer.dto';
+import { RegisterHandler } from './handlers/api/register.handler';
+import { UserSignInHandler } from './handlers/api/user-signin.handler';
 
 @Controller('auth')
 export class AuthController {
@@ -35,7 +35,7 @@ export class AuthController {
     @Req() request: Request,
   ): Promise<HttpResponse<void>> {
     this.logger.log(
-      `Request to register user with email: ${registerDto.email} for the tenant: ${registerDto.tenantName}`,
+      `Request to register user. Email: ${registerDto.email}, TenantID: ${registerDto.tenantName}`,
     );
     return this.registerHandler.handle({
       registerInput: registerDto,
@@ -54,7 +54,7 @@ export class AuthController {
     @Req() request: Request,
   ): Promise<HttpResponse<{ token: string }>> {
     this.logger.log(
-      `Request to login user with email: ${userSignInDto.email} for the tenant: ${tenantId}`,
+      `Request to login user. Email: ${userSignInDto.email}, TenantID: ${tenantId}`,
     );
     return this.userSignInHandler.handle({
       userSignInInput: { ...userSignInDto, tenantId },
@@ -72,7 +72,7 @@ export class AuthController {
     @Req() request: Request,
   ) {
     this.logger.log(
-      `Request to register customer: ${registerCustomerDto.email} for the tenant: ${tenantId}`,
+      `Request to register customer. Email: ${registerCustomerDto.email}, TenantID: ${tenantId}`,
     );
     return this.registerCustomerHandler.handle({
       registerCustomerInput: { ...registerCustomerDto, tenantId },

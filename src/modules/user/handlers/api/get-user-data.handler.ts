@@ -3,10 +3,10 @@ import {
   HttpResponse,
 } from 'src/shared/handlers/base-http.handler';
 import { Injectable, Logger } from '@nestjs/common';
-import { UserService } from '../service/user.service';
-import { UserNotFoundException } from '../exceptions';
 import { normalizeError } from 'src/shared/utils/error.utils';
-import { GetUserDataInput, GetUserDataOutput } from '../types/user.type';
+import { GetUserDataInput, GetUserDataOutput } from '../../types/user.type';
+import { UserService } from '../../service/user.service';
+import { UserNotFoundException } from '../../exceptions';
 
 @Injectable()
 export class GetUserDataHandler extends BaseHttpHandler<
@@ -22,12 +22,12 @@ export class GetUserDataHandler extends BaseHttpHandler<
     getUserDataInput: GetUserDataInput,
   ): Promise<HttpResponse<GetUserDataOutput>> {
     try {
-      this.logger.log(
-        `Handling request to fetch user data for: ${getUserDataInput.email}`,
+      this.logger.debug(
+        `Handling request to fetch user data. Email: ${getUserDataInput.email}`,
       );
       const user = await this.userService.getUserData(getUserDataInput);
-      this.logger.log(
-        `User data fetched successfully for user: ${getUserDataInput.email}`,
+      this.logger.debug(
+        `User data fetched successfully. Email: ${getUserDataInput.email}`,
       );
       return this.ok({
         id: user.id,
@@ -42,14 +42,14 @@ export class GetUserDataHandler extends BaseHttpHandler<
     } catch (error) {
       const { message } = normalizeError(error);
       this.logger.error(
-        `Error fetching data for the user: ${getUserDataInput.email}. Error: ${message}`,
+        `Error fetching user data. Email: ${getUserDataInput.email}. Error: ${message}`,
       );
 
       if (error instanceof UserNotFoundException) {
-        this.notFound(message);
+        return this.notFound(message);
       }
 
-      this.handleUnknownError(message);
+      return this.internalServerError(message);
     }
   }
 }

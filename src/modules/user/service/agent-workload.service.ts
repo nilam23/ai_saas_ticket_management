@@ -15,28 +15,28 @@ export class AgentWorkloadService {
   public async createAgentWorkload(
     createAgentWorkloadInput: CreateAgentWorkloadInput,
   ) {
-    this.logger.log(
-      `Creating workload for the agent: ${createAgentWorkloadInput.agentId}`,
+    this.logger.debug(
+      `Creating agent workload. AgentID: ${createAgentWorkloadInput.agentId}`,
     );
     await this.agentWorkloadRepository.createAgentWorkload(
       createAgentWorkloadInput,
     );
-    this.logger.log(
-      `Workload created for the agent: ${createAgentWorkloadInput.agentId}`,
+    this.logger.debug(
+      `Agent workload created. AgentID: ${createAgentWorkloadInput.agentId}`,
     );
   }
 
   public async updateAgentWorkload(
     updateAgentWorkloadInput: UpdateAgentWorkloadInput,
   ): Promise<void> {
-    this.logger.log(
-      `Updating workload for agent ${updateAgentWorkloadInput.agentId} with ${updateAgentWorkloadInput.delta}`,
+    this.logger.debug(
+      `Updating agent workload. AgentID: ${updateAgentWorkloadInput.agentId}, Delta: ${updateAgentWorkloadInput.delta}`,
     );
     await this.agentWorkloadRepository.updateAgentWorkload(
       updateAgentWorkloadInput,
     );
-    this.logger.log(
-      `Workload updated for the agent ${updateAgentWorkloadInput.agentId}`,
+    this.logger.debug(
+      `Agent workload updated. AgentID: ${updateAgentWorkloadInput.agentId}`,
     );
   }
 }

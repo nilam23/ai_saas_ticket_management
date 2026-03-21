@@ -1,13 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { normalizeError } from 'src/shared/utils/error.utils';
+import { UserNotFoundException } from 'src/modules/user/exceptions';
+import { UserSignInApiHandlerEvent } from '../../types/api-handler-event.type';
 import {
   BaseHttpHandler,
   HttpResponse,
-} from '../../../shared/handlers/base-http.handler';
-import { AuthService } from '../service/auth.service';
-import { InvalidPasswordException } from '../exceptions';
-import { normalizeError } from 'src/shared/utils/error.utils';
-import { UserNotFoundException } from 'src/modules/user/exceptions';
-import { UserSignInApiHandlerEvent } from '../types/api-handler-event.type';
+} from 'src/shared/handlers/base-http.handler';
+import { AuthService } from '../../service/auth.service';
+import { InvalidPasswordException } from '../../exceptions';
 
 @Injectable()
 export class UserSignInHandler extends BaseHttpHandler<
@@ -25,30 +25,28 @@ export class UserSignInHandler extends BaseHttpHandler<
   ): Promise<HttpResponse<{ token: string }>> {
     const { userSignInInput, auditContext } = event;
     try {
-      this.logger.log(
-        `Handling request to login user with email: ${userSignInInput.email} for the tenant: ${userSignInInput.tenantId}`,
+      this.logger.debug(
+        `Handling request to login user. Email: ${userSignInInput.email}, TenantId: ${userSignInInput.tenantId}`,
       );
       const loginData = await this.authService.loginUser(
         userSignInInput,
         auditContext,
       );
-      this.logger.log(
-        `User logged in successfully with email: ${userSignInInput.email} for the tenant: ${userSignInInput.tenantId}`,
+      this.logger.debug(
+        `User logged in successfully. Email: ${userSignInInput.email}, TenantId: ${userSignInInput.tenantId}`,
       );
       return this.ok(loginData);
     } catch (error) {
       const { message } = normalizeError(error);
       this.logger.error(
-        `Error logging in user with email: ${userSignInInput.email} for the tenant: ${userSignInInput.tenantId}. Error: ${message}`,
+        `Error logging in user. Email: ${userSignInInput.email}, TenantId: ${userSignInInput.tenantId}. Error: ${message}`,
       );
-
       if (error instanceof UserNotFoundException) {
-        this.notFound(message);
+        return this.notFound(message);
       } else if (error instanceof InvalidPasswordException) {
-        this.unauthorized(message);
+        return this.unauthorized(message);
       }
-
-      this.handleUnknownError(message);
+      return this.internalServerError(message);
     }
   }
 }

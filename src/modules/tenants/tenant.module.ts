@@ -7,11 +7,11 @@ import { AuditModule } from '../audit/audit.module';
 import { TenantController } from './tenant.controller';
 import { AuthModule } from '../auth/auth.module';
 import { UserModule } from '../user/user.module';
-import { UploadDocHandler } from './handlers/upload-doc.handler';
 import { AwsModule } from 'src/infra/aws/aws.module';
 import { TenantDocRepository } from './repository/tenant-doc.repository';
 import { TenantDocService } from './service/tenant-doc.service';
 import { KafkaModule } from 'src/infra/kafka/kafka.module';
+import { UploadDocHandler } from './handlers/api/upload-doc.handler';
 
 @Module({
   imports: [

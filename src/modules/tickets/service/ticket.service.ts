@@ -35,8 +35,8 @@ export class TicketService {
     createTicketInput: CreateTicketInput,
     auditContext: AuditContext,
   ) {
-    this.logger.log(
-      `Creating ticket. CustomerID: ${createTicketInput.createdById}`,
+    this.logger.debug(
+      `Creating ticket. CustomerID: ${createTicketInput.createdById}, TenantID: ${createTicketInput.tenantId}`,
     );
     const createdTicket =
       await this.ticketRepository.createTicket(createTicketInput);
@@ -64,8 +64,8 @@ export class TicketService {
       userAgent: auditContext.userAgent,
     });
 
-    this.logger.log(
-      `Ticket created successfully. Ticket ID: ${createdTicket.id}, CustomerID: ${createTicketInput.createdById}`,
+    this.logger.debug(
+      `Ticket created successfully. Ticket ID: ${createdTicket.id}, CustomerID: ${createTicketInput.createdById}, TenantID: ${createTicketInput.tenantId}`,
     );
 
     const event = new TicketCreatedEvent({
@@ -74,7 +74,7 @@ export class TicketService {
       subject: createTicketInput.subject,
       message: createTicketInput.message,
     });
-    this.logger.log(
+    this.logger.debug(
       `Emitting event. Topic: ${KafkaTopic.EVENT_BUS}, Event: ${event.name}, EventID: ${event.id}`,
     );
     this.kafkaProducer.emit(KafkaTopic.EVENT_BUS, event);
@@ -83,7 +83,7 @@ export class TicketService {
   public async findTicketById(
     findTicketByIdInput: FindTicketByIdInput,
   ): Promise<Ticket> {
-    this.logger.log(
+    this.logger.debug(
       `Fetching ticket. TicketID: ${findTicketByIdInput.ticketId}`,
     );
     const ticket =
@@ -96,7 +96,7 @@ export class TicketService {
       throw new TicketNotFoundException(findTicketByIdInput.ticketId);
     }
 
-    this.logger.log(
+    this.logger.debug(
       `Ticket fetched successfully. TicketID: ${findTicketByIdInput.ticketId}`,
     );
     return ticket;
@@ -129,7 +129,7 @@ export class TicketService {
       updatedAt: new Date(),
     };
 
-    this.logger.log(
+    this.logger.debug(
       `Updating ticket. TicketID: ${updateTicketInput.ticketId}, Data: ${JSON.stringify(updateQuery)}`,
     );
 
@@ -138,7 +138,9 @@ export class TicketService {
       updateQuery,
     );
 
-    this.logger.log(`Ticket updated. TicketID: ${updateTicketInput.ticketId}`);
+    this.logger.debug(
+      `Ticket updated. TicketID: ${updateTicketInput.ticketId}`,
+    );
 
     return updatedTicket;
   }

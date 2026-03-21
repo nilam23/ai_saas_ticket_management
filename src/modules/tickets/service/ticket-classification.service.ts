@@ -1,11 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { generateTicketClassificationPrompt } from '../../ai-core/utils/prompt.utils';
-import {
-  TicketClassificationRawResult,
-  TicketClassificationInput,
-} from '../types/ticket-classification.type';
 import { AiProviderService } from '../../ai-core/service/ai-provider.service';
-import { TicketClassificationSchema } from '../types/ticket-classification.schema';
 import { AuditService } from 'src/modules/audit/service/audit.service';
 import { UserService } from 'src/modules/user/service/user.service';
 import { getTenantSystemUserEmail } from 'src/shared/utils/common.utils';
@@ -14,6 +9,11 @@ import {
   AuditLogEntityType,
 } from 'src/modules/audit/enums/audit-log.enum';
 import { TicketService } from 'src/modules/tickets/service/ticket.service';
+import {
+  TicketClassificationInput,
+  TicketClassificationRawResult,
+} from '../types/ticket-classification.type';
+import { TicketClassificationSchema } from '../types/ticket-classification.schema';
 
 @Injectable()
 export class TicketClassificationService {
@@ -31,7 +31,7 @@ export class TicketClassificationService {
   ): Promise<void> {
     const { ticketId, subject, message } = classificationInput;
 
-    this.logger.log(`Classifying the ticket ${ticketId}`);
+    this.logger.debug(`Classifying ticket. TicketID: ${ticketId}`);
 
     const prompt = generateTicketClassificationPrompt(subject, message);
     const aiResponse = await this.aiProviderService.generateText(prompt, {
@@ -47,8 +47,8 @@ export class TicketClassificationService {
       throw new Error('AI classification validation failed');
     }
 
-    this.logger.log(
-      `Classification generated for the ticket ${ticketId}. Result: ${JSON.stringify(validation.data)}`,
+    this.logger.debug(
+      `Ticket classified. TicketID: ${ticketId}, Result: ${JSON.stringify(validation.data)}`,
     );
 
     await this.ticketService.updateTicket({
@@ -62,8 +62,8 @@ export class TicketClassificationService {
       email: getTenantSystemUserEmail(classificationInput.tenantId),
     });
 
-    this.logger.log(
-      `System user fetched for the tenant ${classificationInput.tenantId}`,
+    this.logger.debug(
+      `System user fetched. TenantID: ${classificationInput.tenantId}`,
     );
 
     await this.auditService.createAuditLog({

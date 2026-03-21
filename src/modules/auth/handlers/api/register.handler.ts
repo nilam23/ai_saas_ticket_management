@@ -1,13 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
-import {
-  BaseHttpHandler,
-  HttpResponse,
-} from '../../../shared/handlers/base-http.handler';
-import { AuthService } from '../service/auth.service';
 import { normalizeError } from 'src/shared/utils/error.utils';
 import { UserAlreadyExistsException } from 'src/modules/user/exceptions';
 import { TenantAlreadyExistsException } from 'src/modules/tenants/exceptions';
-import { RegisterApiHandlerEvent } from '../types/api-handler-event.type';
+import {
+  BaseHttpHandler,
+  HttpResponse,
+} from 'src/shared/handlers/base-http.handler';
+import { RegisterApiHandlerEvent } from '../../types/api-handler-event.type';
+import { AuthService } from '../../service/auth.service';
 
 @Injectable()
 export class RegisterHandler extends BaseHttpHandler<
@@ -25,27 +25,25 @@ export class RegisterHandler extends BaseHttpHandler<
   ): Promise<HttpResponse<void>> {
     const { registerInput, auditContext } = event;
     try {
-      this.logger.log(
-        `Handling request to register user with email: ${registerInput.email} for the tenant: ${registerInput.tenantName}`,
+      this.logger.debug(
+        `Handling request to register user. Email: ${registerInput.email}, Tenant: ${registerInput.tenantName}`,
       );
       await this.authService.registerUser(registerInput, auditContext);
-      this.logger.log(
-        `User registered successfully with email: ${registerInput.email} for the tenant: ${registerInput.tenantName}`,
+      this.logger.debug(
+        `User registered. Email: ${registerInput.email}, Tenant: ${registerInput.tenantName}`,
       );
       return this.created();
     } catch (error) {
       const { message } = normalizeError(error);
       this.logger.error(
-        `Error registering user with email: ${registerInput.email} for the tenant: ${registerInput.tenantName}. Error: ${message}`,
+        `Error registering user. Email: ${registerInput.email}, Tenant: ${registerInput.tenantName}, Error: ${message}`,
       );
-
       if (error instanceof UserAlreadyExistsException) {
-        this.conflict(message);
+        return this.conflict(message);
       } else if (error instanceof TenantAlreadyExistsException) {
-        this.conflict(message);
+        return this.conflict(message);
       }
-
-      this.handleUnknownError(message);
+      return this.internalServerError(message);
     }
   }
 }

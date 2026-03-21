@@ -29,19 +29,19 @@ export class TenantDocService {
     auditContext: AuditContext,
   ) {
     const fileKey: string = `tenant-docs/${auditContext.tenantId}/${formatDateToYMD()}/${file.originalname}`;
-    this.logger.log(`Uploading doc with the key: ${fileKey} to S3`);
+    this.logger.debug(`Uploading doc. Key: ${fileKey}`);
     await this.s3Service.uploadFile(fileKey, file.buffer);
-    this.logger.log(`Doc with the key ${fileKey} uploaded to S3`);
+    this.logger.debug(`Doc uploaded. Key: ${fileKey} `);
 
-    this.logger.log(`Creating metadata for the doc with the key: ${fileKey}`);
+    this.logger.debug(`Creating metadata for the doc. Key: ${fileKey}`);
     const docMetadata = await this.tenantDocRepository.createDocMetadata({
       fileKey,
       fileName: file.originalname,
       tenantId: auditContext.tenantId!,
       uploadedBy: auditContext.actorUserId!,
     });
-    this.logger.log(
-      `Metadata created successfully for the doc with the key: ${fileKey}`,
+    this.logger.debug(
+      `Metadata created successfully. Key: ${fileKey}, DocID: ${docMetadata.id}`,
     );
 
     await this.auditService.createAuditLog({
@@ -58,8 +58,8 @@ export class TenantDocService {
       userAgent: auditContext.userAgent,
     });
 
-    this.logger.log(
-      `Doc: ${file.originalname} uploaded successfully for the tenant: ${auditContext.tenantId}`,
+    this.logger.debug(
+      `Doc uploaded successfully. File Name: ${file.originalname}, TenantID: ${auditContext.tenantId}`,
     );
 
     const event = new TenantDocUploadedEvent({
@@ -67,7 +67,7 @@ export class TenantDocService {
       docId: docMetadata.id,
       fileKey,
     });
-    this.logger.log(
+    this.logger.debug(
       `Emitting event. Topic: ${KafkaTopic.EVENT_BUS}, Event: ${event.name}, Event ID: ${event.id}`,
     );
     this.kafkaProducer.emit(KafkaTopic.EVENT_BUS, event);
@@ -77,8 +77,7 @@ export class TenantDocService {
     updateTenantDocInput: UpdateTenantDocInput,
   ): Promise<void> {
     const { docId, tenantId, status } = updateTenantDocInput;
-    this.logger.log(`Updating doc with id ${docId} for the tenant ${tenantId}`);
-
+    this.logger.debug(`Updating doc. DocID: ${docId}, TenantID: ${tenantId}`);
     await this.tenantDocRepository.updateTenantDoc(
       { id: docId, tenantId: tenantId },
       {
@@ -86,7 +85,6 @@ export class TenantDocService {
         updatedAt: new Date(),
       },
     );
-
-    this.logger.log(`Doc updated with id ${docId} for the tenant ${tenantId}`);
+    this.logger.debug(`Doc updated. DocID: ${docId}, TenantID: ${tenantId}`);
   }
 }

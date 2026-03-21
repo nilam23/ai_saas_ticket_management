@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { HealthController } from './health.controller';
 import { TerminusModule } from '@nestjs/terminus';
-import { HEALTH_INDICATORS } from './index';
+import { HEALTH_INDICATORS } from './indicators/index';
 import { DatabaseModule } from 'src/infra/prisma/prisma.module';
 import { STSClient } from '@aws-sdk/client-sts';
 import {

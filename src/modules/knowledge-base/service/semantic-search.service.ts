@@ -22,7 +22,7 @@ export class SemanticSearchService {
   ): Promise<RetrievedContextResult[]> {
     const { tenantId, query, queryEmbeddings } = retrieveContextInput;
 
-    this.logger.log(
+    this.logger.debug(
       `Retrieving context. Query: "${query}", TenantID: ${tenantId}`,
     );
 
@@ -38,7 +38,7 @@ export class SemanticSearchService {
       (ctx) => ctx.similarityScore >= CONTEXT_SIMILARITY_THRESHOLD,
     );
 
-    this.logger.log(
+    this.logger.debug(
       `Context retrieved. Query: "${query}", TenantId:${tenantId}, Total: ${retrievedContext.length}, Above Threshold: ${relevantContext.length}`,
     );
 

@@ -2,11 +2,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import {
   BaseHttpHandler,
   HttpResponse,
-} from '../../../shared/handlers/base-http.handler';
-import { AuthService } from '../service/auth.service';
+} from '../../../../shared/handlers/base-http.handler';
+import { AuthService } from '../../service/auth.service';
 import { normalizeError } from 'src/shared/utils/error.utils';
 import { UserAlreadyExistsException } from 'src/modules/user/exceptions';
-import { RegisterCustomerApiHandlerEvent } from '../types/api-handler-event.type';
+import { RegisterCustomerApiHandlerEvent } from '../../types/api-handler-event.type';
 
 @Injectable()
 export class RegisterCustomerHandler extends BaseHttpHandler<
@@ -24,28 +24,26 @@ export class RegisterCustomerHandler extends BaseHttpHandler<
   ): Promise<HttpResponse<void>> {
     const { registerCustomerInput, auditContext } = event;
     try {
-      this.logger.log(
-        `Handling request to register customer with email: ${registerCustomerInput.email} for the tenant: ${registerCustomerInput.tenantId}`,
+      this.logger.debug(
+        `Handling request to register customer. Email: ${registerCustomerInput.email}, TenantID: ${registerCustomerInput.tenantId}`,
       );
       await this.authService.registerCustomer(
         registerCustomerInput,
         auditContext,
       );
-      this.logger.log(
-        `Customer registered successfully with email: ${registerCustomerInput.email} for the tenant: ${registerCustomerInput.tenantId}`,
+      this.logger.debug(
+        `Customer registered. Email: ${registerCustomerInput.email}, TenantID: ${registerCustomerInput.tenantId}`,
       );
       return this.created();
     } catch (error) {
       const { message } = normalizeError(error);
       this.logger.error(
-        `Error registering customer with email: ${registerCustomerInput.email} for the tenant: ${registerCustomerInput.tenantId}. Error: ${message}`,
+        `Error registering customer. Email: ${registerCustomerInput.email}, TenantID: ${registerCustomerInput.tenantId}, Error: ${message}`,
       );
-
       if (error instanceof UserAlreadyExistsException) {
-        this.conflict(message);
+        return this.conflict(message);
       }
-
-      this.handleUnknownError(message);
+      return this.internalServerError(message);
     }
   }
 }

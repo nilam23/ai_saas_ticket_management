@@ -14,7 +14,6 @@ import {
   UnprocessableEntityException,
   UnsupportedMediaTypeException,
 } from '@nestjs/common';
-import { normalizeError } from '../utils/error.utils';
 
 export interface HttpResponse<TOutput> {
   status: {
@@ -161,17 +160,6 @@ export abstract class BaseHttpHandler<TInput, TOutput> {
   protected internalServerError(
     message: string = 'Internal Server Error',
   ): never {
-    const response: HttpErrorResponse = {
-      status: {
-        code: HttpStatus.INTERNAL_SERVER_ERROR,
-        message,
-      },
-    };
-    throw new InternalServerErrorException(response);
-  }
-
-  protected handleUnknownError(error: unknown): never {
-    const { message } = normalizeError(error);
     const response: HttpErrorResponse = {
       status: {
         code: HttpStatus.INTERNAL_SERVER_ERROR,

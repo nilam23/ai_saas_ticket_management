@@ -3,10 +3,10 @@ import {
   BaseHttpHandler,
   HttpResponse,
 } from 'src/shared/handlers/base-http.handler';
-import { UploadDocHandlerEvent } from '../types/api-handler-event.type';
 import { normalizeError } from 'src/shared/utils/error.utils';
 import { S3UploadException } from 'src/infra/aws/exceptions';
-import { TenantDocService } from '../service/tenant-doc.service';
+import { UploadDocHandlerEvent } from '../../types/api-handler-event.type';
+import { TenantDocService } from '../../service/tenant-doc.service';
 
 @Injectable()
 export class UploadDocHandler extends BaseHttpHandler<
@@ -24,22 +24,20 @@ export class UploadDocHandler extends BaseHttpHandler<
   ): Promise<HttpResponse<void>> {
     const { file, auditContext } = event;
     try {
-      this.logger.log(
-        `Handling request to upload doc: ${file.originalname} for the tenant: ${auditContext.tenantId}`,
+      this.logger.debug(
+        `Handling request to upload doc. File Name: ${file.originalname}, TenantID: ${auditContext.tenantId}`,
       );
       await this.tenantDocService.uploadTenantDoc(file, auditContext);
       return this.created();
     } catch (error) {
       const { message } = normalizeError(error);
       this.logger.error(
-        `Error uploading doc: ${file.originalname} for the tenant: ${auditContext.tenantId}. Error: ${message}`,
+        `Error uploading doc. File Name: ${file.originalname}, TenantID: ${auditContext.tenantId}, Error: ${message}`,
       );
-
       if (error instanceof S3UploadException) {
-        this.badRequest(message);
+        return this.badRequest(message);
       }
-
-      this.handleUnknownError(message);
+      return this.internalServerError(message);
     }
   }
 }

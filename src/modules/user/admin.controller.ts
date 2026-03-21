@@ -15,9 +15,9 @@ import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { CreateAgentDto } from './dto/create-user.dto';
 import { HttpResponse } from 'src/shared/handlers/base-http.handler';
 import { GetTenantUsersOutput } from './types/user.type';
-import { GetTenantUsersHandler } from './handlers/get-tenant-users.handler';
 import { USER_DEFAULT_PASSWORD } from 'src/shared/utils/env-config.utils';
-import { CreateAgentHandler } from './handlers/create-agent.handler';
+import { CreateAgentHandler } from './handlers/api/create-agent.handler';
+import { GetTenantUsersHandler } from './handlers/api/get-tenant-users.handler';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.ADMIN)
@@ -36,7 +36,7 @@ export class AdminController {
     @Req() request: Request,
   ): Promise<HttpResponse<void>> {
     this.logger.log(
-      `Request to create agent with email: ${createAgentDto.email} for the tenant: ${request.user.tenantId}`,
+      `Request to create agent. Email: ${createAgentDto.email}, TenantID: ${request.user.tenantId}`,
     );
     return this.createAgentHandler.handle({
       createUserInput: {
@@ -59,7 +59,7 @@ export class AdminController {
     @Req() request: Request,
   ): Promise<HttpResponse<GetTenantUsersOutput>> {
     this.logger.log(
-      `Request to get users for the tenant: ${request.user.tenantId}`,
+      `Request to get tenant users. TenantID: ${request.user.tenantId}`,
     );
     return this.getTenantUsersHandler.handle({
       tenantId: request.user.tenantId,

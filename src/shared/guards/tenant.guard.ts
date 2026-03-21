@@ -22,8 +22,8 @@ export class TenantGuard implements CanActivate {
     );
 
     if (isPublic) {
-      this.logger.log(
-        `Route: '${(request.route as { path: string }).path}' is public, skipping tenant resolution`,
+      this.logger.debug(
+        `Public route, skipping tenant resolution. Route: '${(request.route as { path: string }).path}'`,
       );
       return true;
     }
@@ -53,7 +53,7 @@ export class TenantGuard implements CanActivate {
     }
 
     request.tenantId = tenant.id;
-    this.logger.log(`Tenant ${tenant.id} resolved for request`);
+    this.logger.debug(`Tenant resolved for request. TenantID: ${tenant.id}`);
     return true;
   }
 }

@@ -24,7 +24,7 @@ export class AiProviderService {
     prompt: string,
     options?: OllamaModelOptions,
   ): Promise<string> {
-    this.logger.log('AI generation started');
+    this.logger.debug('AI text generation started');
 
     const response = await invokeAPI<
       OllamaGenerateRequest,
@@ -36,7 +36,7 @@ export class AiProviderService {
       ...(options && { options }),
     });
 
-    this.logger.log('AI generation completed');
+    this.logger.debug('AI text generation completed');
 
     return response.data.response;
   }

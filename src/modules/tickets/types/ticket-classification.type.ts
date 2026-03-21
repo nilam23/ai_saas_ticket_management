@@ -1,5 +1,5 @@
 import z from 'zod';
-import { TicketClassificationSchema } from '../../ticket-classification/types/ticket-classification.schema';
+import { TicketClassificationSchema } from './ticket-classification.schema';
 
 export type TicketClassificationInput = {
   tenantId: string;

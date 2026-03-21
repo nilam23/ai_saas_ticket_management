@@ -10,7 +10,6 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuditModule } from './modules/audit/audit.module';
 import { TicketModule } from './modules/tickets/ticket.module';
 import { AiCoreModule } from './modules/ai-core/ai-core.module';
-import { ClassificationModule } from './modules/ticket-classification/classification.module';
 import { KnowledgeBaseModule } from './modules/knowledge-base/knowledge-base.module';
 
 @Module({
@@ -27,7 +26,6 @@ import { KnowledgeBaseModule } from './modules/knowledge-base/knowledge-base.mod
     AuditModule,
     TicketModule,
     AiCoreModule,
-    ClassificationModule,
     KnowledgeBaseModule,
   ],
   providers: [

@@ -158,7 +158,7 @@ export class AiResponseValidationService {
       semanticRelevanceValidation.score * RELEVANCE_WEIGHT;
 
     if (confidenceScore >= AUTO_SEND_THRESHOLD) {
-      this.logger.log(
+      this.logger.debug(
         `Confidence score reliable, auto sending the AI response. Confidence Score: ${confidenceScore}`,
       );
       return {

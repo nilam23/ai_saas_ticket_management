@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAgentSkillMapInput } from '../types/agent-skill-map.type';
 import { PrismaService } from 'src/infra/prisma/prisma.service';
 import { AgentSkillMap } from '@prisma/client';
+import { CreateAgentSkillMapInput } from '../types/agent-skill-map.type';
 
 @Injectable()
 export class AgentSkillMapRepository {

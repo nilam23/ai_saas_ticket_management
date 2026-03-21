@@ -12,13 +12,11 @@ export class AuditService {
   public async createAuditLog(
     createAuditLogInput: CreateAuditLogInput,
   ): Promise<void> {
-    this.logger.log(
-      `Creating audit log. Actor ID: ${createAuditLogInput.actorUserId}, Action: ${createAuditLogInput.action}, Entity Type: ${createAuditLogInput.entityType}, Entity ID: ${createAuditLogInput.entityId}`,
+    this.logger.debug(
+      `Creating audit log. Audit Log Object: ${JSON.stringify(createAuditLogInput)}`,
     );
     const auditLog =
       await this.auditRepository.createAuditLog(createAuditLogInput);
-    this.logger.log(
-      `Audit log created successfully. Audit log ID: ${auditLog.id}`,
-    );
+    this.logger.debug(`Audit log created. ID: ${auditLog.id}`);
   }
 }

@@ -2,14 +2,14 @@ import { Injectable, Logger } from '@nestjs/common';
 import {
   BaseHttpHandler,
   HttpResponse,
-} from '../../../shared/handlers/base-http.handler';
+} from 'src/shared/handlers/base-http.handler';
 import { normalizeError } from 'src/shared/utils/error.utils';
-import { ReviewAiResponseApiHandlerEvent } from '../types/api-handler-event.type';
-import { AiResponseService } from '../service/ai-response.service';
+import { ReviewAiResponseApiHandlerEvent } from '../../types/api-handler-event.type';
+import { AiResponseService } from '../../service/ai-response.service';
 import {
   AgentReviewForbiddenException,
   MessageNotFoundException,
-} from '../exceptions/ticket-service.exception';
+} from '../../exceptions/ticket-service.exception';
 
 @Injectable()
 export class ReviewAiResponseHandler extends BaseHttpHandler<
@@ -28,14 +28,14 @@ export class ReviewAiResponseHandler extends BaseHttpHandler<
     const { reviewAiResponseInput, auditContext } = event;
     const { tenantId, ticketId, messageId, agentId } = reviewAiResponseInput;
     try {
-      this.logger.log(
+      this.logger.debug(
         `Handling request to review AI response. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${agentId}, TenantID: ${tenantId}`,
       );
       await this.aiResponseService.reviewAiResponse(
         reviewAiResponseInput,
         auditContext,
       );
-      this.logger.log(
+      this.logger.debug(
         `AI response reviewed. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${agentId}, TenantID: ${tenantId}`,
       );
       return this.ok();
@@ -49,7 +49,7 @@ export class ReviewAiResponseHandler extends BaseHttpHandler<
       } else if (error instanceof MessageNotFoundException) {
         return this.badRequest(message);
       }
-      return this.handleUnknownError(message);
+      return this.internalServerError(message);
     }
   }
 }

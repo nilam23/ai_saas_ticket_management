@@ -7,30 +7,37 @@ import { TicketController } from './ticket.controller';
 import { TicketService } from './service/ticket.service';
 import { TicketRepository } from './repository/ticket.repository';
 import { PrismaService } from 'src/infra/prisma/prisma.service';
-import { CreateTicketHandler } from './handlers/create-ticket.handler';
+import { CreateTicketHandler } from './handlers/api/create-ticket.handler';
 import { MessageRepository } from './repository/message.repository';
 import { MessageService } from './service/message.service';
 import { KafkaModule } from 'src/infra/kafka/kafka.module';
-import { RoutingModule } from '../ticket-routing/routing.module';
 import { AiResponseService } from './service/ai-response.service';
 import { AiCoreModule } from '../ai-core/ai-core.module';
 import { KnowledgeBaseModule } from '../knowledge-base/knowledge-base.module';
 import { AiResponseValidationService } from './service/ai-response-validation.service';
 import { TicketAssignedEventHandler } from './handlers/kafka/ticket-assigned-event.handler';
-import { ReviewAiResponseHandler } from './handlers/review-ai-response.handler';
+import { TicketCreatedEventHandler } from './handlers/kafka/ticket-created-event.handler';
+import { TicketClassificationService } from './service/ticket-classification.service';
+import { TicketAssignmentService } from './service/ticket-assignment.service';
+import { TicketClassifiedEventHandler } from './handlers/kafka/ticket-classified-event.handler';
+import { ReviewAiResponseHandler } from './handlers/api/review-ai-response.handler';
 
 @Module({
   imports: [
     DatabaseModule,
     AuditModule,
     KafkaModule,
-    forwardRef(() => RoutingModule),
     forwardRef(() => AuthModule),
     forwardRef(() => UserModule),
     forwardRef(() => AiCoreModule),
     forwardRef(() => KnowledgeBaseModule),
   ],
-  controllers: [TicketController, TicketAssignedEventHandler],
+  controllers: [
+    TicketController,
+    TicketAssignedEventHandler,
+    TicketCreatedEventHandler,
+    TicketClassifiedEventHandler,
+  ],
   providers: [
     TicketService,
     TicketRepository,
@@ -41,6 +48,8 @@ import { ReviewAiResponseHandler } from './handlers/review-ai-response.handler';
     AiResponseService,
     AiResponseValidationService,
     ReviewAiResponseHandler,
+    TicketClassificationService,
+    TicketAssignmentService,
   ],
   exports: [TicketService, TicketRepository],
 })
