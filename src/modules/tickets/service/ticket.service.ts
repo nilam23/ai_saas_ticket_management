@@ -1,6 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import {
   CreateTicketInput,
+  FetchTicketsFilterQuery,
+  FetchTicketsInput,
   FindTicketByIdInput,
   UpdateTicketFilterQuery,
   UpdateTicketInput,
@@ -8,7 +10,7 @@ import {
 } from '../types/ticket.type';
 import { AuditContext } from 'src/modules/audit/types/audit.type';
 import { TicketRepository } from '../repository/ticket.repository';
-import { SenderType, Ticket } from '@prisma/client';
+import { SenderType, Ticket, UserRole } from '@prisma/client';
 import { AuditService } from 'src/modules/audit/service/audit.service';
 import {
   AuditLogAction,
@@ -143,5 +145,20 @@ export class TicketService {
     );
 
     return updatedTicket;
+  }
+
+  public async fetchTickets(
+    fetchTicketsInput: FetchTicketsInput,
+  ): Promise<Ticket[]> {
+    const { tenantId, userId, userRole } = fetchTicketsInput;
+    const filterQuery: FetchTicketsFilterQuery = {
+      tenantId,
+      ...(userRole === UserRole.CUSTOMER && { createdById: userId }),
+      ...(userRole === UserRole.AGENT && { assignedToId: userId }),
+    };
+    this.logger.debug(
+      `Fetching tickets. Filter: ${JSON.stringify(filterQuery)}`,
+    );
+    return this.ticketRepository.fetchTickets(filterQuery);
   }
 }

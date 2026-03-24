@@ -3,6 +3,7 @@ import { Prisma, Ticket } from '@prisma/client';
 import { PrismaService } from 'src/infra/prisma/prisma.service';
 import {
   CreateTicketInput,
+  FetchTicketsFilterQuery,
   FindTicketByIdInput,
   UpdateTicketFilterQuery,
   UpdateTicketUpdateQuery,
@@ -46,6 +47,15 @@ export class TicketRepository {
     return this.prisma.ticket.update({
       where: filterQuery,
       data: updateQuery,
+    });
+  }
+
+  public async fetchTickets(
+    filterQuery: FetchTicketsFilterQuery,
+  ): Promise<Ticket[]> {
+    return this.prisma.ticket.findMany({
+      where: filterQuery,
+      orderBy: { createdAt: 'desc' },
     });
   }
 }

@@ -41,3 +41,15 @@ export type UpdateTicketUpdateQuery = {
   assignedTo?: { connect: { id: string } };
   updatedAt: Date;
 };
+
+export type FetchTicketsInput = {
+  tenantId: string;
+  userId: string;
+  userRole: string;
+};
+
+export type FetchTicketsFilterQuery = {
+  tenantId: string;
+  createdById?: string;
+  assignedToId?: string;
+};

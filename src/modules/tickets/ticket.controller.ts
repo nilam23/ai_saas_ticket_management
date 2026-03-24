@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Logger,
   Param,
   Patch,
@@ -18,6 +19,7 @@ import { Roles } from 'src/shared/decorators/roles.decorator';
 import { UserRole } from '@prisma/client';
 import { HttpResponse } from 'src/shared/handlers/base-http.handler';
 import { ReviewAiResponseHandler } from './handlers/api/review-ai-response.handler';
+import { FetchTicketsHandler } from './handlers/api/get-tickets.handler';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('tickets')
@@ -27,6 +29,7 @@ export class TicketController {
   constructor(
     private readonly createTicketHandler: CreateTicketHandler,
     private readonly reviewAiResponseHandler: ReviewAiResponseHandler,
+    private readonly fetchTicketsHandler: FetchTicketsHandler,
   ) {}
 
   @Roles(UserRole.CUSTOMER)
@@ -76,6 +79,20 @@ export class TicketController {
       auditContext: {
         ipAddress: request.ip,
         userAgent: request.headers['user-agent'],
+      },
+    });
+  }
+
+  @Get()
+  fetchTickets(@Tenant() tenantId: string, @Req() request: Request) {
+    this.logger.log(
+      `Request to fetch tickets. UserID: ${request.user.id}, TenantID: ${tenantId}`,
+    );
+    return this.fetchTicketsHandler.handle({
+      fetchTicketsInput: {
+        tenantId,
+        userId: request.user.id,
+        userRole: request.user.role,
       },
     });
   }

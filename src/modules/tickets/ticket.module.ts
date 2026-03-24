@@ -21,6 +21,7 @@ import { TicketClassificationService } from './service/ticket-classification.ser
 import { TicketAssignmentService } from './service/ticket-assignment.service';
 import { TicketClassifiedEventHandler } from './handlers/kafka/ticket-classified-event.handler';
 import { ReviewAiResponseHandler } from './handlers/api/review-ai-response.handler';
+import { FetchTicketsHandler } from './handlers/api/get-tickets.handler';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { ReviewAiResponseHandler } from './handlers/api/review-ai-response.handl
     ReviewAiResponseHandler,
     TicketClassificationService,
     TicketAssignmentService,
+    FetchTicketsHandler,
   ],
   exports: [TicketService, TicketRepository],
 })
