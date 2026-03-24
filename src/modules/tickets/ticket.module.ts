@@ -22,6 +22,7 @@ import { TicketAssignmentService } from './service/ticket-assignment.service';
 import { TicketClassifiedEventHandler } from './handlers/kafka/ticket-classified-event.handler';
 import { ReviewAiResponseHandler } from './handlers/api/review-ai-response.handler';
 import { FetchTicketsHandler } from './handlers/api/get-tickets.handler';
+import { MessageController } from './message.controller';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { FetchTicketsHandler } from './handlers/api/get-tickets.handler';
   ],
   controllers: [
     TicketController,
+    MessageController,
     TicketAssignedEventHandler,
     TicketCreatedEventHandler,
     TicketClassifiedEventHandler,

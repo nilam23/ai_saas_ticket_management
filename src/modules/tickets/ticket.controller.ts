@@ -3,8 +3,6 @@ import {
   Controller,
   Get,
   Logger,
-  Param,
-  Patch,
   Post,
   Req,
   UseGuards,
@@ -13,12 +11,11 @@ import type { Request } from 'express';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { CreateTicketHandler } from './handlers/api/create-ticket.handler';
 import { Tenant } from 'src/shared/decorators/tenant.decorator';
-import { CreateTicketDto, ReviewAiResponseDto } from './dto/create-ticket.dto';
+import { CreateTicketDto } from './dto/create-ticket.dto';
 import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { UserRole } from '@prisma/client';
 import { HttpResponse } from 'src/shared/handlers/base-http.handler';
-import { ReviewAiResponseHandler } from './handlers/api/review-ai-response.handler';
 import { FetchTicketsHandler } from './handlers/api/get-tickets.handler';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -28,7 +25,6 @@ export class TicketController {
 
   constructor(
     private readonly createTicketHandler: CreateTicketHandler,
-    private readonly reviewAiResponseHandler: ReviewAiResponseHandler,
     private readonly fetchTicketsHandler: FetchTicketsHandler,
   ) {}
 
@@ -48,33 +44,6 @@ export class TicketController {
         createdById: request.user.id,
         subject: createTicketDto.subject,
         message: createTicketDto.message,
-      },
-      auditContext: {
-        ipAddress: request.ip,
-        userAgent: request.headers['user-agent'],
-      },
-    });
-  }
-
-  @Roles(UserRole.AGENT)
-  @Patch(':ticketId/messages/:messageId/review')
-  reviewAiResponse(
-    @Tenant() tenantId: string,
-    @Param('ticketId') ticketId: string,
-    @Param('messageId') messageId: string,
-    @Body() reviewAiResponseDto: ReviewAiResponseDto,
-    @Req() request: Request,
-  ): Promise<HttpResponse<void>> {
-    this.logger.log(
-      `Request to review AI generated response. MessageID: ${messageId}, TicketID: ${ticketId}, AgentID: ${request.user.id}, TenantID: ${tenantId}`,
-    );
-    return this.reviewAiResponseHandler.handle({
-      reviewAiResponseInput: {
-        tenantId,
-        ticketId,
-        messageId,
-        agentId: request.user.id,
-        ...reviewAiResponseDto,
       },
       auditContext: {
         ipAddress: request.ip,
