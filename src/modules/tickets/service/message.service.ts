@@ -8,15 +8,25 @@ import {
   FindMessageByIdInput,
 } from '../types/message.type';
 import { Message } from '@prisma/client';
+import { AuditContext } from 'src/modules/audit/types/audit.type';
+import { AuditService } from 'src/modules/audit/service/audit.service';
+import {
+  AuditLogAction,
+  AuditLogEntityType,
+} from 'src/modules/audit/enums/audit-log.enum';
 
 @Injectable()
 export class MessageService {
   private readonly logger = new Logger(MessageService.name);
 
-  constructor(private readonly messageRepository: MessageRepository) {}
+  constructor(
+    private readonly messageRepository: MessageRepository,
+    private readonly auditService: AuditService,
+  ) {}
 
   public async createMessage(
     createMessageInput: CreateMessageInput,
+    auditContext?: AuditContext,
   ): Promise<Message> {
     this.logger.debug(
       `Creating message. Ticket ID: ${createMessageInput.ticketId}`,
@@ -26,6 +36,22 @@ export class MessageService {
     this.logger.debug(
       `Message created. Message ID: ${createdMessage.id}, Ticket ID: ${createMessageInput.ticketId}`,
     );
+
+    if (auditContext) {
+      await this.auditService.createAuditLog({
+        tenantId: auditContext.tenantId!,
+        actorUserId: createMessageInput.senderId!,
+        action: AuditLogAction.CREATE_MESSAGE,
+        entityId: createdMessage.id,
+        entityType: AuditLogEntityType.MESSAGE,
+        afterState: {
+          messageId: createdMessage.id,
+          createdBy: createdMessage.senderId,
+        },
+        ipAddress: auditContext.ipAddress,
+        userAgent: auditContext.userAgent,
+      });
+    }
 
     return createdMessage;
   }

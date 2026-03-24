@@ -4,6 +4,7 @@ import {
   Logger,
   Param,
   Patch,
+  Post,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -13,21 +14,24 @@ import { Tenant } from 'src/shared/decorators/tenant.decorator';
 import { ReviewAiResponseDto } from './dto/create-ticket.dto';
 import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { Roles } from 'src/shared/decorators/roles.decorator';
-import { UserRole } from '@prisma/client';
+import { SenderType, UserRole } from '@prisma/client';
 import { HttpResponse } from 'src/shared/handlers/base-http.handler';
 import { ReviewAiResponseHandler } from './handlers/api/review-ai-response.handler';
+import { CreateMessageDto } from './dto/create-message.dto';
+import { CreateMessageHandler } from './handlers/api/create-message.handler';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Controller('tickets')
+@Controller('tickets/:ticketId/messages')
 export class MessageController {
   private readonly logger = new Logger(MessageController.name);
 
   constructor(
     private readonly reviewAiResponseHandler: ReviewAiResponseHandler,
+    private readonly createMessageHandler: CreateMessageHandler,
   ) {}
 
   @Roles(UserRole.AGENT)
-  @Patch(':ticketId/messages/:messageId/review')
+  @Patch(':messageId/review')
   reviewAiResponse(
     @Tenant() tenantId: string,
     @Param('ticketId') ticketId: string,
@@ -47,6 +51,35 @@ export class MessageController {
         ...reviewAiResponseDto,
       },
       auditContext: {
+        ipAddress: request.ip,
+        userAgent: request.headers['user-agent'],
+      },
+    });
+  }
+
+  @Roles(UserRole.CUSTOMER, UserRole.AGENT)
+  @Post()
+  createMessage(
+    @Tenant() tenantId: string,
+    @Param('ticketId') ticketId: string,
+    @Body() createMessageDto: CreateMessageDto,
+    @Req() request: Request,
+  ) {
+    this.logger.log(
+      `Request to create message. UserID: ${request.user.id}, TenantID: ${tenantId}`,
+    );
+    return this.createMessageHandler.handle({
+      createMessageInput: {
+        ticketId,
+        senderId: request.user.id,
+        senderType:
+          request.user.role === UserRole.AGENT
+            ? SenderType.AGENT
+            : SenderType.CUSTOMER,
+        content: createMessageDto.content,
+      },
+      auditContext: {
+        tenantId,
         ipAddress: request.ip,
         userAgent: request.headers['user-agent'],
       },
