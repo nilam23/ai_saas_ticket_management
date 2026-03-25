@@ -6,6 +6,8 @@ import {
   UpdateMessageUpdateQuery,
   UpdateMessageInput,
   FindMessageByIdInput,
+  FetchMessagesInput,
+  FetchMessagesOutput,
 } from '../types/message.type';
 import { Message } from '@prisma/client';
 import { AuditContext } from 'src/modules/audit/types/audit.type';
@@ -90,5 +92,15 @@ export class MessageService {
       `Fetching message. MessageID: ${messageId}, TicketID: ${ticketId}`,
     );
     return this.messageRepository.findMessageById(findMessageByIdInput);
+  }
+
+  public async fetchMessages(
+    fetchMessagesInput: FetchMessagesInput,
+  ): Promise<FetchMessagesOutput[]> {
+    const { tenantId, ticketId, userId } = fetchMessagesInput;
+    this.logger.debug(
+      `Fetching messages. TicketID: ${ticketId}, UserID: ${userId}, TenantID: ${tenantId}`,
+    );
+    return this.messageRepository.fetchMessages(fetchMessagesInput);
   }
 }

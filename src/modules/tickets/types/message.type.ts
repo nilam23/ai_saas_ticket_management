@@ -62,3 +62,17 @@ export type FindMessageByIdInput = {
   messageId: string;
   aiResponseStatus: AiResponseStatus;
 };
+
+export type FetchMessagesInput = {
+  tenantId: string;
+  ticketId: string;
+  userId: string;
+};
+
+export type FetchMessagesOutput = {
+  id: string;
+  senderId: string | null;
+  senderType: SenderType;
+  content: string | null; // needs change
+  createdAt: Date;
+};

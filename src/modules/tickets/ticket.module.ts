@@ -24,6 +24,7 @@ import { ReviewAiResponseHandler } from './handlers/api/review-ai-response.handl
 import { FetchTicketsHandler } from './handlers/api/get-tickets.handler';
 import { MessageController } from './message.controller';
 import { CreateMessageHandler } from './handlers/api/create-message.handler';
+import { FetchMessagesHandler } from './handlers/api/view-messages.handler';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { CreateMessageHandler } from './handlers/api/create-message.handler';
     TicketAssignmentService,
     FetchTicketsHandler,
     CreateMessageHandler,
+    FetchMessagesHandler,
   ],
   exports: [TicketService, TicketRepository],
 })

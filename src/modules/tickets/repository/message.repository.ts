@@ -3,6 +3,8 @@ import { Message, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/infra/prisma/prisma.service';
 import {
   CreateMessageInput,
+  FetchMessagesInput,
+  FetchMessagesOutput,
   FindMessageByIdInput,
   UpdateMessageFilterQuery,
   UpdateMessageUpdateQuery,
@@ -60,6 +62,26 @@ export class MessageRepository {
         id: findMessageByIdInput.messageId,
         ticketId: findMessageByIdInput.ticketId,
         aiResponseStatus: findMessageByIdInput.aiResponseStatus,
+      },
+    });
+  }
+
+  public async fetchMessages(
+    fetchMessagesInput: FetchMessagesInput,
+  ): Promise<FetchMessagesOutput[]> {
+    return this.prisma.message.findMany({
+      where: {
+        ticketId: fetchMessagesInput.ticketId,
+      },
+      select: {
+        id: true,
+        senderId: true,
+        senderType: true,
+        content: true,
+        createdAt: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
   }

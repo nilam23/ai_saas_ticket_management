@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Logger,
   Param,
   Patch,
@@ -19,6 +20,8 @@ import { HttpResponse } from 'src/shared/handlers/base-http.handler';
 import { ReviewAiResponseHandler } from './handlers/api/review-ai-response.handler';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { CreateMessageHandler } from './handlers/api/create-message.handler';
+import { FetchMessagesHandler } from './handlers/api/view-messages.handler';
+import { FetchMessagesOutput } from './types/message.type';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('tickets/:ticketId/messages')
@@ -28,6 +31,7 @@ export class MessageController {
   constructor(
     private readonly reviewAiResponseHandler: ReviewAiResponseHandler,
     private readonly createMessageHandler: CreateMessageHandler,
+    private readonly fetchMessagesHandler: FetchMessagesHandler,
   ) {}
 
   @Roles(UserRole.AGENT)
@@ -64,7 +68,7 @@ export class MessageController {
     @Param('ticketId') ticketId: string,
     @Body() createMessageDto: CreateMessageDto,
     @Req() request: Request,
-  ) {
+  ): Promise<HttpResponse<void>> {
     this.logger.log(
       `Request to create message. UserID: ${request.user.id}, TenantID: ${tenantId}`,
     );
@@ -82,6 +86,24 @@ export class MessageController {
         tenantId,
         ipAddress: request.ip,
         userAgent: request.headers['user-agent'],
+      },
+    });
+  }
+
+  @Get()
+  fetchMessages(
+    @Tenant() tenantId: string,
+    @Param('ticketId') ticketId: string,
+    @Req() request: Request,
+  ): Promise<HttpResponse<FetchMessagesOutput[]>> {
+    this.logger.log(
+      `Request to fetch messages. TicketID: ${ticketId}, UserID: ${request.user.id}, TenantID: ${tenantId}`,
+    );
+    return this.fetchMessagesHandler.handle({
+      fetchMessagesInput: {
+        tenantId,
+        ticketId,
+        userId: request.user.id,
       },
     });
   }
