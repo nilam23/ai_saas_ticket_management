@@ -104,6 +104,7 @@ export class MessageController {
         tenantId,
         ticketId,
         userId: request.user.id,
+        userRole: request.user.role,
       },
     });
   }

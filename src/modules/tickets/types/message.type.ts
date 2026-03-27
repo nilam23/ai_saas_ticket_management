@@ -1,4 +1,4 @@
-import { AiResponseStatus, SenderType } from '@prisma/client';
+import { AiResponseStatus, SenderType, UserRole } from '@prisma/client';
 import { AgentReviewAction } from '../enums/message.enum';
 
 export type CreateMessageInput = {
@@ -67,12 +67,13 @@ export type FetchMessagesInput = {
   tenantId: string;
   ticketId: string;
   userId: string;
+  userRole: UserRole;
 };
 
 export type FetchMessagesOutput = {
   id: string;
   senderId: string | null;
   senderType: SenderType;
-  content: string | null; // needs change
+  content: string;
   createdAt: Date;
 };

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Message, Prisma } from '@prisma/client';
+import { AiResponseStatus, Message, Prisma, UserRole } from '@prisma/client';
 import { PrismaService } from 'src/infra/prisma/prisma.service';
 import {
   CreateMessageInput,
@@ -72,6 +72,21 @@ export class MessageRepository {
     return this.prisma.message.findMany({
       where: {
         ticketId: fetchMessagesInput.ticketId,
+        ...(fetchMessagesInput.userRole === UserRole.CUSTOMER && {
+          OR: [
+            {
+              aiResponseStatus: {
+                notIn: [
+                  AiResponseStatus.FAILED,
+                  AiResponseStatus.QUEUE_FOR_REVIEW,
+                ],
+              },
+            },
+            {
+              aiResponseStatus: null,
+            },
+          ],
+        }),
       },
       select: {
         id: true,
@@ -83,6 +98,6 @@ export class MessageRepository {
       orderBy: {
         createdAt: 'desc',
       },
-    });
+    }) as Promise<FetchMessagesOutput[]>;
   }
 }
