@@ -70,3 +70,8 @@ npm run start
 # watch mode
 npm run start:dev
 ```
+
+## Tenant-aware local requests
+Because tenant is resolved from Host, ensure your HTTP client sets a tenant subdomain host:
+- Example: `acme.localhost:3002`
+- For tools that don’t support arbitrary Host headers, add an entry to `/etc/hosts` mapping a fake domain to `127.0.0.1`.

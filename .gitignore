@@ -15,5 +15,4 @@ prisma/dev.db
 prisma/dev.db-journal
 .DS_Store
 .vscode
-producer.kafka
 .docs

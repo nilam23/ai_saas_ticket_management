@@ -1,0 +1,44 @@
+PRODUCER keyed-message 
+topic: event-bus
+key: tz4a98xxat96iws9zmbrgj3a
+{
+  "id": "tz4a98xxat96iws9zmbrgj3a",
+  "name": "TICKET_CLASSIFIED",
+  "occurredAt": "2026-03-08T10:00:00.000Z",
+  "payload": {
+    "tenantId": "913869e5-3106-4fe6-8165-550bb0bcbfef",
+    "ticketId": "8adab765-4c51-4fdc-b2c5-6cd4485fac84"
+  }
+}
+
+###
+
+PRODUCER keyed-message
+topic: event-bus
+key: nc6bzmkmd014706rfda898to
+{
+  "id": "nc6bzmkmd014706rfda898to",
+  "name": "TENANT_DOC_UPLOADED",
+  "occurredAt": "2026-03-12T10:00:00.000Z",
+	"payload": {
+	    "tenantId": "07b95ced-d84e-4c8d-995a-7101c5f436c7",
+	    "docId": "f0d8720f-630d-47ac-abc1-6418ef380fd3",
+	    "fileKey": "tenant-docs/07b95ced-d84e-4c8d-995a-7101c5f436c7/2026-03-11/billing_policy.pdf"
+	  }
+}
+
+###
+
+PRODUCER keyed-message
+topic: event-bus
+key: pfh0haxfpzowht3oi213cqos
+{
+  "id": "pfh0haxfpzowht3oi213cqos",
+  "name": "TICKET_ASSIGNED",
+  "occurredAt": "2026-03-17T10:00:00.000Z",
+	"payload": {
+	    "tenantId": "91e1d98b-bab1-4821-ace0-243fac88bf63",
+	    "ticketId": "c6fe906c-f54c-4770-9a9e-92e1b1a1da97",
+	    "message": "Can I use debit card for payments?"
+	  }
+}
