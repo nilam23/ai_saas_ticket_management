@@ -25,6 +25,7 @@ import { FetchTicketsHandler } from './handlers/api/get-tickets.handler';
 import { MessageController } from './message.controller';
 import { CreateMessageHandler } from './handlers/api/create-message.handler';
 import { FetchMessagesHandler } from './handlers/api/view-messages.handler';
+import { UpdateTicketStatusHandler } from './handlers/api/update-ticket-status.handler';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { FetchMessagesHandler } from './handlers/api/view-messages.handler';
     FetchTicketsHandler,
     CreateMessageHandler,
     FetchMessagesHandler,
+    UpdateTicketStatusHandler,
   ],
   exports: [TicketService, TicketRepository],
 })

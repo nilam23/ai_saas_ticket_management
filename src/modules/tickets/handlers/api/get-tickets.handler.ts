@@ -25,7 +25,7 @@ export class FetchTicketsHandler extends BaseHttpHandler<
     const { fetchTicketsInput } = event;
     try {
       this.logger.debug(
-        `Handling request to fetch tickets. <UserID: ${fetchTicketsInput.userId}, TenantID: ${fetchTicketsInput.tenantId}`,
+        `Handling request to fetch tickets. UserID: ${fetchTicketsInput.userId}, TenantID: ${fetchTicketsInput.tenantId}`,
       );
       const tickets = await this.ticketService.fetchTickets(fetchTicketsInput);
       this.logger.debug(

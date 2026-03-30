@@ -106,6 +106,7 @@ export class TicketService {
 
   public async updateTicket(
     updateTicketInput: UpdateTicketInput,
+    auditContext?: AuditContext,
   ): Promise<Ticket> {
     const filterQuery: UpdateTicketFilterQuery = {
       id: updateTicketInput.ticketId,
@@ -143,6 +144,19 @@ export class TicketService {
     this.logger.debug(
       `Ticket updated. TicketID: ${updateTicketInput.ticketId}`,
     );
+
+    if (auditContext) {
+      await this.auditService.createAuditLog({
+        tenantId: updateTicketInput.tenantId,
+        actorUserId: auditContext.actorUserId!,
+        action: AuditLogAction.UPDATE_TICKET,
+        entityType: AuditLogEntityType.TICKET,
+        entityId: updatedTicket.id,
+        afterState: updatedTicket,
+        ipAddress: auditContext.ipAddress,
+        userAgent: auditContext.userAgent,
+      });
+    }
 
     return updatedTicket;
   }

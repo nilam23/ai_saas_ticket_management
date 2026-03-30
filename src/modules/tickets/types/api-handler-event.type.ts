@@ -1,5 +1,9 @@
 import { AuditContext } from 'src/modules/audit/types/audit.type';
-import { CreateTicketInput, FetchTicketsInput } from './ticket.type';
+import {
+  CreateTicketInput,
+  FetchTicketsInput,
+  UpdateTicketInput,
+} from './ticket.type';
 import {
   CreateMessageInput,
   FetchMessagesInput,
@@ -27,4 +31,9 @@ export type CreateMessageApiHandlerEvent = {
 
 export type FetchMessagesApiHandlerEvent = {
   fetchMessagesInput: FetchMessagesInput;
+};
+
+export type UpdateTicketStatusApiHandlerEvent = {
+  updateTicketStatusInput: UpdateTicketInput;
+  auditContext: AuditContext;
 };
